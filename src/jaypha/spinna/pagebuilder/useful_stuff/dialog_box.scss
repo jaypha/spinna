@@ -1,0 +1,24 @@
+/* jqModal base Styling courtesy of;
+	Brice Burgess <bhb@iceburg.net> */
+
+/* The Window's CSS z-index value is respected (takes priority). If none is supplied,
+	the Window's z-index value will be set to 3000 by default (via jqModal.js). */
+	
+.jqmWindow
+{
+  display: none;
+
+  position: fixed;
+  top: 17%;
+  left: 50%;
+
+  margin-left: -300px;
+  width: 600px;
+
+  background-color: white;
+  color: #25408F;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px #666;
+}
+
+.jqmOverlay { background-color: #000; }

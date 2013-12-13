@@ -1,0 +1,19 @@
+jaypha.conv
+
+by Jason den Dulk
+
+Conversion routines
+
+===bin2hex===
+
+Converts an integer to a string of hex characters
+
+====synopsis====
+
+stringbin2hex(uint i)
+
+====example====
+
+assert(bin2hex(10) == "0000000A");
+assert(bin2hex(0xB4C58A6E) == "B4C58A6E");
+

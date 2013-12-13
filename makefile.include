@@ -1,0 +1,16 @@
+
+LIBDIR = /usr/local/lib /usr/lib64/mysql $(SPINNA_ROOT)/lib
+LIBS = fcgi fig mysqlclient
+
+
+LIBFLAGS= $(addprefix -L-l,$(LIBS)) $(addprefix -L-L,$(LIBDIR))
+
+JFLAGS = $(addprefix -J,$(IMPDIR)) -J$(SPINNA_ROOT)/src
+IFLAGS = $(addprefix -I,$(IMPDIR)) -I$(SPINNA_ROOT)/src
+
+
+JSFILES = $(SPINNA_ROOT)/import/jaypha/spinna/pagebuilder/widgets/widgets.js \
+          $(SPINNA_ROOT)/import/jaypha/spinna/pagebuilder/useful_stuff/dialog_box.js \
+
+SCSSFILES = $(SPINNA_ROOT)/import/jaypha/spinna/pagebuilder/widgets/widgets.scss \
+           $(SPINNA_ROOT)/import/jaypha/spinna/pagebuilder/useful_stuff/dialog_box.scss \

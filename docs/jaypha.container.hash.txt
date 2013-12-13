@@ -1,0 +1,95 @@
+jaypha.container.hash
+
+by Jason den Dulk
+
+Defines a multi-value Hash container.
+
+== struct Hash(T) ==
+
+A string hash table for elements of type T. It works similar to an associative
+array, but can store more than one value for a key.
+
+Internally the values are stored as a 2D associative array which can be
+accessed with the ``all`` property. 1D array functionality is mimiced for
+the common case of one value for an index. In the case where 1D style
+access is made to a key with more than one value, the first value is
+used.
+
+Example. For a Hash ``x``, corresponding to ``a=2&b=3&a=5``.
+- ``x["a"]`` will return ``"2"`` (the first (usually the only) value for "a").
+- ``x("a")`` will return ``["2","5"]`` (all the values for "a" in an array).
+- ``x["a"] = "y"`` Assigns "y" to "a".
+- ``x("a")`` now returns ``["y"]``.
+- ``x["a"] = ["y","x"]`` Assigns ["y","x"] to "a".
+- ``x("a")`` now returns ``["y","x"]`` and ``x["a"]`` returns ``"y"``.
+- ``x.add("a","z")`` appends "z" to "a".
+- ``x("a")`` now returns ``["y","x","z"]``.
+- ``x["b"]`` returns ``"3"``, while ``x("b")`` returns ``["3"]``.
+- ``x.length`` returns 2. ``x("a").length`` returns 3. ``x("b").length`` returns 1.
+
+
+===Methods===
+
+- this(this)
+
+Deep copy constructor.
+
+- @property T[][string] all()
+
+Returns contents as a 2D associative array.
+
+- @property int length()
+
+Number of keys used.
+
+- @property string[] keys()
+
+The keys as an array.
+
+- @property T[][] values()
+
+The values as a 2D array with no keys.
+
+- T[] opCall(string ``key``)
+
+Returns all contents for key ``key``.
+
+-T opIndex(string ``key``)
+
+Returns first content for key ``key``.
+
+-void opIndexAssign(T value, string key)
+
+Assigns ``value`` to the key ``key``, replacing existing contents.
+
+-void opIndexAssign(T[] ``value``, string ``key``)
+
+Assigns the array ``value`` to the key ``key``, replacing existing contents.
+
+-T[]* opIn_r(string ``key``)
+
+Returns pointer to contents for key ``key``, or ``null`` if ``key`` is not a valid key.
+
+-Hash!(T) rehash()
+
+Re hashes the container.
+
+-void add(string ``key``, T ``value``)
+
+Appends ``value`` to the key ``key``.
+
+- void remove(string ``key``)
+
+Removes key ``key`` and its contents.
+
+- int opApply(int delegate(ref T[]) ``dg``)
+
+Allows foreach over values. Elements are arrays, so all stored values can be accessed.
+
+- int opApply(int delegate(ref string, ref T[]) ``dg``)
+
+Same as above but supplies keys as well.
+
+== alias Hash!string StrHash ==
+
+Convenience type for string hash tables.

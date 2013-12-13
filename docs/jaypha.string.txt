@@ -1,0 +1,58 @@
+jaypha.string
+
+by Jason den Dulk
+
+Defines serveral functions used with strings.
+
+===splitup===
+
+Splits a string into substrings based on a group of possible delimiters.
+
+====synopsis====
+
+inout(char)[][] splitup(inout(char)[] text, inout(char)[] delimiters)
+
+====parameters====
+
+- text: The text to be split up.
+- delimiters: A string containing characters that act as delimiters.
+Each character is a separate delimiters.
+
+====returns====
+
+An array of strings containing the substrings.
+
+====example====
+
+auto result = splitup("abcdef","cf");
+assert(result.length == 3);
+assert(result[0] == "ab");
+assert(result[1] == "de");
+assert(result[2] == "");
+
+------------------------------------------------------------------------------
+
+===to_camel_case===
+
+Converts a string into camel case. Both '_' and ' ' are recognised as
+seperaters.
+
+====synopsis====
+
+@trusted pure nothrow immutable(C)[] to_camel_case(C = char)(const(C)[] text, bool first = true)
+  if (isSomeChar!C)
+
+====parameters====
+
+- text: The text to be converted.
+- first: If true, the first character will be converted.
+
+====returns====
+
+The converted string.
+
+====example====
+
+assert(to_camel_case("abc_def pip") == "AbcDefPip");
+assert(to_camel_case("xyz_tob", false) == "xyzTob");
+assert(to_camel_case("123_456") == "123456");

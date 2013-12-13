@@ -1,0 +1,62 @@
+
+
+
+.boolean-widget
+{
+  border-radius:4px;
+  padding: 2px;
+  font-family: arial;
+  font-size: 11px;
+  cursor: default;
+  width: 30px;
+  height:12px;
+  text-align:center;
+  background-color: white;
+}
+
+.boolean-widget .false-setting, .boolean-widget .true-setting
+{
+  display: none;
+}
+
+.boolean-widget, .string-widget, .content-widget,.selector-search, .selector-box,
+.sort-widget
+{
+  border-radius:4px;
+  padding: 2px;
+}
+
+/* Selector ---------------------------------------------------------------------*/
+
+.selector-box
+{
+  overflow: auto;
+  margin:0;
+  list-style: none;
+}
+
+.selector-search-empty
+{
+  color: grey;
+}
+
+.selector-widget td
+{
+  vertical-align: top;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.selector-search
+{
+  border: 1px solid;
+}
+
+/* Sort --------------------------------------------------------------------------*/
+
+.sort-widget
+{
+  list-style: none;
+  border: 1px solid;
+  cursor: default;
+}
