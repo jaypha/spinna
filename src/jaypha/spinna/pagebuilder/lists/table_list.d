@@ -11,9 +11,10 @@ import jaypha.spinna.pagebuilder.lists.column;
 import std.range;
 import jaypha.types;
 
-class TableList(R) : Component if (is (ElementType!R ==strstr))
+class TableList(R) : Component // has an element type.
 {
-  Column[] columns;
+  alias E ElementType!R;
+  Column!E[] columns;
 
   HtmlTable table;
   string name;

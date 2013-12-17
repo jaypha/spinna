@@ -5,17 +5,17 @@ import std.array;
 import jaypha.types;
 
 
-struct Column
+struct Column(T = strstr)  // T must have op[](string) defined
 {
   string name;
   string label;
 
-  string delegate(ref Column, strstr) itemfn = null;
-  string delegate(ref Column, strstr, string) linkfn = null;
+  string delegate(ref Column!T, T) itemfn = null;
+  string delegate(ref Column!T, T, string) linkfn = null;
 
   @property header() { return label; }
 
-  this(string n, string l, string delegate(ref Column, strstr) i = null, string delegate(ref Column, strstr, string) lk = null )
+  this(string n, string l, string delegate(ref Column!T, T) i = null, string delegate(ref Column!T, T, string) lk = null )
   { 
     name = n;
     label = l;
@@ -23,7 +23,7 @@ struct Column
     linkfn = lk;
   }
 
-  string content(strstr data)
+  string content(T data)
   {
     string item = replace(itemfn?itemfn(this,data):data[name],"\n","<br/>");
 
