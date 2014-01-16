@@ -130,9 +130,9 @@ struct HttpResponse
 
   //---------------------------------------------------------------------------
 
-  void redirect(string url)
+  void redirect(string url, int http_status = 303)
   {
-    status(303);
+    status(http_status);
     header("Location",url);
   }
 
@@ -156,10 +156,7 @@ unittest
   response.content_type("text/plain");
   response.status(202, "yahoo");
   response.header("X-Content", "just");
-  response.no_cache();
   response.copy(napp);
 
-  write(cast(string)napp.data);
-
-//  assert(napp.data == cast(ByteArray)("HTTP/1.1 202 yahoo\r\nContent-Type: text/plain\r\nX-Content: just\r\n\r\nHello Goodbye\n"));
+  assert(cast(string)napp.data == "Content-Type: text/plain\r\nStatus: 202 yahoo\r\nX-Content: just\r\n\r\nHello Goodbye\n");
 }

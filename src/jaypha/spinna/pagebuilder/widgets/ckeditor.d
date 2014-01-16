@@ -1,4 +1,4 @@
-module jaypha.spinna.pagebuilder.widgets.markitup;
+module jaypha.spinna.pagebuilder.widgets.ckeditor;
 
 public import jaypha.spinna.pagebuilder.widgets.text;
 

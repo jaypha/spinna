@@ -30,6 +30,21 @@ function add_selector_widget(n,l,f,b,t)
   widgets[f].push(new SelectorWidget(n,l,f,b,t));
 }
 
+function add_integer_widget(n,l,f,r,b,t)
+{
+  widgets[f].push(new IntegerWidget(n,l,f,r,b,t));
+}
+
+function add_radiogroup_widget(n,l,f,r)
+{
+  widgets[f].push(new RadioGroupWidget(n, l, f, r));
+}
+
+function add_decimal_widget(n,l,f,r,s,b,t)
+{
+  alert("add_decimal_widget: TODO");
+}
+
 /*****************************************************************************
  *
  * Validation
@@ -114,6 +129,63 @@ StringWidget.prototype.validate = function()
 
 /*****************************************************************************
  *
+ * Integer Widget
+ *
+ ****************************************************************************/
+
+function IntegerWidget(n, l, f, r, b, t)
+{
+  this.nam = n;
+  this.lab = l;
+  this.fid = f;
+  this.req = r;
+  this.min = b;
+  this.max = t;
+}
+
+IntegerWidget.prototype.validate = function()
+{
+  var msg = null;
+
+  var v = $("#"+this.fid+"-"+this.nam).val();
+
+  if (v == "")
+  {
+    if (this.req)
+    {
+      msg = '"'+this.lab + '" cannot be empty';
+    }
+  }
+  else
+  {
+    if (!(/^(\+|-)?(\d+)$/.test(v)))
+    {
+      msg = '"'+this.lab + '" must be a valid integer';
+    }
+    v = parseInt(v,10); // Explicity give radix, just in case.
+    
+    if (msg === null && this.min !== null)
+    {
+      if (v < this.min)
+        msg = '"'+this.lab + '" cannot be less than ' + this.min;
+    }
+    if (msg === null && this.max !== null)
+    {
+      if (v > this.max)
+        msg = '"'+this.lab + '" cannot be more than ' + this.max;
+    }
+  }
+
+  if (msg !== null)
+    $("#"+this.fid+" ."+this.nam+"-valid-indicator").addClass("bad-input");
+  else
+    $("#"+this.fid+" ."+this.nam+"-valid-indicator").removeClass("bad-input");
+
+  return msg;
+}
+
+/*****************************************************************************
+ *
  * Boolean Widget
  *
  ****************************************************************************/
@@ -132,7 +204,6 @@ function BooleanWidget(n, l, f, r)
 function set_boolean(fid,nam)
 {
   var v = $("#"+fid+"-"+nam+" input").val();
-  alert(v);
   if (v == "0") $("#"+fid+"-"+nam+" .false-setting").show();
   else if (v == "1") $("#"+fid+"-"+nam+" .true-setting").show();
 }
@@ -159,9 +230,9 @@ BooleanWidget.prototype.validate = function()
 
   if (this.req == true)
   {
-    if (v == "")
+    if (v == "0")
     {
-      msg = '"'+this.lab + '" cannot be empty';
+      msg = '"'+this.lab + '" must be set to "Yes"';
     }
   }
   if (msg != null)
@@ -186,7 +257,7 @@ function SelectorWidget(n,l,f,b,t)
   this.min = b;
   this.max = t;
 
-  var id = f.id + "-" + n;
+  var id = f + "-" + n;
   var wgt = $("#"+id);
   var obj = this;
 
@@ -206,9 +277,9 @@ function SelectorWidget(n,l,f,b,t)
     sv.click(function() { obj.unsel(v); });
     sv.get(0).selector_value = v;
     if ($(this).prop("checked"))
-      uv.hide();
+      sv.show();
     else
-      sv.hide();
+      uv.show();
   });
 
   var x = $(".selector-search", wgt);
@@ -311,6 +382,68 @@ SelectorWidget.prototype.validate = function()
 
 /******************************************************************************
  *
+ * RadioGroup Widget
+ *
+ *****************************************************************************/
+
+function RadioGroupWidget(n, l, f, r)
+{
+  this.nam = n;
+  this.lab = l;
+  this.fid = f;
+  this.req=r;
+
+  var id = f + "-" + n;
+  var wgt = $("#"+id);
+
+  $("#"+f+"-"+n+" label").each(function()
+  {
+    if ($("#"+$(this).attr("for")).prop("checked"))
+      $(this).addClass("selected");
+  });
+
+  $('input', wgt).change(function()
+  {
+    var id = $(this).attr("id");
+
+    $('label', wgt).each(function()
+    {
+      if ($(this).attr('for') == id)
+        $(this).addClass("selected");
+      else
+        $(this).removeClass("selected");
+    });
+  });
+}
+
+RadioGroupWidget.prototype.validate = function()
+{
+  var msg = null;
+
+  if (this.req)
+  {
+    var has_value = false;
+    $("#"+this.fid+"-"+this.nam+" input").each(function()
+    {
+      if ($(this).prop("checked"))
+        has_value = true;
+    });
+    if (!has_value)
+    {
+      msg = '"'+this.lab + '" must have a value selected';
+    }
+  }
+
+  if (msg !== null)
+    $("#"+this.fid+" ."+this.nam+"-valid-indicator").addClass("bad-input");
+  else
+    $("#"+this.fid+" ."+this.nam+"-valid-indicator").removeClass("bad-input");
+
+  return msg;
+}
+
+/******************************************************************************
+ *
  * Sort Widget
  *
  *****************************************************************************/
@@ -373,17 +506,22 @@ $(function()
   (
     function()
     {
-      var v = $("input",$(this)).val();
-      if (v == '')
-      {
-        $(".true-setting",$(this)).toggle();
-        $("input",$(this)).val(1);
-      }
-      else
-      {
-        $(".true-setting",$(this)).toggle(); $(".false-setting",$(this)).toggle();
-        $("input",$(this)).val(1-$("input",$(this)).val());
-      }
+      $(".true-setting",$(this)).toggle(); $(".false-setting",$(this)).toggle();
+      $("input",$(this)).val(1-$("input",$(this)).val());
+    }
+  );
+
+  $(".integer-widget").keypress
+  (
+    function(event)
+    {
+      var c = event.which;
+      var wgt = $(event.target);
+      if (c == 0) return; // Home. End, Arrows etc.
+      if (c == '\b'.charCodeAt(0)) return; // Backspace
+      if (wgt.val() == '' && (c == '-'.charCodeAt(0) || c == '+'.charCodeAt(0))) return;
+      if (c < '0'.charCodeAt(0) || c > '9'.charCodeAt(0))
+        event.preventDefault();
     }
   );
 });

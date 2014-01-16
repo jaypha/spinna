@@ -112,7 +112,7 @@ void main(string[] args)
   }
 
   if (!quiet) writeln("Running post db make.");
-  post_db_make(quiet, dry_run, show_sql);
+  post_db_make(db_connection, quiet, dry_run, show_sql);
 }
 
 //-----------------------------------------------------------------------------

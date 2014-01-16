@@ -22,6 +22,8 @@ import std.algorithm;
 
 struct MySqlDatabase
 {
+  alias MySQLRange ResultType;
+
   string host;
   string dbname;
   string username;
@@ -111,34 +113,12 @@ struct MySqlDatabase
   // General query function. Can be used with both retrieval and modification.
   //---------------------------------------------------------------------------
 
-  auto query(string sql)
+  ResultType query(string sql)
   {
-    struct MySQLRange
-    {
-      MYSQL_RES* res;
-      string[string] row = null;
-      this(MYSQL_RES* r)
-      {
-        res = r;
-
-        if (r !is null) 
-          popFront();
-      }
-      @property bool empty() { return row is null; }
-      @property string[string] front() { return row; }
-      void popFront()
-      {
-
-        row = get_row(res);
-
-        if (row is null)
-          mysql_free_result(res);
-      }
-    }
 
     MYSQL_RES* res = query_raw(sql);
 
-    return MySQLRange(res);
+    return ResultType(res);
   }
 
   //---------------------------------------------------------------------------
@@ -340,7 +320,7 @@ struct MySqlDatabase
   }
 
   //---------------------------------------------------------------------------
-  // Shortcuts for using ids
+  // Shortcuts for use with ids
   //---------------------------------------------------------------------------
 
   //---------------------------------------------------------------------------
@@ -407,7 +387,39 @@ struct MySqlDatabase
 
     return res;
   }
-  
+
+  struct MySQLRange
+  {
+    this(MYSQL_RES* r)
+    {
+      res = r;
+
+      if (r !is null)
+        popFront();
+    }
+    @property bool empty() { return row is null; }
+    @property string[string] front() { return row; }
+
+    void popFront()
+    {
+      row = get_row(res);
+      if (row is null)
+      {
+        mysql_free_result(res);
+        res = null;
+      }
+    }
+
+    private:
+      MYSQL_RES* res;
+      string[string] row = null;
+  }
+
+  void cancel(ref ResultType r)
+  {
+    mysql_free_result(r.res);
+  }
+
   private:
 
     MYSQL* mysql = null;

@@ -62,7 +62,7 @@ class DelegateComponent : Component
 {
   this(void delegate(TextOutputStream) d_) { d = d_; }
   
-  void delegate(TextOutputStream) d;
+  protected void delegate(TextOutputStream) d;
 
   override void copy(TextOutputStream output)
   {

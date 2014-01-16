@@ -10,18 +10,24 @@ public import jaypha.types;
 import std.algorithm;
 import jaypha.algorithm;
 
-import std.stdio;
-struct Catalogue(string table_prefix, DB)
+import jaypha.dbms.dynamic_query;
+
+struct Catalogue(string table_prefix, Database)
 {
-  this(ref DB _database) { database = _database; }
+  this(ref Database _database) { database = _database; }
 
   //-----------------------------------------------------------------------------
   // Items
   //-----------------------------------------------------------------------------
 
+  bool exists(ulong id)
+  {
+    return (get(id) !is null);
+  }
+
   strstr get(ulong id)
   {
-    return database.get(table_prefix ~ "_catalogue", id);
+    return database.query_row("select * from "~table_prefix ~ "_catalogue where id="~to!string(id));
   }
 
   //-----------------------------------------------------------------------------
@@ -35,15 +41,19 @@ struct Catalogue(string table_prefix, DB)
 
   ulong save(ulong id, strstr data)
   {
-    data["uri_title"] = get_uri_title(data["title"]);
+    if ("title" in data)
+      data["uri_title"] = get_uri_title(data["title"]);
     
     if (id)
     {
-      auto oldtitle = database.query_value("select uri_title from " ~ table_prefix ~ "_catalogue where id="~to!string(id));
-      if (oldtitle != data["uri_title"])
+      if ("title" in data)
       {
-        database.query("update " ~ table_prefix ~ "_uri_redirect set newtitle="~database.quote(data["uri_title"])~" where newtitle="~database.quote(oldtitle));
-        database.quick_insert(table_prefix ~ "_uri_redirect", ["oldtitle":oldtitle, "newtitle":data["uri_title"]]);
+        auto oldtitle = database.query_value("select uri_title from " ~ table_prefix ~ "_catalogue where id="~to!string(id));
+        if (oldtitle != data["uri_title"])
+        {
+          database.query("update " ~ table_prefix ~ "_uri_redirect set newtitle="~database.quote(data["uri_title"])~" where newtitle="~database.quote(oldtitle));
+          database.quick_insert(table_prefix ~ "_uri_redirect", ["oldtitle":oldtitle, "newtitle":data["uri_title"]]);
+        }
       }
       database.set(table_prefix ~ "_catalogue", data, id);
     }
@@ -61,20 +71,29 @@ struct Catalogue(string table_prefix, DB)
 
   //-----------------------------------------------------------------------------
 
-  auto get_items()
+  auto get_items(bool categories_also = false)
   {
-    return database.query("select * from " ~ table_prefix ~ "_catalogue where type='item' order by title");
+    DynamicQuery dq;
+    dq.table = table_prefix ~ "_catalogue";
+    if (!categories_also)
+      dq.wheres ~= "type='item'";
+    dq.add_sorting("title");
+    return dq;
   }
 
   //-----------------------------------------------------------------------------
 
   auto get_categories()
   {
-    return database.query("select * from " ~ table_prefix ~ "_catalogue where type='category' order by title");
+    DynamicQuery dq;
+    dq.table = table_prefix ~ "_catalogue";
+    dq.wheres ~= "type='category'";
+    dq.add_sorting("title");
+    return dq;
   }
 
   //-----------------------------------------------------------------------------
-
+/*
   auto get_items_in_category_as_range(ulong category_id, bool visible_only = true)
   {
     return database.query
@@ -82,6 +101,18 @@ struct Catalogue(string table_prefix, DB)
       "select * from " ~ table_prefix ~ "_catalogue as I "
       "left_join " ~ table_prefix ~ "_links as L on (L.item = I.id) where category="~to!string(category_id)~(visible_only?" and visible=1":"")~" order by L.list_order"
     );
+  }
+*/
+  auto get_items_in_category_as_query(ulong category_id, bool visible_only = true)
+  {
+    DynamicQuery dq;
+    dq.table = table_prefix ~ "_links as L";
+    dq.add_table(table_prefix ~ "_catalogue as I", dq.JoinType.Left, "L.item = I.id");
+    dq.wheres ~= "category="~to!string(category_id);
+    if (visible_only)
+      dq.wheres ~= "visible=1";
+    dq.add_sorting("L.list_order");
+    return dq;
   }
 
   //-----------------------------------------------------------------------------
@@ -123,22 +154,24 @@ struct Catalogue(string table_prefix, DB)
   // Categories
   //-----------------------------------------------------------------------------
 
+  // Simple list of items.
   strstr[] get_items_in_category(ulong category_id)
   {
     return database.query_data
     (
-      "select * from " ~ table_prefix ~ "_links as L left join " ~ table_prefix ~ "_catalogue as I "
+      "select I.id,title,short_title from " ~ table_prefix ~ "_links as L left join " ~ table_prefix ~ "_catalogue as I "
       "on (I.id = L.item) where L.category="~to!string(category_id)~" order by L.list_order"
     );
   }
 
   //-----------------------------------------------------------------------------
 
+  // Simple list of categories.
   strstr[] get_categories_for_item(ulong item_id)
   {
     return database.query_data
     (
-      "select * from " ~ table_prefix ~ "_links as L left join " ~ table_prefix ~ "_catalogue as I "
+      "select I.id,title,short_title from " ~ table_prefix ~ "_links as L left join " ~ table_prefix ~ "_catalogue as I "
       " on (I.id = L.category) where L.item="~to!string(item_id)
     );
   }
@@ -211,7 +244,7 @@ struct Catalogue(string table_prefix, DB)
   //-----------------------------------------------------------------------------
 
   private:
-    DB database;
+    Database database;
 }
 
 string get_uri_title(string title)

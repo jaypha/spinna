@@ -36,17 +36,20 @@ class DialogBox(string S) : HtmlElement
 }
 
 
-unittest
+debug(dialog_box)
 {
   import std.stdio;
   import std.array;
 
-  auto x = new DialogBox!("dialog_default.tpl")("x");
+  void main(string[] args)
+  {
+    auto x = new DialogBox!("dialog_default.tpl")("x");
 
-    x.content = "hello";
+      x.content = "hello";
 
-  auto buf = appender!(char[])();
+    auto buf = appender!(char[])();
 
-  x.copy(new TextOutputStream(output_range_stream(buf)));
-  write(buf.data);
+    x.copy(new TextOutputStream(output_range_stream(buf)));
+    write(buf.data);
+  }
 }

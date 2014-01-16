@@ -1,26 +1,42 @@
+/*
+ * Prints out a table of data based on a list given by a data source. Each row is displayed by the
+ * template given.
+ *
+ * Copyhright 2013 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ *
+ * Written in the D programming language.
+ */
+
+/*
+ * page number, num pages and page size are things relevant to the data source.
+ * List Components do not need to know about them in order to work.
+ */
 
 
 module jaypha.spinna.pagebuilder.lists.table_list;
 
-public import jaypha.spinna.pagebuilder.component;
+public import jaypha.spinna.pagebuilder.lists.data_source;
 
 import jaypha.spinna.pagebuilder.htmltable;
-import jaypha.spinna.pagebuilder.lists.column;
 
-//import std.traits;
+import std.traits;
 import std.range;
 import jaypha.types;
 
-class TableList(R) : Component // has an element type.
+class TableList : ListComponent
 {
-  alias E ElementType!R;
-  Column!E[] columns;
-
   HtmlTable table;
   string name;
-  R source;
+  TableSource source;
 
-  this(R s) { table = new HtmlTable(); source = s; }
+  override @property DataSource data_source() { return source; }
+
+  this(string _name, TableSource s) { name = _name; table = new HtmlTable(); source = s; }
 
   override void copy(TextOutputStream output)
   {
@@ -29,15 +45,13 @@ class TableList(R) : Component // has an element type.
     table.id = name~"-table";
 
     auto thr = table.head_row();
-    foreach (i; 0..columns.length)
+    foreach (c; source.headers)
     {
       auto cell = thr.cell();
-      cell.content = columns[i].header;
-      table.column_classes ~= columns[i].name;
-      if (i==0) cell.add_class("left");
-      else if (i == columns.length-1) cell.add_class("right");
-      else cell.add_class("middle");
+      cell.content = c;
     }
+
+    source.reset();
 
     ulong count = 0;
     foreach (row; source)
@@ -47,13 +61,10 @@ class TableList(R) : Component // has an element type.
       if (++count%2 == 0) tbr.add_class("even");
       else tbr.add_class("odd");
 
-      foreach (i; 0..columns.length)
+      foreach (c; row)
       {
         auto cell = tbr.cell();
-        cell.content = columns[i].content(row);
-        if (i==0) cell.add_class("left");
-        else if (i == columns.length-1) cell.add_class("right");
-        else cell.add_class("middle");
+        cell.content = c;
       }
     }
 
@@ -61,9 +72,54 @@ class TableList(R) : Component // has an element type.
   }
 }
 
-auto table_list(R)(R s) { return new TableList!R(s); }
-
 unittest
 {
-  TableList!(string[string][]) tl;
+  class MyTSource : TableSource
+  {
+    this(string[][] _data) { data = _data; }
+
+    @property string[] front() { return data[i+offset]; }
+    @property bool empty() { return i>= psize || i+offset > data.length; }
+    void popFront() { ++i; }
+
+    void set_page_size(ulong size) { psize = (size == 0?data.length:size); }
+    void set_page(ulong num) { offset = psize*(num-1); }
+    @property ulong num_pages() { return (data.length + psize - 1)/psize; }
+
+    @property string[] headers() { return [ "label", "thwonk" ]; }
+
+    void reset() { i = 0; }
+
+    private:
+      string[][] data;
+      ulong i = 0;
+      ulong psize = 0;
+      ulong offset = 0;
+      
+  }
+
+
+  auto output = new TextBuffer!string();
+
+  auto ds = new MyTSource
+  (
+    [
+      [ "hello", "honk" ],
+      [ "beetle", "tonk" ],
+      [ "tweetle", "tank" ],
+      [ "twobird", "crank" ],
+      [ "accost", "plank" ],
+      [ "zigzag", "pluto" ],
+      [ "mumbo", "jumbo" ]
+    ]
+  );
+
+  auto sl = new TableList("tablelist", ds);
+
+  ds.set_page_size(2);
+  ds.set_page(2);
+  assert(ds.num_pages == 4);
+  
+  sl.copy(output);
+  assert(output.data == "<table class='data list' id='tablelist-table'><thead><tr><th>label</th><th>thwonk</th></tr></thead><tbody><tr class='odd'><td>tweetle</td><td>tank</td></tr><tr class='even'><td>twobird</td><td>crank</td></tr></tbody></table>");
 }

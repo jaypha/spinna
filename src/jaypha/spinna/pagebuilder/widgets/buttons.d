@@ -39,7 +39,7 @@ class LinkButton : HtmlElement
   {
     auto x = attributes["onclick"];
     attributes["onclick"] = "var i = confirm('"~w~"'); if (i)  { "~x~"; }";
-    attributes["onclick"] = "return confirm('"~w~"')";
+    //attributes["onclick"] = "return confirm('"~w~"')";
   }
 }
 
@@ -58,7 +58,7 @@ class OpenButton : HtmlElement
   {
     auto x = attributes["onclick"];
     attributes["onclick"] = "var i = confirm('"~w~"'); if (i)  { "~x~"; }";
-    attributes["onclick"] = "return confirm('"~w~"')";
+    //attributes["onclick"] = "return confirm('"~w~"')";
   }
 }
 

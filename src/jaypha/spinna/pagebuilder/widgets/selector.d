@@ -2,6 +2,7 @@
 module jaypha.spinna.pagebuilder.widgets.selector;
 
 public import jaypha.spinna.pagebuilder.widgets.widget;
+public import jaypha.spinna.pagebuilder.widgets.enumerated;
 
 import std.array;
 import std.algorithm;
@@ -9,21 +10,15 @@ import std.conv;
 import jaypha.container.hash;
 
 
-struct SelectorOption
-{
-  string label;
-  string value;
-}
-
-class SelectorWidget(alias Tpl = "jaypha/spinna/pagebuilder/widgets/selector.tpl") : Widget
+class SelectorWidget(string tpl = "jaypha/spinna/pagebuilder/widgets/selector.tpl") : Widget
 {
   class SelectorTpl : Component
   {
-    SelectorOption[] options;
+    EnumeratedOption[] options;
     string[] selected;
     string name;
 
-    mixin TemplateCopy!Tpl;
+    mixin TemplateCopy!tpl;
   }
 
   @property
@@ -40,7 +35,7 @@ class SelectorWidget(alias Tpl = "jaypha/spinna/pagebuilder/widgets/selector.tpl
 
   uint min_options = 0;
   uint max_options = 0;
-  SelectorOption[] options;
+  EnumeratedOption[] options;
   string[] selected;
   
   this(HtmlForm _form, string _name)
@@ -64,10 +59,7 @@ class SelectorWidget(alias Tpl = "jaypha/spinna/pagebuilder/widgets/selector.tpl
   }
 }
 
-string[] extract_selector_value(StrHash request, string name)
+auto selector_widget(string tpl = "jaypha/spinna/pagebuilder/widgets/selector.tpl")(HtmlForm _form, string _name)
 {
-  if (!(name in request))
-    return [];
-  else
-    return request(name);
+  return new SelectorWidget!tpl(_form, _name);
 }

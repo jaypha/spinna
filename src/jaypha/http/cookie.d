@@ -18,8 +18,6 @@ import jaypha.string;
 import std.array;
 import std.string;
 
-import std.stdio;
-
 /*
  * RFC6265 - Cookies
  */

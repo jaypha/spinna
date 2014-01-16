@@ -11,7 +11,7 @@ DFLAGS = $(IFLAGS) $(JFLAGS)
 
 LFLAGS = $(LIBFLAGS)
 
-build: bin lib res/spinna.js res/spinna.scss imgs
+build: bin lib res/spinna.js res/spinna.scss
 
 deps:
 	$(RDMD) $(DFLAGS) --makedepend progs/makerouter.d > deps.include
@@ -57,3 +57,6 @@ res/spinna.scss: $(SCSSFILES)
 	cat $(SCSSFILES) > res/spinna.scss
 
 include deps.include
+
+test:
+	$(RDMD) $(DFLAGS) $(LFLAGS) -J./src_test -unittest src_test/test_main.d

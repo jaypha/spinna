@@ -15,6 +15,11 @@ struct decimal(uint scale)
 
   public:
 
+    // min and max represent the smallest and larget possible values respectively.
+
+    static immutable decimal min = decimal(long.min);
+    static immutable decimal max = decimal(long.max);
+
     decimal opUnary(string s:"-")()
     {
       return decimal(-value);
@@ -31,8 +36,8 @@ struct decimal(uint scale)
     }
 
     bool opEquals(decimal b) { return (value == b.value); }
-    bool opEquals(long b) { return (value == b*factor); }
-    bool opEquals(double b) { return (value == b*factor); }
+    bool opEquals(long b)    { return (value == b*factor); }
+    bool opEquals(double b)  { return ((cast(double)value / factor) == b); }
 
     int opCmp(decimal b)
     {
@@ -72,8 +77,11 @@ struct decimal(uint scale)
       mixin("value = (this "~op~" v).value;");
     }
 
-    T opCast(T)() if (is(T == long) || is(T==double))
+    T opCast(T : long)()
     { return value / factor; }
+
+    T opCast(T : double)()
+    { return (cast(double)value) / factor; }
 
     string toString()
     {
@@ -83,6 +91,8 @@ struct decimal(uint scale)
       else
         return format("0.%0*d",scale,value);
     }
+
+    // Operators for decimal and decimal
 
     decimal opBinary(string s:"+")(decimal b)
     {
@@ -103,6 +113,8 @@ struct decimal(uint scale)
     {
       return decimal(value*factor/b.value);
     }
+
+    // Operators for decimal and long
 
     decimal opBinary(string s:"+")(long b)
     {
@@ -136,6 +148,42 @@ struct decimal(uint scale)
     {
       return decimal(b/value);
     }
+
+    // Operators for decimal and double
+/* TODO
+    decimal opBinary(string s:"+")(double b)
+    {
+      return decimal(value + b*factor);
+    }
+    decimal opBinaryRight(string s:"+")(double b)
+    {
+      return decimal(value + b*factor);
+    }
+    decimal opBinary(string s:"-")(double b)
+    {
+      return decimal(value + b*factor);
+    }
+    decimal opBinaryRight(string s:"-")(double b)
+    {
+      return decimal(b*factor - value);
+    }
+    decimal opBinary(string s:"*")(double b)
+    {
+      return decimal(value*b);
+    }
+    decimal opBinaryRight(string s:"*")(double b)
+    {
+      return decimal(b*value);
+    }
+    decimal opBinary(string s:"/")(double b)
+    {
+      return decimal(value/b);
+    }
+    decimal opBinaryRight(string s:"/")(double b)
+    {
+      return decimal(b/value);
+    }
+*/
 }
 
 
@@ -146,13 +194,20 @@ auto mult(ubyte s1, ubyte s2)(decimal!s1 a, decimal!s2 b)
   return d;
 }
 
-alias decimal!2 Currency;
+alias decimal!1 dec1;
+alias decimal!2 dec2;
 
 //mixin decimalOps!2;
 
 unittest
 {
-  Currency amount;
+  //import std.stdio;
+
+  assert(dec2.min.value == long.min);
+  assert(dec2.max.value == long.max);
+
+  dec2 amount;
+  assert(amount.value == 0);
   amount = 20;
   assert(amount.value == 2000);
 
@@ -167,4 +222,10 @@ unittest
   assert(amount.toString() == "45.0");
   assert(cast(long)amount == 45);
   assert(cast(double)amount == 45.0);
+
+  amount = 0.05;
+  assert(amount.value == 5);
+  assert(amount.toString() == "0.05");
+  assert(cast(long)amount == 0);
+  assert(cast(double)amount == 0.05);
 }

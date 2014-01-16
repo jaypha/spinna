@@ -114,7 +114,7 @@ class HtmlHead : Composite
     }
 
     if (use_jquery || named_onload_scripts.length || ordinary_onload_scripts.length)
-      output.println("<script type='text/javascript' src='" jquery_src "'></script>");
+      output.println("<script type='text/javascript' src='",jquery_src,"'></script>");
     foreach (f;script_files)
       output.println("<script type='text/javascript' src='",f,"'></script>");
 

@@ -1,32 +1,36 @@
 /*
- * Widget for integers
+ * Widget for decimal (fixed point) values.
  *
- * Copyright 2013 Jaypha.
+ * Copyright 2013 Jaypha
  *
  * Distributed under the Boost Software License, Version 1.0.
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
  *
- * Written in the D language.
+ * Written in the D programming language.
  */
 
-module jaypha.spinna.pagebuilder.widgets.integer;
+module jaypha.spinna.pagebuilder.widgets.decimal;
 
 public import jaypha.spinna.pagebuilder.widgets.widget;
+public import jaypha.decimal;
 
 import std.conv;
 
-//----------------------------------------------------------------------------
+import jaypha.container.hash;
 
-class IntegerWidget : Widget
+class DecimalWidget(uint scale) : Widget
 {
+  alias decimal!scale D;
+
   @property
   {
     override string value() { return ("value" in attributes)?attributes["value"]:null; }
-    override void value(string v) { to!long(v); attributes["value"] = v; }
+    override void value(string v) { attributes["value"] = v; }
 
-    void value(long v) { attributes["value"] = to!string(v); }
+    void value(D v) { attributes["value"] = v.toString(); }
+
   }
 
   @property
@@ -41,12 +45,12 @@ class IntegerWidget : Widget
     string _name,
     string _label,
     bool _required,
-    long _min = long.min,
-    long _max = long.max
+    D _min = D.min,
+    D _max = D.max
   )
   {
     super(_form, _name,"input");
-    add_class("integer-widget");
+    add_class("decimal-widget");
     label = _label;
     required = _required;
     min_value = _min;
@@ -55,10 +59,10 @@ class IntegerWidget : Widget
 
   override void copy(TextOutputStream output)
   {
-    form.doc.page_head.add_script("add_integer_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~","~(min_value == long.min?"null":to!string(min_value))~","~(max_value == long.max?"null":to!string(max_value))~");");
+    form.doc.page_head.add_script("add_decimal_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~","~min_value.toString()~","~max_value.toString()~");");
     super.copy(output);
   }
 
-  long min_value;
-  long max_value;
+  D min_value;
+  D max_value;
 }

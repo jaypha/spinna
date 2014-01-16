@@ -9,8 +9,8 @@ JFLAGS = $(addprefix -J,$(IMPDIR)) -J$(SPINNA_ROOT)/src
 IFLAGS = $(addprefix -I,$(IMPDIR)) -I$(SPINNA_ROOT)/src
 
 
-JSFILES = $(SPINNA_ROOT)/import/jaypha/spinna/pagebuilder/widgets/widgets.js \
-          $(SPINNA_ROOT)/import/jaypha/spinna/pagebuilder/useful_stuff/dialog_box.js \
+JSFILES = $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/widgets.js \
+          $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/useful_stuff/dialog_box.js \
 
-SCSSFILES = $(SPINNA_ROOT)/import/jaypha/spinna/pagebuilder/widgets/widgets.scss \
-           $(SPINNA_ROOT)/import/jaypha/spinna/pagebuilder/useful_stuff/dialog_box.scss \
+SCSSFILES = $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/widgets.scss \
+           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/useful_stuff/dialog_box.scss \

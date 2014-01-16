@@ -1,5 +1,7 @@
+.toolbar * { margin-left: 5px; }
+.toolbar *:first-child { margin-left: 0; }
 
-
+/* Selector ---------------------------------------------------------------------*/
 
 .boolean-widget
 {
@@ -17,13 +19,6 @@
 .boolean-widget .false-setting, .boolean-widget .true-setting
 {
   display: none;
-}
-
-.boolean-widget, .string-widget, .content-widget,.selector-search, .selector-box,
-.sort-widget
-{
-  border-radius:4px;
-  padding: 2px;
 }
 
 /* Selector ---------------------------------------------------------------------*/
@@ -47,9 +42,9 @@
   padding-bottom: 5px;
 }
 
-.selector-search
+.selector-box li:hover
 {
-  border: 1px solid;
+  cursor: pointer;
 }
 
 /* Sort --------------------------------------------------------------------------*/
@@ -57,6 +52,22 @@
 .sort-widget
 {
   list-style: none;
-  border: 1px solid;
   cursor: default;
 }
+
+
+.radiogroup-widget
+{
+  display:inline-block;
+  cursor:default;
+}
+
+.radiogroup-widget input { display: none; }
+
+.radiogroup-widget label
+{
+  display:inline-block;
+  padding: 5px 10px;
+}
+
+.radiogroup-widget label:first-child { border-left: none; }

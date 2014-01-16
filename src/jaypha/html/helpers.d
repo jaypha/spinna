@@ -2,7 +2,7 @@
 
 module jaypha.html.helpers;
 
-import jaypha.html.entity;
+public import jaypha.html.entity;
 
 import std.array;
 
@@ -28,6 +28,22 @@ string nltobr(string text)
 }
 
 //-----------------------------------------------------------------------------
+
+string html_link(string link, string label = null)
+{
+  return "<a href='"~link~"'>"~((label !is null)?label:link)~"</a>";
+}
+
+//-----------------------------------------------------------------------------
+
+string email_link(string email)
+{
+  auto a = appender!string();
+  a.put("&#x6d;&#x61;&#105;&#108;&#116;&#111;&#x3a;");
+  foreach (c; email)
+    a.put(encode(c));
+  return a.data;
+}
 
 /+
 
