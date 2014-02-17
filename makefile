@@ -9,21 +9,30 @@ include makefile.include
 
 DFLAGS = $(IFLAGS) $(JFLAGS)
 
+RDFLAGS = $(DFLAGS) -release -O
+DDFLAGS = $(DFLAGS) -g -debug
+
 LFLAGS = $(LIBFLAGS)
 
-build: bin lib res/spinna.js res/spinna.scss
+build: bin lib js css
+
+css: res/spinna.scss
+
+js: res/spinna.js
 
 deps:
-	$(RDMD) $(DFLAGS) --makedepend progs/makerouter.d > deps.include
-	$(RDMD) $(DFLAGS) --makedepend progs/dbmake.d >> deps.include
+	$(RDMD) $(RDFLAGS) --makedepend progs/makerouter.d > deps.include
+	echo "	touch progs/makerouter.d" >> deps.include
+	$(RDMD) $(RDFLAGS) --makedepend progs/dbmake.d >> deps.include
+	echo "	touch progs/dbmake.d" >> deps.include
 
 bin: bin/makerouter bin/dbmake
 
 bin/makerouter: progs/makerouter.d lib/libfig.a
-	$(RDMD) $(DFLAGS) $(LFLAGS) -ofbin/makerouter --build-only progs/makerouter.d
+	$(RDMD) $(RDFLAGS) $(LFLAGS) -ofbin/makerouter --build-only progs/makerouter.d
 
 bin/dbmake: progs/dbmake.d lib/libfig.a
-	$(RDMD) $(DFLAGS) $(LFLAGS) -ofbin/dbmake --build-only progs/dbmake.d
+	$(RDMD) $(RDFLAGS) $(LFLAGS) -ofbin/dbmake --build-only progs/dbmake.d
 
 lib: lib/libfig.a
 
@@ -39,9 +48,12 @@ install:
 	cp lib/libfig.a /usr/local/lib
 
 clean:
-	rm bin/makerouter
-	rm bin/dbmake
-	rm lib/libfig.a
+	rm -f bin/makerouter
+	rm -f bin/dbmake
+	rm -f lib/libfig.a
+	rm -f res/spinna.min.js
+	rm -f res/spinna.js
+	rm -f res/spinna.scss
 	pushd progs/fig; make clean
 
 
@@ -59,4 +71,4 @@ res/spinna.scss: $(SCSSFILES)
 include deps.include
 
 test:
-	$(RDMD) $(DFLAGS) $(LFLAGS) -J./src_test -unittest src_test/test_main.d
+	$(RDMD) $(DDFLAGS) $(LFLAGS) -J./src_test -unittest src_test/test_main.d

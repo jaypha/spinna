@@ -114,7 +114,13 @@ string literal(ref ViewDef view_def)
 
 string literal(ref FunctionDef function_def)
 {
-  return "";
+  auto w = appender!string;
+  w.print("FunctionDef(");
+  w.print(quote_str(function_def.name));
+  w.print(",");
+  w.print(quote_str(function_def.def));
+  w.print(")");
+  return w.data;
 }
 
 string quote_str(string s)

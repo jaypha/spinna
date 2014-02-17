@@ -178,9 +178,9 @@ struct Catalogue(string table_prefix, Database)
 
   //-----------------------------------------------------------------------------
 
-  void update_category_items(ulong id, ulong[] list)
+  void update_category_items(ulong category_id, ulong[] list)
   {
-    update_category_list("item", "category", id, list);
+    update_category_list("item", "category", category_id, list);
   }
 
   //-----------------------------------------------------------------------------
@@ -188,6 +188,17 @@ struct Catalogue(string table_prefix, Database)
   void update_item_categories(ulong id, ulong[] list)
   {
     update_category_list("category", "item", id, list);
+  }
+
+  //-----------------------------------------------------------------------------
+
+  void add_item_to_category(ulong category_id, ulong id)
+  {
+    database.query
+    (
+      "insert into " ~ table_prefix ~ "_links (`category`,`item`) values "~
+      "("~to!string(category_id)~","~to!string(id)~")"
+    );
   }
 
   //-----------------------------------------------------------------------------
@@ -238,7 +249,7 @@ struct Catalogue(string table_prefix, Database)
     auto cid=to!string(category_id);
     foreach (i,id ; new_order)
       //writeln("update " ~ table_prefix ~ "_links as L set list_order="~to!string(i)~" where L.category="~cid~" L.item="~to!string(id));
-      database.query("update " ~ table_prefix ~ "_links as L set list_order="~to!string(i)~" where L.category="~cid~" and L.item="~to!string(id));
+      database.query("update " ~ table_prefix ~ "_links set list_order="~to!string(i)~" where category="~cid~" and item="~to!string(id));
   }
 
   //-----------------------------------------------------------------------------

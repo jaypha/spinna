@@ -43,6 +43,11 @@ class LinkButton : HtmlElement
   }
 }
 
+template link_button(string link, string label)
+{
+  enum link_button = "<button class='button-widget' type='button' onclick='document.location=\""~link~"\"'>"~label~"</button>";
+}
+
 class OpenButton : HtmlElement
 {
   this(string link, string label)

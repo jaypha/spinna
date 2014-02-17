@@ -34,7 +34,7 @@ lex.yy.c: tokens.txt
 clean:
 	rm -f testfig
 	rm -f libfig.a
-	rm lex.h
-	rm lex.yy.c
-	rm grammer.h
-	rm grammer.c
+	rm -f lex.h
+	rm -f lex.yy.c
+	rm -f grammer.h
+	rm -f grammer.c

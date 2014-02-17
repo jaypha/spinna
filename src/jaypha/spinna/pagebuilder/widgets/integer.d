@@ -55,10 +55,20 @@ class IntegerWidget : Widget
 
   override void copy(TextOutputStream output)
   {
-    form.doc.page_head.add_script("add_integer_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~","~(min_value == long.min?"null":to!string(min_value))~","~(max_value == long.max?"null":to!string(max_value))~");");
+    //form.doc.page_head.add_script
+    //(
+    //  "add_integer_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~","~(min_value == long.min?"null":to!string(min_value))~","~(max_value == long.max?"null":to!string(max_value))~","~(add_spinner?"true":"false")~");",
+    //  true
+    //);
+    if (add_spinner)
+      output.print("<span class='integer-widget-wrapper' id='",id,"-wrapper'>");
     super.copy(output);
+    if (add_spinner)
+      output.print("<a class='spinner-up'>&#9650;</a><a class='spinner-down'>&#9660;</a></span>");
+    output.print("<script type='text/javascript'>$(function(){add_integer_widget('"~name~"','"~label~"',"~(form is null?"null":"'"~form.id~"'")~",'"~id~"',"~(required?"true":"false")~","~(min_value == long.min?"null":to!string(min_value))~","~(max_value == long.max?"null":to!string(max_value))~","~(add_spinner?"true":"false")~");});</script>");
   }
 
+  bool add_spinner = false;
   long min_value;
   long max_value;
 }

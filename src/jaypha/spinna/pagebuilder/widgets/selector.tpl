@@ -1,6 +1,6 @@
  <table>
   <tr>
-   <td class='left-column'>
+   <td class='left-column' style='vertical-align:bottom'>
     &#8595; Currently Selected 
    </td>
    <td class='right-column'>
@@ -15,7 +15,7 @@
      <%
       foreach (o; options)
       {
-        output.print("<li class='selected-",o.value,"' style='display:none'>",o.label,"</li>");
+        output.print("<li class='selected-",o.value,"' style='display:none'>",encode_special(o.label),"</li>");
       }
      %>
     </ul>
@@ -25,7 +25,7 @@
      <%
       foreach (o; options)
       {
-        output.print("<li class='unselected-",o.value,"' style='display:none'>",o.label,"</li>");
+        output.print("<li class='unselected-",o.value,"' style='display:none'>",encode_special(o.label),"</li>");
       }
      %>
     </ul>

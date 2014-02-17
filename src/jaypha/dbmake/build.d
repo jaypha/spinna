@@ -169,6 +169,8 @@ body
       case "unsigned":
         column.unsigned = true;
         break;
+      case "table":
+        break;
       default:
         throw new Exception("column trait "~n~" not supported");
     }
@@ -193,8 +195,12 @@ void extract_type(ref ColumnDef column, string type)
       column.type = ColumnDef.Type.Int;
       column.unsigned =true;
       break;
-    case "bigint":
+    case "long":
       column.type = ColumnDef.Type.BigInt;
+      break;
+    case "ulong":
+      column.type = ColumnDef.Type.BigInt;
+      column.unsigned =true;
       break;
     case "decimal":
       column.type = ColumnDef.Type.Decimal;
@@ -296,4 +302,22 @@ void build_index_def(ref IndexDef index, Fig_Value source)
     index.fulltext = true;
   else if ("unique" in list)
     index.unique = true;
+}
+
+/*************************************************************************
+ *
+ * Function Definition builders
+ *
+ *************************************************************************/
+
+void build_function_def(ref FunctionDef fn, Fig_Value source)
+in
+{
+  assert(source.is_list());
+  assert("def" in source.get_list());
+}
+body
+{
+  auto list = source.get_list();
+  fn.def = list["def"].get_string();
 }

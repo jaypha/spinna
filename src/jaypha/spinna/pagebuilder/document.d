@@ -1,3 +1,15 @@
+/*
+ * Document Element for HTML.
+ *
+ * Copyright (C) 2014, Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ *
+ * Written in the D language.
+ */
 
 module jaypha.spinna.pagebuilder.document;
 
@@ -11,12 +23,9 @@ public import jaypha.spinna.global;
 import std.array;
 import std.conv;
 
-/*
- * Used to generate an HTML document.
- *
- * Correct XHTML requires an XML declaration, but stupid IE interperets this
- * as quirks mode, so we make it optional.
- */
+//-----------------------------------------------------------------------------
+
+// UTF encoding based on D type.
 
 template utf_enc(S)
 {
@@ -27,6 +36,15 @@ template utf_enc(S)
   else
     enum utf_enc = "utf-32";
 }
+
+//-----------------------------------------------------------------------------
+
+/*
+ * Document is used to generate an HTML document.
+ *
+ * Correct XHTML requires an XML declaration, but stupid IE interperets this
+ * as quirks mode, so we make it optional.
+ */
 
 class Document
 {

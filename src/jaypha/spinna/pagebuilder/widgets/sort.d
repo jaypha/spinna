@@ -2,6 +2,7 @@
 module jaypha.spinna.pagebuilder.widgets.sort;
 
 public import jaypha.spinna.pagebuilder.widgets.widget;
+public import jaypha.spinna.pagebuilder.widgets.enumerated;
 
 import jaypha.html.entity;
 import jaypha.container.hash;
@@ -9,16 +10,9 @@ import jaypha.container.hash;
 import std.algorithm;
 import std.array;
 
-struct SortItem
-{
-  string label;
-  string value;
-}
-
-
 class SortWidget : Widget
 {
-  SortItem[] sort_list;
+  EnumeratedOption[] options;
 
   @property
   {
@@ -44,7 +38,7 @@ class SortWidget : Widget
     form.doc.page_head.add_script("$('#"~id~"').sortable({update: function(e,u){ sort_update('"~id~"','"~name~"','"~form.id~"')}});", true);
 
     auto c = new Composite();
-    foreach (item; sort_list)
+    foreach (item; options)
       c.add("<li id='"~id~"-"~item.value~"'>"~encode_special(item.label)~"</li>");
     content = c;
     super.copy(output);

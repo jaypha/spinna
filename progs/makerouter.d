@@ -38,39 +38,40 @@ void main(string[] args)
 {
   scope(success) { dump(stdout.lockingTextWriter); }
 
-  Figtree figs = read_fig_file(args[1]);
-
-  if ("module" in figs)
-    module_name = figs["module"].get_string();
-
-  if ("preamble" in figs)
-    preamble = figs["preamble"].get_string();
-
-  if ("error" in figs)
-  {
-    error_page = figs["error"].get_string();
-    modules.put(error_page.split(".")[0..$-1].join("."));
-  }
-
   fns["route"] = make!(Queue!(string));
 
-  if ("prefix" in figs)
+  foreach (filename; args[1..$])
   {
-    fns["route"] ~=
-    
-      text
-      (
-        "if (!startsWith(path, \"",
-        figs["prefix"].get_string(),
-        "\")) return null;",
-        "path = path.chompPrefix(\"",
-        figs["prefix"].get_string(),
-        "\");"
-      );
+    Figtree figs = read_fig_file(filename);
+
+    if ("module" in figs)
+      module_name = figs["module"].get_string();
+
+    if ("preamble" in figs)
+      preamble = figs["preamble"].get_string();
+
+    if ("error" in figs)
+    {
+      error_page = figs["error"].get_string();
+      modules.put(error_page.split(".")[0..$-1].join("."));
+    }
+
+    if ("prefix" in figs)
+    {
+      fns["route"] ~=
+        text
+        (
+          "if (!startsWith(path, \"",
+          figs["prefix"].get_string(),
+          "\")) return null;",
+          "path = path.chompPrefix(\"",
+          figs["prefix"].get_string(),
+          "\");"
+        );
+    }
+
+    create_sub_route("route",figs);
   }
-
-  create_sub_route("route",figs);
-
 }
 
 void create_node_route(string fn_name, Figtree node)
@@ -195,7 +196,7 @@ void dump(Writer)(Writer w)
     w.println();
     w.println("import std.regex;");
     foreach (r;regexs.Range)
-      w.println("enum rx",count++," ctRegex!(`^",r,"$`);");
+      w.println("enum rx",count++," = ctRegex!(`^",r,"$`);");
   }
 
   foreach (n,f; fns)

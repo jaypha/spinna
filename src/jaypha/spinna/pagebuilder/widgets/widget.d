@@ -27,12 +27,15 @@ abstract class Widget : HtmlElement
     form = _form;
     name = _name;
     add_class("widget");
-    id = form.id~"-"~name;
+    if (!(form is null))
+      id = form.id~"-"~name;
+    else
+      id = name;
   }
 
   override void copy(TextOutputStream output)
   {
-    if (name in form.values)
+    if (!(form is null) && name in form.values)
       value = form.values[name];
     super.copy(output);
   }

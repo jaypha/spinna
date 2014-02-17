@@ -34,27 +34,21 @@ class StringWidget : Widget
     override void name(string v) { attributes["name"] = v; }
   }
 
-  this(HtmlForm _form, string _name, bool is_password = false)
-  {
-    super(_form, _name,"input");
-    attributes["type"] = is_password? "password" : "text";
-    add_class("string-widget");
-  }
-
   this
   (
     HtmlForm _form,
     string _name,
     string _label,
     bool _required,
-    ulong _max = 0,
     ulong _min = 0,
+    ulong _max = 0,
   )
   {
     super(_form, _name,"input");
     add_class("string-widget");
     label = _label;
     required = _required;
+    attributes["type"] = (name == "password")? "password" : "text";
     min_length = _min;
     max_length = _max;
   }
@@ -62,7 +56,11 @@ class StringWidget : Widget
   override void copy(TextOutputStream output)
   {
     if (max_length != 0) attributes["maxlength"] = to!string(max_length);
-    form.doc.page_head.add_script("add_string_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~","~to!string(min_length)~","~to!string(max_length)~","~((regex is null || regex.length == 0)?"null":"'"~regex~"'")~");");
+    form.doc.page_head.add_script
+    (
+      "add_string_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~","~to!string(min_length)~","~to!string(max_length)~","~((regex is null || regex.length == 0)?"null":"'"~regex~"'")~");",
+      true
+    );
     super.copy(output);
   }
 

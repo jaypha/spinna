@@ -1,5 +1,14 @@
 /*
- * Copyright (C) 2009 Fairfax eCommerce Pty Ltd. All rights reserved.
+ * MySQL database connection tool
+ *
+ * Copyright 2009-2013 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ *
+ * Written in the D programming language.
  */
 
 module jaypha.dbms.mysql.database;
@@ -20,7 +29,7 @@ import std.algorithm;
 //
 //-----------------------------------------------------------------------------
 
-struct MySqlDatabase
+final class MySqlDatabase
 {
   alias MySQLRange ResultType;
 
@@ -193,7 +202,7 @@ struct MySqlDatabase
   // first column must be unique, and of the correct type.
   //
 
-  string[string][T] query_indexed_data(T = uint)(string sql)
+  string[string][T] query_indexed_data(T = ulong)(string sql)
   {
     MYSQL_RES* res = query_raw(sql);
     scope(exit) { mysql_free_result(res); }
@@ -222,7 +231,7 @@ struct MySqlDatabase
   // first column must be unique, and of the correct type.
   //
 
-  U[T] query_indexed_column(T = uint,U = string)(string sql)
+  U[T] query_indexed_column(T = ulong,U = string)(string sql)
   {
     MYSQL_RES* res = query_raw(sql);
     scope(exit) { mysql_free_result(res); }

@@ -30,9 +30,17 @@ function add_selector_widget(n,l,f,b,t)
   widgets[f].push(new SelectorWidget(n,l,f,b,t));
 }
 
-function add_integer_widget(n,l,f,r,b,t)
+function add_integer_widget(n,l,f,i,r,b,t,s)
 {
-  widgets[f].push(new IntegerWidget(n,l,f,r,b,t));
+  var w = new IntegerWidget(n,l,f,i,r,b,t)
+  if (f)
+    widgets[f].push(w);
+  if (s)
+  {
+    var id = i+"-wrapper";
+    $('#'+id+' .spinner-up').click(function() { w.increment(1); } );
+    $('#'+id+' .spinner-down').click(function() { w.increment(-1); } );
+  }
 }
 
 function add_radiogroup_widget(n,l,f,r)
@@ -101,20 +109,23 @@ StringWidget.prototype.validate = function()
 
   var v = $("#"+this.fid+"-"+this.nam).val();
 
-  if (this.req == true)
+  if (v == "")
   {
-    if (v == "")
+    if (this.req == true)
       msg = '"'+this.lab + '" cannot be empty';
   }
-  if (msg != null && this.min != 0)
+  else
   {
-    if (v.length < this.min)
-      msg = '"'+this.lab + '" must be at least ' + this.min + ' characters';
-  }
-  if (msg != null &&  this.max != 0)
-  {
-    if (v.length > this.max)
-      msg = '"'+this.lab + '" cannot be more than ' + this.max + ' characters';
+    if (this.min != 0)
+    {
+      if (v.length < this.min)
+        msg = '"'+this.lab + '" must be at least ' + this.min + ' characters';
+    }
+    if (msg === null &&  this.max != 0)
+    {
+      if (v.length > this.max)
+        msg = '"'+this.lab + '" cannot be more than ' + this.max + ' characters';
+    }
   }
 
   // TODO regex checking
@@ -133,11 +144,12 @@ StringWidget.prototype.validate = function()
  *
  ****************************************************************************/
 
-function IntegerWidget(n, l, f, r, b, t)
+function IntegerWidget(n, l, f, i, r, b, t)
 {
   this.nam = n;
   this.lab = l;
   this.fid = f;
+  this.wid = i;
   this.req = r;
   this.min = b;
   this.max = t;
@@ -147,7 +159,7 @@ IntegerWidget.prototype.validate = function()
 {
   var msg = null;
 
-  var v = $("#"+this.fid+"-"+this.nam).val();
+  var v = $("#"+this.wid).val();
 
   if (v == "")
   {
@@ -176,12 +188,29 @@ IntegerWidget.prototype.validate = function()
     }
   }
 
-  if (msg !== null)
-    $("#"+this.fid+" ."+this.nam+"-valid-indicator").addClass("bad-input");
-  else
-    $("#"+this.fid+" ."+this.nam+"-valid-indicator").removeClass("bad-input");
+  if (this.fid)
+  {
+    if (msg !== null)
+      $("#"+this.fid+" ."+this.nam+"-valid-indicator").addClass("bad-input");
+    else
+      $("#"+this.fid+" ."+this.nam+"-valid-indicator").removeClass("bad-input");
+  }
 
   return msg;
+}
+
+IntegerWidget.prototype.increment = function(diff)
+{
+  var w = $("#"+this.wid);
+  var v;
+  if (w.val() === '')
+    v = 0;
+  else
+    v = parseInt(w.val());
+  v += diff;
+  if (v < this.min) v = this.min;
+  if (v > this.max) v = this.max;
+  w.val(v);
 }
 
 /*****************************************************************************

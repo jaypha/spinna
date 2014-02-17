@@ -6,17 +6,19 @@ import jaypha.io.output_stream;
 
 import jaypha.types;
 
-import jaypha.spinna.pagebuilder.widgets.boolean;
+import jaypha.spinna.pagebuilder.widgets.validate;
 
 import jaypha.container.hash;
 
 import std.typecons;
 
 import jaypha.decimal;
-
+import Backtrace = backtrace.backtrace;
 
 void main(string[] args)
 {
+  debug { Backtrace.install(stderr); }
+
   StrHash request;
 
   request["wip"] = "";
@@ -26,20 +28,22 @@ void main(string[] args)
 
   bool v;
 
-  assert(extract_boolean_value(v, request, "yak", false));
+  assert(validate_boolean(v, request, "yak", false));
   assert(!v);
-  assert(!extract_boolean_value(v, request, "yak", true));
+  assert(!validate_boolean(v, request, "yak", true));
 
-  assert(extract_boolean_value(v, request, "wip", false));
+  assert(validate_boolean(v, request, "wip", false));
   assert(!v);
-  assert(!extract_boolean_value(v, request, "wip", true));
+  assert(!validate_boolean(v, request, "wip", true));
 
-  assert(extract_boolean_value(v, request, "bip", false));
+  assert(validate_boolean(v, request, "bip", false));
   assert(!v);
-  assert(!extract_boolean_value(v, request, "bip", true));
+  assert(!validate_boolean(v, request, "bip", true));
 
-  assert(extract_boolean_value(v, request, "zip", false));
+  assert(validate_boolean(v, request, "zip", false));
   assert(v);
-  assert(extract_boolean_value(v, request, "zip", true));
+  assert(validate_boolean(v, request, "zip", true));
   assert(v);
+  writeln(request["tip"]);
+
 }

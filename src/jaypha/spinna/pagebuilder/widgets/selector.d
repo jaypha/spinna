@@ -8,6 +8,7 @@ import std.array;
 import std.algorithm;
 import std.conv;
 import jaypha.container.hash;
+import jaypha.html.helpers;
 
 
 class SelectorWidget(string tpl = "jaypha/spinna/pagebuilder/widgets/selector.tpl") : Widget

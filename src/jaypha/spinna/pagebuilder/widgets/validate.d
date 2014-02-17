@@ -25,10 +25,13 @@
 module jaypha.spinna.pagebuilder.widgets.validate;
 
 public import jaypha.container.hash;
+import jaypha.decimal;
 
 import std.conv;
+import std.regex;
 public import std.typecons;
 import std.ascii;
+
 
 //----------------------------------------------------------------------------
 

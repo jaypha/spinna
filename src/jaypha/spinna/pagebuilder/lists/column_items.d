@@ -4,7 +4,7 @@ module jaypha.spinna.pagebuilder.lists.column_items;
 import jaypha.types;
 import jaypha.spinna.pagebuilder.lists.column;
 
-string yes_no_column_item(ref Column c, strstr r)
+string yes_no_column_item(T)(ref Column!T c, T r)
 {
   return r[c.name]?"Yes":"No";
 }

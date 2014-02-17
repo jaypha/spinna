@@ -53,6 +53,7 @@
 {
   list-style: none;
   cursor: default;
+  margin-left: 0;
 }
 
 
@@ -71,3 +72,25 @@
 }
 
 .radiogroup-widget label:first-child { border-left: none; }
+
+/* Integer -----------------------------------------------------------------------*/
+
+.integer-widget-wrapper
+{
+  display: inline-block;
+  position:relative;
+}
+
+.spinner-up, .spinner-down
+{
+  height: 50%;
+  font-size: 9px;
+  text-align: center;
+  width: 24px;
+  position:absolute;
+  right:0;
+  cursor: default;
+}
+
+.spinner-up { top: 0; border-top-right-radius: 4px; }
+.spinner-down { bottom: 0; border-bottom-right-radius: 4px; }
