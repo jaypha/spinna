@@ -274,6 +274,78 @@ BooleanWidget.prototype.validate = function()
 
 /*****************************************************************************
  *
+ * Date Widget
+ *
+ ****************************************************************************/
+
+function DateWidget(n,l,f)
+{
+  this.nam = n;
+  this.lab = l;
+  this.fid = f;
+  this.req = r;
+
+  var id = f + "-" + n;
+  var obj = this;
+
+  this.wgt = $("#"+id);
+  this.dsp = $("#"+id+"-display");
+
+  var d = this.get();
+  if (d)
+  {
+    this.dsp.val(d.format("jS M Y"));
+  }
+
+  x = new Calendar();
+  x.on_select = function(date) { obj.set(date); };
+  this.wgt.click(function(){ x.show(get_pos(this.dsp), obj.get()); });
+  this.dsp.click(function(){ x.show(get_pos(this.dsp), obj.get()); });
+  this.dsp.focus(function(){ x.show(get_pos(this.dsp), obj.get()); });
+}
+
+DateWidget.prototype.get = function(date)
+{
+  if (this.wgt.val() != "")
+    return new Date(this.wgt.val().replace(/-/g,'/'));
+  else
+    return null;
+}
+
+DateWidget.prototype.set = function(date)
+{
+  if (date)
+  {
+    this.wid.val(date.format("Y-m-d"));
+    this.dsp.val(date.format("jS M Y"));
+  }
+  else
+  {
+    this.wid.val("");
+    this.dsp.val("");
+  }
+}
+
+DateWidget.prototype.validate = function()
+{
+  var msg = null;
+
+  if (this.wgt.val() == "")
+  {
+    if (this.req)
+      msg = '"'+this.lab + '" must have a value';
+  }
+
+  if (msg !== null)
+    $("#"+this.fid+" ."+this.nam+"-valid-indicator").addClass("bad-input");
+  else
+    $("#"+this.fid+" ."+this.nam+"-valid-indicator").removeClass("bad-input");
+
+  return msg;
+}
+
+/*****************************************************************************
+ *
  * Selector Widget
  *
  ****************************************************************************/
