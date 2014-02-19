@@ -22,7 +22,11 @@ struct MimeEntity
 {
   MimeHeader[] headers;
 
-  ubyte[] content;
+  union
+  {
+    ubyte[] simple;
+    MimeEntity[] multi;
+  } content;
 }
 
 struct MimeEntityReader(BR)
