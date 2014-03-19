@@ -1,7 +1,18 @@
 .toolbar * { margin-left: 5px; }
 .toolbar *:first-child { margin-left: 0; }
 
-/* Selector ---------------------------------------------------------------------*/
+input.widget, .selector-search, .boolean-widget, .sort-widget, .selector-box
+{
+  border: $widget-border;
+  border-radius: $widget-corner;
+  padding: $widget-padding;
+}
+
+/* String -----------------------------------------------------------------*/
+
+.string-widget { width: $string-width; }
+
+/* Selector ---------------------------------------------------------------*/
 
 .boolean-widget
 {
@@ -61,6 +72,9 @@
 {
   display:inline-block;
   cursor:default;
+  border-radius: $widget-corner;
+  border: $widget-border;
+  background-color: white;
 }
 
 .radiogroup-widget input { display: none; }
@@ -68,13 +82,36 @@
 .radiogroup-widget label
 {
   display:inline-block;
-  padding: 5px 10px;
+  padding: $widget-padding;
+  border-left: $widget-border;
 }
 
 .radiogroup-widget label:first-child { border-left: none; }
 
 /* Integer -----------------------------------------------------------------------*/
 
+input.integer-widget
+{
+  font-size: $std-font-size;
+  height:$widget-height;
+  width: $integer-width;
+}
+
+.spin-up, .spin-dn
+{
+  height: 8px; /* TODO: make relative to widget-height */
+  font-size: 7px;
+  text-align: center;
+  width: 12px;
+  position:absolute;
+  cursor: default;
+  border-left: 1px solid red;
+  padding-right: 1px;
+}
+.spin-up { border-bottom: 1px solid $widget-border-color; padding-top:1px; }
+.spin-dn { border-top: 1px solid $widget-border-color; padding-bottom: 1px;}
+
+/*
 .integer-widget-wrapper
 {
   display: inline-block;
@@ -94,3 +131,4 @@
 
 .spinner-up { top: 0; border-top-right-radius: 4px; }
 .spinner-down { bottom: 0; border-bottom-right-radius: 4px; }
+*/

@@ -45,6 +45,11 @@ string email_link(string email)
   return a.data;
 }
 
+template javascript(string script)
+{
+  enum javascript = "<script type='text/javascript'>\n<!--\n"~script~"\n//-->\n</script>";
+}
+
 /+
 
 char[] mini_form(char[] id, char[] contents, char[] action)

@@ -110,7 +110,7 @@ struct DynamicQuery
     if (columns.length == 0)
       return "*";
 
-    return "distinct (" ~ join(columns,"),(") ~ ")";
+    return "distinct " ~ join(columns,",");
   }
 
   //-------------------------------------------------------------------------

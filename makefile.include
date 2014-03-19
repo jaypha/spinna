@@ -1,16 +1,23 @@
 
 LIBDIR = /usr/local/lib /usr/lib64/mysql $(SPINNA_ROOT)/lib
 LIBS = fcgi fig mysqlclient
-
+INCDIR = $(IMPDIR) $(SPINNA_ROOT)/src
 
 LIBFLAGS= $(addprefix -L-l,$(LIBS)) $(addprefix -L-L,$(LIBDIR))
 
-JFLAGS = $(addprefix -J,$(IMPDIR)) -J$(SPINNA_ROOT)/src
-IFLAGS = $(addprefix -I,$(IMPDIR)) -I$(SPINNA_ROOT)/src
+JFLAGS = $(addprefix -J,$(INCDIR))
+IFLAGS = $(addprefix -I,$(INCDIR))
 
 
-JSFILES = $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/widgets.js \
+JSFILES = $(SPINNA_ROOT)/src/jquery/jquery-ui.js \
+          $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/widgets.js \
+          $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/integer.js \
+          $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/decimal.js \
+          $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/calendar.js \
           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/useful_stuff/dialog_box.js \
+          $(SPINNA_ROOT)/../thirdparty/js_date_format/js_date_format.js \
+          $(SPINNA_ROOT)/../thirdparty/jquery/jquery.caret.js
 
 SCSSFILES = $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/widgets.scss \
-           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/useful_stuff/dialog_box.scss \
+            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/calendar.scss \
+            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/useful_stuff/dialog_box.scss \

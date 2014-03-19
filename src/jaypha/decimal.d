@@ -149,6 +149,11 @@ struct decimal(uint scale)
       return decimal(b/value);
     }
 
+    auto conv(uint new_scale)()
+    {
+      return decimal!new_scale(value * 10^^(new_scale-scale));
+    }
+    
     // Operators for decimal and double
 /* TODO
     decimal opBinary(string s:"+")(double b)

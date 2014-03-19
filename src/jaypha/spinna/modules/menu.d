@@ -4,7 +4,7 @@ import jaypha.spinna.pagebuilder.component;
 
 struct MenuItem
 {
-  enum LinkType { link, script };
+  enum LinkType { Link, Script, Label, Separator };
   string label;
   string link;
   LinkType type;

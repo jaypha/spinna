@@ -25,9 +25,6 @@ void processRequest(I,O)
   void delegate(uint, string) error_handler
 ) if (isOutputRange!(O,immutable(ubyte)[]))
 {
-  // If an unrecoverable error occurs, a minimal error message is sent to the client.
-  scope(failure) { output_stream.put(cast(immutable(ubyte[])) basic_error_response); }
-
   try
   {
     request.prepare(env, input_stream);

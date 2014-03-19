@@ -61,7 +61,7 @@ class DecimalWidget(uint scale) : Widget
   {
     form.doc.page_head.add_script
     (
-      "add_decimal_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~","~min_value.toString()~","~max_value.toString()~");",
+      "add_decimal_widget('"~name~"','"~label~"','"~form.id~"','"~id~"',"~(required?"true":"false")~","~to!string(scale)~","~min_value.toString()~","~max_value.toString()~");",
       true
     );
     super.copy(output);

@@ -4,6 +4,7 @@ module jaypha.mime.multipart_reader;
 import jaypha.range;
 import jaypha.read_until;
 import jaypha.types;
+import jaypha.algorithm;
 
 import jaypha.mime.entity;
 
@@ -16,6 +17,45 @@ import std.ascii;
 import std.exception;
 import std.typecons;
 
+
+auto get_multipart_reader(Reader)(ref Reader r, string boundary)
+  if (isByteRange!Reader)
+{
+  string full_boundary = "\r\n--"~boundary;
+
+  find_split(r, full_boundary[2..$]);
+  find_split(r, "\r\n"); // skip over whitespace, but don't bother checking.
+
+  auto entity = mime_entity_reader(read_until(r, full_boundary));
+
+  alias typeof(entity) T;
+
+  struct MR
+  {
+    @property bool empty() { return r.empty; }
+
+    @property T front() { return entity; }
+
+    void popFront()
+    {
+      if (!entity.content.empty) entity.content.drain(); // In case the user pops before fully reading the entity
+
+      auto rem = find_split(r, "\r\n"); // skip over whitespace, but don't bother checking.
+      bool last_time = startsWith(rem[0], "--");
+      if (!last_time)
+      {
+        enforce(rem[1] == "\r\n");
+        entity = mime_entity_reader(read_until(r, full_boundary));
+      }
+      else
+      {
+        r.drain(); // Skip epilogue;
+      }
+    }
+  }
+  return MR();
+}
+/+
 auto get_multipart_reader(Reader)(ref Reader r, string boundary)
   if (isByteRange!Reader)
 {
@@ -57,7 +97,7 @@ auto get_multipart_reader(Reader)(ref Reader r, string boundary)
   }
   return MR();
 }
-
++/
 //----------------------------------------------------------------------------
 
 private bool skip_over_until(Reader)(ref Reader r, string sentinel)

@@ -55,17 +55,23 @@ class BooleanWidget : Widget
     label = _label;
     required = _required;
     _v = _default;
+
+    add(new DelegateComponent(&display));
   }
 
   override void copy(TextOutputStream output)
   {
-    content = "<span class='true-setting'>Yes</span><span class='false-setting'>No</span><input type='hidden' name='"~_n~"' value='"~value~"'/>";
     form.doc.page_head.add_script
     (
       "add_boolean_widget('" ~_n~ "','" ~label~ "','" ~form.id~ "'," ~(required?"true":"false")~ ");",
       true
     );
     super.copy(output);
+  }
+
+  void display(TextOutputStream output)
+  {
+    output.print("<span class='true-setting'>Yes</span><span class='false-setting'>No</span><input type='hidden' name='"~_n~"' value='"~value~"'/>");
   }
 
   private:

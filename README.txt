@@ -14,33 +14,11 @@ Spinna is licensed under the Boost License.
 == Modules ==
 
 Spinna modules (not provided by third parties) are kept under the 'jaypha' umbrella package.
-Modules specific to the Spinna server are under the jaypha.spinna package. Other modules
+Modules specific to the Spinna framework are under the jaypha.spinna package. Other modules
 are more generic and can be used in non-Spinna projects.
 
-- jaypha.types
-- jaypha.conv
-- jaypha.rnd
-- jaypha.string
-- jaypha.embed
-- jaypha.container.hash
-- jaypha.io.lines
-- jaypha.io.print
-- jaypha.io.serialize
-- jaypha.http.cookie
-- jaypha.http.exception
-- jaypha.html.entity
-- jaypha.html.helpers
-- jaypha.mime.header
-- jaypha.fcgi.loop
-- jaypha.fcgi.c.fcgiapp.di
-- jaypha.spinna.router_tools
-- jaypha.spinna.global
-- jaypha.spinna.request
-- jaypha.spinna.response
-- jaypha.spinna.session
-- jaypha.spinna.process
-
-All modules in the jaypha package umbrella are Copyright Jaypha.
+All code in the jaypha package umbrella is copyright Jaypha and licensed under the
+Boost License.
 
 == Third Party Stuff ==
 
@@ -52,6 +30,7 @@ Spinna makes use of several third party projects. These are
 | CKEditor  | GPL/LGPL/MPL  | http://ckeditor.com  |
 | CKFinder  | Propriety*  | http://cksource.com/ckfinder  |
 | MarkItUp  | MIT/GPL  | http://http://markitup.jaysalvat.com  |
+| jQuery Caret | BSD | http://http://plugins.jquery.com/caret |
 
 * A license needs to be purchased to use CKFinder features.
 

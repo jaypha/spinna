@@ -477,3 +477,92 @@ unittest
   assert(!validate_multiple_enumerated(vv, source, "strat", options, 3));
   assert(!validate_multiple_enumerated(vv, source, "strat", options, 0,1));
 }
+
+//----------------------------------------------------------------------------
+
+import std.datetime;
+
+bool validate_optional_date
+(
+  out Nullable!Date value,
+  StrHash source,
+  string name,
+)
+{
+  if (name !in source || source[name].length == 0)
+  {
+    value.nullify();
+    return true;
+  }
+  else
+  {
+    value=Date(0);
+    return validate_required_date(value.get(),source,name);
+  }
+}
+
+//----------------------------------------------------------------------------
+
+bool validate_required_date
+(
+  out Date value,
+  StrHash source,
+  string name,
+)
+{
+  if (name !in source || source[name].length == 0)
+    return false;
+
+  try
+  {
+    value = Date.fromISOExtString(source[name]);
+    return true;
+  }
+  catch (DateTimeException e)
+  {
+    return false;
+  }
+}
+
+//----------------------------------------------------------------------------
+
+unittest
+{
+  StrHash source;
+
+  source["wip"] = "";
+  source["zip"] = "2";
+  source["quip"] = "2001-99-99";
+  source["towick"] = "2001-05-22";
+  source["crap"] = "0";
+
+  source["strip"] = [ "2022-07-13", "zank" ];
+  source["strat"] = [ "tonk", "2001-05-22" ];
+
+
+  Nullable!Date d1;
+  Date d2;
+
+  assert(!validate_required_date(d2,source,"rip"));
+  assert(!validate_required_date(d2,source,"wip"));
+  assert(!validate_required_date(d2,source,"zip"));
+  assert(!validate_required_date(d2,source,"quip"));
+  assert(validate_required_date(d2,source,"towick"));
+  assert(d2.toISOExtString() == "2001-05-22");
+  assert(validate_required_date(d2,source,"strip"));
+  assert(d2.toISOExtString() == "2022-07-13");
+  assert(!validate_required_date(d2,source,"strat"));
+
+  assert(validate_optional_date(d1,source,"rip"));
+  assert(d1.isNull);
+  assert(validate_optional_date(d1,source,"wip"));
+  assert(d1.isNull);
+  assert(!validate_optional_date(d1,source,"zip"));
+  assert(!validate_optional_date(d1,source,"quip"));
+  assert(validate_optional_date(d1,source,"towick"));
+  assert(d1.get().toISOExtString() == "2001-05-22");
+  assert(validate_optional_date(d1,source,"strip"));
+  assert(d1.get().toISOExtString() == "2022-07-13");
+  assert(!validate_optional_date(d1,source,"strat"));
+
+}

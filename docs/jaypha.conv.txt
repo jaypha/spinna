@@ -10,7 +10,7 @@ Converts an integer to a string of hex characters
 
 ====synopsis====
 
-stringbin2hex(uint i)
+string bin2hex(uint i)
 
 ====example====
 

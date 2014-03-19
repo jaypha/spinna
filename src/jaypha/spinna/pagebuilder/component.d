@@ -52,9 +52,19 @@ class Composite : Component
   }
 
   private Appender!(Component[]) content;
+  protected @property Component _c() {if (length) return content.data[0]; else return null; }
+  protected void _cl() { content.clear(); }
 }
 
 //-----------------------------------------------------------------------------
+
+Composite wrap(Composite wrapper, Composite target)
+{
+  wrapper.content.put(target.content.data);
+  target.content.clear();
+  target.content.put(wrapper);
+  return wrapper;
+}
 
 //-----------------------------------------------------------------------------
 
@@ -99,6 +109,14 @@ mixin template TemplateCopy(string S)
   }
 }
 
+mixin template TemplateComponent(string S)
+{
+  class TC : Component
+  {
+    mixin TemplateCopy!S;
+  }
+}
+
 //-----------------------------------------------------------------------------
 
 class FileComponent(S = string) : Component
@@ -119,16 +137,30 @@ class FileComponent(S = string) : Component
 
 //-----------------------------------------------------------------------------
 
-mixin template TemplateComponent(string S)
-{
-  class TC : Component
-  {
-    mixin TemplateCopy!S;
-  }
-}
 
 unittest
 {
+  import std.stdio;
+  void pp(TextOutputStream o) { o.print("--phbf--"); }
+
+  auto buf = appender!(char[])();
+  auto bos = new TextOutputStream(output_range_stream(buf));
+
+  auto target = new Composite();
+  target.add("abc").add("xyz").add(new TextComponent("123"));
+
+  target.add(new DelegateComponent(&pp));
+  target.copy(bos);
+  assert(buf.data == "abcxyz123--phbf--");
+  buf.clear();
+
+  auto wrapper = new Composite();
+  wrapper.add("start!").wrap(target).add("!end");
+  target.copy(bos);
+  writeln(buf.data);
+  assert(buf.data == "start!abcxyz123--phbf--!end");
+  
+
 /*
   import std.stdio;
 

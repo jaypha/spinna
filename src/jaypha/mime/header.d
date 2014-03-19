@@ -23,6 +23,9 @@ import std.algorithm;
 import jaypha.range;
 import jaypha.read_until;
 import jaypha.types;
+import jaypha.algorithm;
+
+  import std.stdio;
 
 /*
  * Handles MIME related content headers in accordance with RFC's
@@ -43,6 +46,7 @@ struct MimeHeader
 {
   string name;
   string field_body;
+  @property string str() { return name~": "~field_body; }
 }
 
 struct MimeContentType
@@ -181,35 +185,25 @@ MimeHeader[] parse_headers(BR)(ref BR r)
   MimeHeader[] headers;
   /* Read headers until we get to a blank line */
 
-  while (!r.skip_over_anyway("\r\n",true))
+  while (true)
   {
-    auto name = appender!string();
-    auto field_body = appender!string();
+    auto buf = find_split(r, cast(ubyte[])"\r\n");
+    enforce(buf[1] == cast(ubyte[])"\r\n");
 
-    while (!r.empty && r.front != ':')
+    if (buf[0].length == 0) break;
+
+    auto header = cast(string) buf[0];
+    if (isWhite(header[0]))
     {
-      name.put(r.front);
-      r.popFront();
+      // leading whitespace means s part of the previous header.
+      headers[$-1].field_body ~= header;
     }
-    enforce(!r.empty);
-    r.popFront();
-    enforce(!r.empty);
-
-    do
+    else
     {
-      while (!r.empty && r.front != '\r')
-      {
-        field_body.put(r.front);
-        r.popFront();
-      }
-      enforce(!r.empty);
-      r.popFront();
-      enforce(!r.empty);
-      enforce(r.front=='\n');
-      r.popFront();
-      enforce(!r.empty);
-    } while(r.front == ' ' || r.front == '\t');
-    headers ~= MimeHeader(name.data, field_body.data);
+      auto i = std.string.indexOf(header,':');
+      enforce(i > 0);
+      headers ~= MimeHeader(header[0..i], header[i+1..$]);
+    }
   }
   return headers;
 }
@@ -218,6 +212,8 @@ MimeHeader[] parse_headers(BR)(ref BR r)
 
 unittest
 {
+  import std.stdio;
+
   auto c = get_mime_content_type("text / plain ; two = a; three=\"z l\"");
   assert(c.type=="text/plain");
   assert(c.parameters.length == 2);
@@ -247,7 +243,8 @@ unittest
     "This is explicitly typed plain US-ASCII text.\r\n"
     "It DOES end with a linebreak.\r\n";
 
-  auto r1 = inputRangeObject(cast(ubyte[]) entity_text.dup);
+  //auto r1 = inputRangeObject(cast(ubyte[]) entity_text.dup);
+  auto r1 = cast(ubyte[]) entity_text;
 
   auto headers = parse_headers(r1);
   assert(headers.length == 2);

@@ -25,7 +25,7 @@ class DateWidget : Widget
   @property
   {
     override string value() { return ("value" in attributes)?attributes["value"]:null; }
-    override void value(string v) { attributes["value"] = v; }
+    override void value(string v) { attributes["value"] = v; /* TODO validate v */ }
   }
 
   @property
@@ -40,35 +40,26 @@ class DateWidget : Widget
     string _name,
     string _label,
     bool _required,
-    ulong _min = 0,
-    ulong _max = 0,
   )
   {
     super(_form, _name,"input");
-    add_class("string-widget");
+    add_class("date-widget");
     label = _label;
     required = _required;
-    attributes["type"] = (name == "password")? "password" : "text";
-    min_length = _min;
-    max_length = _max;
   }
 
   override void copy(TextOutputStream output)
   {
     string x = "<input name='"~name~"' style='display:none;' id='"~id~"'/>";
-    name = null;
-    id=id~"-display";
     form.doc.page_head.add_script
     (
       "add_date_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~");",
       true
     );
+    name = null;
+    id=id~"-display";
+    attributes["readonly"] = "readonly";
     super.copy(output);
-    ouput.print(x);
+    output.print(x);
   }
-
-  ulong min_length = 0;
-  ulong max_length = 0;
-
-  string regex;
 }

@@ -4,10 +4,20 @@
       <%
         foreach (j,m; menu)
         {
-          if (m.type == MenuItem.LinkType.link)
-            output.print("<td><a href='",encode_special(m.link),"'>",encode_special(m.label),"</a></td>");
-          else
-            output.print("<td><a onclick='",encode_special(m.link),"'>",encode_special(m.label),"</a></td>");
+          final switch (m.type)
+          {
+            case MenuItem.LinkType.Link:
+              output.print("<td><a href='",encode_special(m.link),"'>",encode_special(m.label),"</a></td>");
+              break;
+            case MenuItem.LinkType.Script:
+              output.print("<td><a onclick='",encode_special(m.link),"'>",encode_special(m.label),"</a></td>");
+              break;
+            case MenuItem.LinkType.Label:
+              output.print("<td>",encode_special(m.label),"</td>");
+              break;
+            case MenuItem.LinkType.Separator:
+              output.print("<td>&nbsp;</td>");
+          }
         }
       %>
     </tr>

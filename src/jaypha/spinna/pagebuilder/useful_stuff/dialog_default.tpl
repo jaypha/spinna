@@ -20,4 +20,3 @@ $(function()
   $('#about-btn').click(function(){ $('#about-dialog').jqmShow(); });
 });
 </script>
-

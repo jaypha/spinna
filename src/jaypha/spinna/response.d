@@ -9,8 +9,6 @@ import std.string;
 
 alias immutable(ubyte)[] ByteArray;
 
-immutable string basic_error_response = "Content-Type: text/plain\r\nStatus: 500 Internal Error\r\n\r\n";
-
 struct HttpResponse
 {
   ByteArray entity;

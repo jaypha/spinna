@@ -21,6 +21,7 @@ module jaypha.fcgi.loop;
 
 import std.concurrency;
 import std.array;
+import std.exception;
 
 import jaypha.fcgi.c.fcgiapp;
 
@@ -68,8 +69,9 @@ struct FCGI_InStream
   this(FCGX_Stream* _stream)
   {
     stream = _stream;
+    popFront();
   }
-
+/+
   @property bool empty()
   {
     if (current != -1)
@@ -98,6 +100,32 @@ struct FCGI_InStream
       popFront();
     return cast(ubyte) current;
   }
++/
+  bool empty = false;
+
+  ubyte front;
+
+  void popFront()
+  {
+    auto next =  FCGX_GetChar(stream);
+    if (next == -1) empty = true;
+    else
+      front = cast(ubyte) next;
+  }
+
+  /*
+  immutable(ubyte)[] grab_it_all()
+  {
+    auto a = appender!(ubyte[]);
+    int c;
+
+    while ((c = FCGX_GetChar(stream)) != -1)
+    {
+      a.put(cast(ubyte)c);
+    }
+    return assumeUnique(a.data);
+  }
+  */
 }
 
 //---------------------------------------------------------------------------
@@ -126,6 +154,7 @@ struct FCGI_Request
     fcgi_in  = FCGI_InStream(request._in);
     env = pp_to_assoc(cast(const(char)**) r.envp);
   }
+  
 }
 
 //---------------------------------------------------------------------------

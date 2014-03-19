@@ -41,6 +41,25 @@ abstract class Widget : HtmlElement
   }
 }
 
+class LabelWidget : Widget
+{
+  @property { override string value() { return null; } override void value(string) {}; }
+  @property { override string name() { return null; } override void name(string) {}; }
+
+  this(string _label)
+  {
+    super(null, null);
+    label = _label;
+  }
+
+  override void copy(TextOutputStream output)
+  {
+    if (!(form is null) && name in form.values)
+      value = form.values[name];
+    super.copy(output);
+  }
+}
+
 class WidgetComponent(string tpl = "jaypha/spinna/pagebuilder/widgets/default_widgets.tpl") : Component
 {
   Widget[] widgets;

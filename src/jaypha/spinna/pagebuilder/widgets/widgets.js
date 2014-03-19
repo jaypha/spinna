@@ -30,6 +30,7 @@ function add_selector_widget(n,l,f,b,t)
   widgets[f].push(new SelectorWidget(n,l,f,b,t));
 }
 
+/*
 function add_integer_widget(n,l,f,i,r,b,t,s)
 {
   var w = new IntegerWidget(n,l,f,i,r,b,t)
@@ -42,15 +43,20 @@ function add_integer_widget(n,l,f,i,r,b,t,s)
     $('#'+id+' .spinner-down').click(function() { w.increment(-1); } );
   }
 }
-
+*/
 function add_radiogroup_widget(n,l,f,r)
 {
   widgets[f].push(new RadioGroupWidget(n, l, f, r));
 }
 
-function add_decimal_widget(n,l,f,r,s,b,t)
+function add_date_widget(n,l,f,r)
 {
-  alert("add_decimal_widget: TODO");
+  widgets[f].push(new DateWidget(n,l,f,r));
+}
+
+function add_dropdown_list_widget(n,l,f,r)
+{
+  widgets[f].push(new DropdownListWidget(n,l,f,r));
 }
 
 /*****************************************************************************
@@ -278,7 +284,7 @@ BooleanWidget.prototype.validate = function()
  *
  ****************************************************************************/
 
-function DateWidget(n,l,f)
+function DateWidget(n,l,f,r)
 {
   this.nam = n;
   this.lab = l;
@@ -297,11 +303,11 @@ function DateWidget(n,l,f)
     this.dsp.val(d.format("jS M Y"));
   }
 
-  x = new Calendar();
-  x.on_select = function(date) { obj.set(date); };
-  this.wgt.click(function(){ x.show(get_pos(this.dsp), obj.get()); });
-  this.dsp.click(function(){ x.show(get_pos(this.dsp), obj.get()); });
-  this.dsp.focus(function(){ x.show(get_pos(this.dsp), obj.get()); });
+  this.x = new Calendar();
+  this.x.on_select = function(date) { obj.set(date); };
+  this.wgt.click(function(){ obj.x.show(get_position(obj.dsp), obj.get()); });
+  this.dsp.click(function(){ obj.x.show(get_position(obj.dsp), obj.get()); });
+  this.dsp.focus(function(){ obj.x.show(get_position(obj.dsp), obj.get()); });
 }
 
 DateWidget.prototype.get = function(date)
@@ -316,12 +322,12 @@ DateWidget.prototype.set = function(date)
 {
   if (date)
   {
-    this.wid.val(date.format("Y-m-d"));
+    this.wgt.val(date.format("Y-m-d"));
     this.dsp.val(date.format("jS M Y"));
   }
   else
   {
-    this.wid.val("");
+    this.wgt.val("");
     this.dsp.val("");
   }
 }
@@ -556,6 +562,42 @@ function sort_update(id, name, formid)
   for (var i=1; i<a.length; ++i)
     s=s+','+a[i].replace(id+'-','');
   $('#'+formid+" input[name='"+name+"']").val(s);
+}
+
+/*****************************************************************************
+ *
+ * DropdownListWidget
+ *
+ *****************************************************************************/
+
+function DropdownListWidget(n, l, f, r)
+{
+  this.nam = n;
+  this.lab = l;
+  this.fid = f;
+  this.req=r;
+
+  this.wid = f + "-" + n;
+}
+
+DropdownListWidget.prototype.validate = function()
+{
+  var msg = null;
+
+  if (this.req)
+  {
+    if ($("#"+this.wid).val() == '')
+    {
+      msg = '"'+this.lab + '" must have a value selected';
+    }
+  }
+
+  if (msg !== null)
+    $("#"+this.fid+" ."+this.nam+"-valid-indicator").addClass("bad-input");
+  else
+    $("#"+this.fid+" ."+this.nam+"-valid-indicator").removeClass("bad-input");
+
+  return msg;
 }
 
 /*****************************************************************************

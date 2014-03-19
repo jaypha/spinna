@@ -7,9 +7,9 @@ import jaypha.types;
 import std.conv;
 import std.traits;
 
-bool has_role(RoleType)(ref strstr auth, RoleType role) if (is(RoleType == enum))
+bool has_role(RoleType)(ulong roles, RoleType role) if (is(RoleType == enum))
 {
-  return (to!uint(auth["roles"]) & role);
+  return (roles & role);
 }
 
 RoleType extract_role(RoleType)(ref strstr auth) if (is(RoleType == enum))

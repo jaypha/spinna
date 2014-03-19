@@ -14,7 +14,9 @@
 
 module jaypha.algorithm;
 
-import std.algorithm;
+import std.algorithm, std.typecons, std.range, std.array, std.traits;
+
+//----------------------------------------------------------------------------
 
 template meld(alias fun)
 {
@@ -53,6 +55,7 @@ unittest
   assert(cast(const(char)[])z == "one1,bee3,john66");
 }
 
+//----------------------------------------------------------------------------
 
 T[] diff(T)(T[] primary, T[] secondary)
 {
@@ -65,4 +68,67 @@ T[] diff(T)(T[] primary, T[] secondary)
   }
 
   return result;
+}
+
+//----------------------------------------------------------------------------
+
+// R1 is input range, R2 is slicable
+
+auto find_split(R1,R2)(ref R1 haystack, R2 needle) //if ((ElementType!R1 == ElementType!R2) && isInputRange!(R1) && hasSlicing!(R2))
+{
+  alias ElementType!R2 E;
+  R2 first_part, second_part;
+
+  while (true)
+  {
+    if (startsWith(needle, second_part))
+    {
+      foreach (n; needle[second_part.length .. $])
+      {
+        if (haystack.empty || haystack.front != n) break;
+        second_part ~= n;
+        haystack.popFront();
+      }
+      if (needle.length == second_part.length)
+      {
+        assert(equal(needle, second_part));
+        return tuple(first_part, second_part);
+      }
+      if (haystack.empty)
+        return tuple(first_part~second_part, uninitializedArray!(R2)(0));
+      else
+      {
+        second_part ~= haystack.front;
+        haystack.popFront();
+      }
+    }
+
+    first_part ~= second_part[0];
+    second_part = second_part[1..$];
+  }
+}
+
+unittest
+{
+  //import std.stdio;
+  ubyte[] txt = cast(ubyte[]) "acabacbxyz".dup;
+
+  string haystack = "donabababcbxyz";
+  string needle = "ababc";
+
+  auto res = find_split(haystack, needle);
+  assert(res[0] == "donab");
+  assert(res[1] == "ababc");
+  assert(haystack == "bxyz");
+
+  auto res2 = find_split(haystack, needle);
+  assert(res2[0] == "bxyz");
+  assert(res2[1] == "");
+  assert(haystack == "");
+
+  haystack = "asdfjkewu";
+  auto res3 = find_split(haystack, "a");
+  assert(res3[0] == "");
+  assert(res3[1] == "a");
+  assert(haystack == "sdfjkewu");
 }

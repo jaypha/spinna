@@ -26,6 +26,7 @@ class HtmlForm : HtmlElement
     if (action !is null) attributes["action"] = action;
     attributes["method"] = "post";
     hiddens["formid"] = id;
+    add("<div class='form-wrapper'>");
   }
   
   override void copy(TextOutputStream output)
@@ -35,18 +36,12 @@ class HtmlForm : HtmlElement
     doc.current_form = this;
     scope(exit) { doc.current_form = null; }
 
-    auto composite = new Composite();
-    composite.add("<div class='form-wrapper'>");
-
-    if (content !is null)
-      composite.add(content);
-
-    composite.add("</div>");
-    composite.add(meld!(hidden)(hiddens).join());
-    content = composite;
+    add("</div>");
+    add(meld!(hidden)(hiddens).join());
 
     doc.page_head.add_script("widgets['"~id~"'] = [];");
     doc.page_head.add_script("$('#"~id~"').submit(function(event) { return form_validate('"~id~"',no_valid); });",true);
+    //doc.page_head.add_script("$('#"~id~"').submit(function(event) { var x = form_validate('"~id~"',no_valid); return x; });",true);
 
     super.copy(output);
 

@@ -10,7 +10,7 @@ class DialogBox(string S) : HtmlElement
 
   class DialogTpl : Component
   {
-    Component content;
+    Composite content;
     Component header;
 
     mixin TemplateCopy!S;
@@ -21,35 +21,37 @@ class DialogBox(string S) : HtmlElement
     super();
     add_class("jqmWindow");
     id = _id;
+    tpl = new DialogTpl();
+    tpl.content = new Composite();
+    assert(!(tpl is null));
+    super.add(tpl);
   }
+
+  override Composite add(const(char)[] t) { tpl.content.add(t); return this; }
+  override Composite add(Component o) { tpl.content.add(o); return this; }
 
   override void copy(TextOutputStream output)
   {
-    auto c = new DialogTpl();
-    
-    if (content)
-      c.content = content;
-    c.header = header;
-    content = c;
+    tpl.header = header;
     super.copy(output);
   }
+
+  private:
+    DialogTpl tpl;
 }
 
 
-debug(dialog_box)
+unittest
 {
-  import std.stdio;
+  //import std.stdio;
   import std.array;
 
-  void main(string[] args)
-  {
-    auto x = new DialogBox!("dialog_default.tpl")("x");
+  auto x = new DialogBox!("jaypha/spinna/pagebuilder/useful_stuff/dialog_default.tpl")("x");
 
-      x.content = "hello";
+  x.add("hello");
 
-    auto buf = appender!(char[])();
+  auto buf = appender!(char[])();
 
-    x.copy(new TextOutputStream(output_range_stream(buf)));
-    write(buf.data);
-  }
+  x.copy(new TextOutputStream(output_range_stream(buf)));
+  assert(buf.data == "<div class='jqmWindow' id='x'>\n <div class='jqm-border-box'>\n  <div class='jqm-header'>\n    \n  </div>\n  <hr class='p'/>\n  <div class='dialog-content'>\n    hello\n  </div>\n  <div class='jqm-footer'>\n   <button class='dialog-ok-button' type='button'>OK</button>\n  </div>\n </div>\n\n<script type='text/javascript'>\n$(function()\n{\n  $('#x').jqm();\n  $('#x').jqmAddClose('#x .dialog-ok-button');\n  $('#about-btn').click(function(){ $('#about-dialog').jqmShow(); });\n});\n</script>\n\n</div>");
 }

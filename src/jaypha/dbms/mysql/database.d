@@ -328,6 +328,19 @@ final class MySqlDatabase
     query("update `"~tablename~"` set "~join(s,",")~" where "~wheres.join(" and "));
   }
 
+  void replace(string tablename, string[string] values)
+  {
+    query
+    (
+      "replace into  `"~tablename~"` set "~
+      meld!
+      (
+        (a,b) => (a~"="~quote(b))
+      )
+      (values).join(",")
+    );
+  }
+
   //---------------------------------------------------------------------------
   // Shortcuts for use with ids
   //---------------------------------------------------------------------------
