@@ -205,6 +205,8 @@ Fig_Context* read_figfile(char* filename)
 {
   FILE *in;
 
+  include_stack[include_stack_ptr] = strdup(filename);
+
   fig_parse_context* context = malloc(sizeof(fig_parse_context));
   context->content = NULL;
   context->err_line_no = 0;
@@ -229,6 +231,7 @@ Fig_Context* read_figfile(char* filename)
   ret_val->err_line_no = context->err_line_no;
   ret_val->err_column  = context->err_column;
   ret_val->err_message = context->err_message;
+  ret_val->err_filename = context->err_filename;
   
   free(context);
 
@@ -247,18 +250,20 @@ void yyerror(fig_parse_context* context, char const *s)
     int l1, l2;
     l1 = strlen(s);
     l2 = strlen(yys->strval);
-    context->err_message = malloc(l1+l2+4);
+    context->err_message = malloc(l1+l2+200);
     memcpy(context->err_message, s,l1);
-    memcpy(context->err_message+l1, " (",2);
-    memcpy(context->err_message+l1+2,yys->strval,l2);
-    context->err_message[l1+2+l2] = ')';
-    context->err_message[l1+3+l2] = 0;
+    memcpy(context->err_message+l1, " (actually read '",17);
+    memcpy(context->err_message+l1+17,yys->strval,l2);
+    context->err_message[l1+l2+17] = '\'';
+    context->err_message[l1+l2+18] = ')';
+    context->err_message[l1+l2+19] = 0;
   }
   else
     context->err_message = strdup(s);
 
   context->err_line_no = yyget_lineno(context->scanr);
   context->err_column = yyget_column(context->scanr);
+  context->err_filename = strdup(include_stack[include_stack_ptr]);
 
   if (context->content != NULL)
   {

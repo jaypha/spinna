@@ -19,7 +19,12 @@ struct fig_parse_context
   int         err_line_no;
   int         err_column;
   char*       err_message;
+  char*       err_filename;
   void*       scanr;
 };
 
 typedef struct fig_parse_context fig_parse_context;
+
+#define MAX_FNAME_DEPTH 10
+extern char* include_stack[MAX_FNAME_DEPTH];
+extern int include_stack_ptr;

@@ -43,6 +43,7 @@ struct Fig_Context
   Fig_Record* content;
   int         err_line_no;
   int         err_column;
+  char*       err_filename;
   char*       err_message;
 };
 

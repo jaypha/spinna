@@ -71,7 +71,7 @@ int main(int argc, char** argv)
   {
     printf("No content\n");
     if (context->err_message != NULL)
-      printf("Error: line %d, column %d: %s\n", context->err_line_no, context->err_column, context->err_message);
+      printf("Error: file '%s', line %d, column %d: %s\n", context->err_filename, context->err_line_no, context->err_column, context->err_message);
   }
   else
   {
