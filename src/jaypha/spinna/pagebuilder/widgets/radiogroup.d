@@ -34,6 +34,7 @@ class RadioGroupWidget: Widget
     label = _label;
     required = _required;
     options = _options;
+    add_class("enum-widget");
     add_class("radiogroup-widget");
   }
 

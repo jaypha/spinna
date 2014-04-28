@@ -10,6 +10,8 @@ import jaypha.algorithm;
 import std.algorithm;
 import std.array;
 
+import std.stdio;
+
 /**
  * These elements are allowed to be printed using the empty tag shorthand.
  *
@@ -49,7 +51,13 @@ class HtmlElement : Composite
 
   void remove_class(string class_name)
   {
-    css_classes.remove(class_name);
+    uint i;
+    for (; i<css_classes.length; ++i)
+      if (css_classes[i] == class_name)
+      {
+        css_classes = remove(css_classes,i);
+        return;
+      }
   }
 
   override void copy(TextOutputStream output)

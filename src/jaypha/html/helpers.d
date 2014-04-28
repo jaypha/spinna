@@ -39,7 +39,7 @@ string html_link(string link, string label = null)
 string email_link(string email)
 {
   auto a = appender!string();
-  a.put("&#x6d;&#x61;&#105;&#108;&#116;&#111;&#x3a;");
+  a.put("&#x6d;&#x61;&#105;&#108;&#116;&#111;&#x3a;"); // encoded "mailto:"
   foreach (c; email)
     a.put(encode(c));
   return a.data;

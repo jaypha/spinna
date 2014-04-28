@@ -46,7 +46,12 @@ function add_integer_widget(n,l,f,i,r,b,t,s)
 */
 function add_radiogroup_widget(n,l,f,r)
 {
-  widgets[f].push(new RadioGroupWidget(n, l, f, r));
+  widgets[f].push(new EnumGroupWidget(n, l, f, r));
+}
+
+function add_checkgroup_widget(n,l,f,r)
+{
+  widgets[f].push(new EnumGroupWidget(n, l, f, r));
 }
 
 function add_date_widget(n,l,f,r)
@@ -489,16 +494,17 @@ SelectorWidget.prototype.validate = function()
 
 /******************************************************************************
  *
- * RadioGroup Widget
+ * EnumGroup Widget - For checkbox and radio groups
  *
  *****************************************************************************/
 
-function RadioGroupWidget(n, l, f, r)
+function EnumGroupWidget(n, l, f, r)
 {
   this.nam = n;
   this.lab = l;
   this.fid = f;
   this.req=r;
+  var obj = this;
 
   var id = f + "-" + n;
   var wgt = $("#"+id);
@@ -509,21 +515,21 @@ function RadioGroupWidget(n, l, f, r)
       $(this).addClass("selected");
   });
 
-  $('input', wgt).change(function()
-  {
-    var id = $(this).attr("id");
+  $('input', wgt).change(function() { obj.onchange(); });
+}
 
-    $('label', wgt).each(function()
-    {
-      if ($(this).attr('for') == id)
-        $(this).addClass("selected");
-      else
-        $(this).removeClass("selected");
-    });
+EnumGroupWidget.prototype.onchange = function()
+{
+  $("#"+this.fid+"-"+this.nam+" label").each(function()
+  {
+    if ($("#"+$(this).attr("for")).prop("checked"))
+      $(this).addClass("selected");
+    else
+      $(this).removeClass("selected");
   });
 }
 
-RadioGroupWidget.prototype.validate = function()
+EnumGroupWidget.prototype.validate = function()
 {
   var msg = null;
 

@@ -144,7 +144,7 @@ string[] get_queries(ref DatabaseDef def, DB db)
   {
     if (!quiet) writeln("Creating function '"~n~"'");
     queries.put("drop function if exists `"~n~"`");
-    queries.put(fn.def);
+    queries.put(get_function_def_sql(fn, db));
   }
 
   return queries.data;
@@ -528,6 +528,45 @@ string get_alter_table_sql
     if (!quiet) writeln("  no alterations");
     return null;
   }
+}
+
+//-----------------------------------------------------------------------------
+// Functions
+
+string get_function_def_sql(ref FunctionDef fn, DB db)
+{
+  auto s = appender!string();
+  string[] parms;
+
+  s.put("CREATE DEFINER = ");
+  s.put(fn.definer);
+  s.put(" FUNCTION `");
+  s.put(fn.name);
+  s.put("`(");
+  foreach (v; fn.parameters)
+  {
+    auto p = appender!string();
+
+    p.put("`");
+    p.put(v.name);
+    p.put("` ");
+    p.put(get_type_sql(v, db));
+    parms ~= p.data;
+  }
+  if (parms.length)
+    s.put(parms.join(","));
+
+  s.put(") RETURNS ");
+  s.put(get_type_sql(fn.returns, db));
+  if (fn.no_sql)
+    s.put(" NO SQL");
+  if (fn.deterministic)
+    s.put(" DETERMINISTIC");
+  s.put(" BEGIN ");
+  s.put(fn.fn_body);
+  s.put(" END;");
+
+  return s.data;
 }
 
 //-----------------------------------------------------------------------------

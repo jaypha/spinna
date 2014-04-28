@@ -21,7 +21,7 @@ test: libfig.a test-main.c
 	rm -f test-main.o
 
 libfig.a: grammer.c lex.yy.c defs.h figparser.h
-	gcc -c grammer.c lex.yy.c
+	gcc -c -Os -s grammer.c lex.yy.c
 	ar rcs libfig.a grammer.o lex.yy.o
 	rm -f *.o
 

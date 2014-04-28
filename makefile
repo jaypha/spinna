@@ -20,12 +20,6 @@ css: res/spinna.scss
 
 js: res/spinna.js
 
-deps:
-	$(RDMD) $(RDFLAGS) --makedepend progs/makerouter.d > deps.include
-	echo "	touch progs/makerouter.d" >> deps.include
-	$(RDMD) $(RDFLAGS) --makedepend progs/dbmake.d >> deps.include
-	echo "	touch progs/dbmake.d" >> deps.include
-
 bin: bin/makerouter bin/dbmake
 
 bin/makerouter: progs/makerouter.d lib/libfig.a
@@ -34,11 +28,22 @@ bin/makerouter: progs/makerouter.d lib/libfig.a
 bin/dbmake: progs/dbmake.d lib/libfig.a
 	$(RDMD) $(RDFLAGS) $(LFLAGS) -ofbin/dbmake --build-only progs/dbmake.d
 
+# --------------------------
+# makerouter for testing
+
+makerouter: progs/makerouter.d lib/libfig.a
+	$(RDMD) $(DDFLAGS) $(LFLAGS) -ofmakerouter --build-only progs/makerouter.d
+
+# --------------------------
+
 lib: lib/libfig.a
 
 lib/libfig.a:
 	pushd progs/fig; make lib
 	cp progs/fig/libfig.a lib
+
+# --------------------------
+# This is for installing support programs, not finished software.
 
 install:
 	cp bin/makerouter /usr/local/bin
@@ -47,7 +52,10 @@ install:
 	strip /usr/local/bin/dbmake
 	cp lib/libfig.a /usr/local/lib
 
+# --------------------------
+
 clean:
+	rm -f makerouter
 	rm -f bin/makerouter
 	rm -f bin/dbmake
 	rm -f lib/libfig.a
@@ -67,8 +75,6 @@ res/spinna.js: $(JSFILES)
 
 res/spinna.scss: $(SCSSFILES)
 	cat $(SCSSFILES) > res/spinna.scss
-
-include deps.include
 
 test:
 	$(RDMD) $(DDFLAGS) $(LFLAGS) -J./src_test -unittest src_test/test_main.d

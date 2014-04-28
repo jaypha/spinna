@@ -29,6 +29,8 @@ void dump_figs(Writer)(Writer w, Figtree figs)
 
 void dump_fig(Writer)(Writer w, Fig_Value f)
 {
+  io.println(w,"Name: ",f.name);
+  io.println(w,"Full Name: ",f.full_name);
   io.println(w,"Type: ",f.type());
 
   switch(f.type())

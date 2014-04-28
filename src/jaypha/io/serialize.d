@@ -47,6 +47,11 @@ import std.variant;
 //
 //----------------------------------------------------------------------------
 
+string serialize(T:string)(T value)
+{
+  return format("s%d:%s",value.length,value);
+}
+
 string serialize(T:const(char)[])(T value)
 {
   return format("s%d:%s",value.length,value);

@@ -5,7 +5,7 @@ module jaypha.dbmake.dbdef;
 struct DatabaseDef
 //--------------------------------
 {
-  TableDef[string] tables;
+  TableDef[] tables;
   ViewDef[string] views;
   FunctionDef[string] functions;
 }
@@ -71,7 +71,15 @@ struct FunctionDef
 //--------------------------------
 {
   string name;
-  string def;
+  string definer;
+  bool no_sql = false;
+  bool deterministic = false;
+
+  ColumnDef[] parameters;
+  ColumnDef returns;
+  string fn_body;
+
+  //string def;
 }
 
 //--------------------------------
@@ -79,6 +87,7 @@ struct ViewDef
 //--------------------------------
 {
   string name;
+  string sql;
   string[][string] columns;  // table, columns
   string[string][string] aliases;  // table, column, alias
   string[string] joins;

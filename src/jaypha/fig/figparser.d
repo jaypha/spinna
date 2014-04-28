@@ -21,6 +21,7 @@ import std.conv;
 import std.string;
 
 import std.stdio;
+import std.exception;
 
 Figtree read_fig_file(const (char)[] filename)
 {
@@ -30,18 +31,27 @@ Figtree read_fig_file(const (char)[] filename)
 
   if (context.err_message !is null)
   {
-    throw new Exception(format("Error reading fig file '%s': line %d, column %d: %s\n",filename, context.err_line_no, context.err_column, to!string(context.err_message)));
+    throw new Exception(format("Error reading fig file '%s': line %d, column %d: %s\n",to!string(context.err_filename), context.err_line_no, context.err_column, to!string(context.err_message)));
   }
   return convert_list(context.content);
 }
 
 private:
 
-Fig_Value convert(Fig_Record* val)
+Fig_Value convert(Fig_Record* val, string prefix = null)
 {
   Fig_Value v;
   
   v.type_ = cast(Fig_Type) val.type;
+
+  if (val.name !is null)
+  {
+    v.name = to!string(val.name);
+    if (prefix !is null)
+      v.full_name = prefix ~"."~v.name;
+    else
+      v.full_name = v.name;
+  }
 
   switch (v.type_)
   {
@@ -66,7 +76,7 @@ Fig_Value convert(Fig_Record* val)
       break;
 
     case Fig_Type.List:
-      v.value_.fig_list = convert_list(val.value.list);
+      v.value_.fig_list = convert_list(val.value.list, v.full_name);
       break;
 
     default:
@@ -76,14 +86,15 @@ Fig_Value convert(Fig_Record* val)
   return v;
 }
 
-Figtree convert_list(Fig_Record* val)
+Figtree convert_list(Fig_Record* val, string prefix = null)
 {
   Figtree list;
 
   Fig_Record* current = val;
   do
   {
-    list[to!string(current.name)] = convert(current);
+    enforce(to!string(current.name) !in list);
+    list[to!string(current.name)] = convert(current, prefix);
     current = current.next;
   } while (current !is null);
 

@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <unistd.h>
 #include "defs.h"
 #define YYERROR_VERBOSE
 
@@ -201,10 +202,27 @@ void free_fig_context(Fig_Context* context)
  * return content and/or error details.
  */
 
-Fig_Context* read_figfile(char* filename)
+Fig_Context* read_figfile(char* filepath)
 {
   FILE *in;
+  char *curwd = NULL;
+  char path[1024];
+  char* filename;
+  char *ptr;
 
+  ptr = strrchr(filepath,'/');
+  filename = filepath;
+
+  if (ptr)
+  {
+    strncpy(path,filename,ptr-filename);
+    path[ptr-filename] = '\0';
+    filename = ptr+1;
+
+    curwd = get_current_dir_name();
+    chdir(path);
+  }
+    
   include_stack[include_stack_ptr] = strdup(filename);
 
   fig_parse_context* context = malloc(sizeof(fig_parse_context));
@@ -234,6 +252,12 @@ Fig_Context* read_figfile(char* filename)
   ret_val->err_filename = context->err_filename;
   
   free(context);
+
+  if (ptr)
+  {
+    chdir(curwd);
+    free(curwd);
+  }
 
   return ret_val;
 }

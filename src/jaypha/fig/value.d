@@ -31,6 +31,10 @@ struct Fig_Value
     V value_;
 
   public:
+
+    string name;
+    string full_name;
+
     bool is_bool()   { return type_ == Fig_Type.Bool; }
     bool is_int()    { return type_ == Fig_Type.Int; }
     bool is_float()  { return type_ == Fig_Type.Float; }

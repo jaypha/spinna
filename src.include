@@ -33,8 +33,7 @@ SPINNA_SRC_FILES = \
     $(SPINNA_ROOT)/src/jaypha/spinna/modules/catalogue.d \
     $(SPINNA_ROOT)/src/jaypha/spinna/modules/menu.d \
     $(SPINNA_ROOT)/src/jaypha/spinna/modules/invoicing/gst.d \
-    $(SPINNA_ROOT)/src/jaypha/spinna/modules/auth/authentication.d \
-    $(SPINNA_ROOT)/src/jaypha/spinna/modules/auth/authorization.d \
+    $(SPINNA_ROOT)/src/jaypha/spinna/modules/authorisation.d \
     $(SPINNA_ROOT)/src/jaypha/spinna/modules/estore/item_cart.d \
     $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/document.d \
     $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/component.d \

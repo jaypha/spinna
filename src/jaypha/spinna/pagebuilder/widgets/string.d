@@ -48,7 +48,7 @@ class StringWidget : Widget
     add_class("string-widget");
     label = _label;
     required = _required;
-    attributes["type"] = (name == "password")? "password" : "text";
+    attributes["type"] = "text";
     min_length = _min;
     max_length = _max;
   }

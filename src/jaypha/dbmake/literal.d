@@ -12,7 +12,7 @@ string literal(ref DatabaseDef database_def)
 {
   auto w = appender!string;
   w.print("DatabaseDef([");
-  w.print(database_def.tables.meld!((a,b) => ("\""~a~"\":"~b.literal()))().join(","));
+  w.print(database_def.tables.map!literal().join(","));
   w.print("],");
   if (database_def.views.length)
     w.print("[",database_def.views.meld!((a,b) => ("\""~a~"\":"~b.literal()))().join(","),"]");
@@ -118,7 +118,17 @@ string literal(ref FunctionDef function_def)
   w.print("FunctionDef(");
   w.print(quote_str(function_def.name));
   w.print(",");
-  w.print(quote_str(function_def.def));
+  w.print(quote_str(function_def.definer));
+  w.print(",");
+  w.print(function_def.no_sql);
+  w.print(",");
+  w.print(function_def.deterministic);
+  w.print(",[");
+  w.print(function_def.parameters.map!literal().join(","));
+  w.print("],");
+  w.print(literal(function_def.returns));
+  w.print(",");
+  w.print(quote_str(function_def.fn_body));
   w.print(")");
   return w.data;
 }

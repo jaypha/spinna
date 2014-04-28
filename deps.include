@@ -1,4 +1,0 @@
-progs/makerouter.d : ./src/jaypha/fig/value.d /usr/bin/dmd /etc/dmd.conf ./src/jaypha/fig/figparser.d ./src/jaypha/io/print.d
-	touch progs/makerouter.d
-progs/dbmake.d : ./src/jaypha/fig/value.d ./src/jaypha/fig/diagnostic.d /usr/bin/dmd /etc/dmd.conf ./src/jaypha/dbmake/build.d ./src/jaypha/algorithm.d ./src/jaypha/dbmake/dbdef.d ./src/jaypha/dbmake/literal.d ./src/jaypha/io/print.d ./src/jaypha/fig/figparser.d
-	touch progs/dbmake.d

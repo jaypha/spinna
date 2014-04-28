@@ -67,8 +67,9 @@ input.widget, .selector-search, .boolean-widget, .sort-widget, .selector-box
   margin-left: 0;
 }
 
+/* Radio & Check groups ----------------------------------------------------------*/
 
-.radiogroup-widget
+.enum-widget
 {
   display:inline-block;
   cursor:default;
@@ -77,16 +78,29 @@ input.widget, .selector-search, .boolean-widget, .sort-widget, .selector-box
   background-color: white;
 }
 
-.radiogroup-widget input { display: none; }
+.enum-widget input { display: none; }
 
-.radiogroup-widget label
+.enum-widget label
+{
+  padding: $widget-padding;
+  color: #eee;
+}
+
+.enum-widget.horizontal label
 {
   display:inline-block;
-  padding: $widget-padding;
   border-left: $widget-border;
 }
 
-.radiogroup-widget label:first-child { border-left: none; }
+.enum-widget.vertical label
+{
+  display:block;
+  border-top: $widget-border;
+}
+
+.enum-widget label.selected { color: black; }
+
+.enum-widget label:first-child { border-left: none; border-top: none; }
 
 /* Integer -----------------------------------------------------------------------*/
 

@@ -51,24 +51,27 @@ void main(string[] args)
       enforce(v.is_list());
       if ("type" !in v.get_list())
       {
-        db_def.tables[n] = TableDef(n);
-        build_table_def(db_def.tables[n],v);
+        auto table_def = TableDef();
+        table_def.name = n;
+        build_table_def(table_def,v);
+        db_def.tables ~= table_def;
       }
       else
       {
         switch (v.get_list()["type"].get_string())
         {
           case "table":
-            db_def.tables[n] = TableDef();
-            db_def.tables[n].name = n;
-            build_table_def(db_def.tables[n],v);
+            auto table_def = TableDef();
+            table_def.name = n;
+            build_table_def(table_def,v);
+            db_def.tables ~= table_def;
             break;
 
           case "view":
             break;
           case "function":
             db_def.functions[n] = FunctionDef();
-            db_def.functions[n].name = n;
+            //db_def.functions[n].name = n;
             build_function_def(db_def.functions[n], v);
             break;
           default:

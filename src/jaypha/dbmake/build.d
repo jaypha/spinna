@@ -310,14 +310,49 @@ void build_index_def(ref IndexDef index, Fig_Value source)
  *
  *************************************************************************/
 
+import std.stdio;
+
 void build_function_def(ref FunctionDef fn, Fig_Value source)
-in
 {
-  assert(source.is_list());
-  assert("def" in source.get_list());
-}
-body
-{
+  enforce(source.is_list());
+
   auto list = source.get_list();
-  fn.def = list["def"].get_string();
+
+  enforce("body" in list);
+
+  fn.name = source.name;
+
+  if ("definer" in list)
+    fn.definer = list["definer"].get_string();
+  else
+    fn.definer = "CURRENT_USER";
+
+  if ("deterministic" in list)
+    fn.deterministic = true;
+
+  if ("no_sql" in list)
+    fn.no_sql = true;
+
+  if ("parameters" in list)
+  {
+    foreach (n,v; list["parameters"].get_list())
+    {
+      auto def = ColumnDef();
+      def.name = n;
+      if (v.is_list())
+        build_column_def(def,v);
+      else
+        enforce(v.is_bool());
+      fn.parameters ~= def;
+    }
+  }
+
+  if ("returns" in list)
+    extract_type(fn.returns, list["returns"].get_string());
+  else
+    fn.returns.type = ColumnDef.Type.String;
+
+  fn.fn_body = list["body"].get_string();
+  //fn.def = list["def"].get_string();
+
 }

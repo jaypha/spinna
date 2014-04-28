@@ -1,10 +1,12 @@
 module jaypha.spinna.process;
 
-
-import jaypha.spinna.global;
-
 import std.range;
 import std.algorithm;
+
+import jaypha.spinna.global;
+import jaypha.spinna.modules.authorisation;
+
+import gen.router;
 
 /*
  * Procedure
@@ -21,7 +23,6 @@ void processRequest(I,O)
   string[string] env,
   I input_stream,
   O output_stream,
-  void delegate() function(string) router,
   void delegate(uint, string) error_handler
 ) if (isOutputRange!(O,immutable(ubyte)[]))
 {
@@ -30,15 +31,25 @@ void processRequest(I,O)
     request.prepare(env, input_stream);
     if ("SPINNA_SESSION" in request.cookies)
       session.session_id = request.cookies["SPINNA_SESSION"].value;
-    auto service = router(request.path);
-    if (service is null)
+
+    auto action_info = find_route(request.path);
+
+    if (action_info.action is null)
     {
       // Could not match.
       error_handler(404, "Page not found: "~request.path);
     }
     else
     {
-      service();
+      if (action_authorised(action_info.action))
+        action_info.service();
+      else
+      {
+        if (redirect_unauthorised(action_info.action) && !is_logged_in())
+          response.redirect("/login?url="~request.path);
+        else
+          error_handler(403, "Not authorised to access: "~request.path);
+      }
     }
     if (session.active)
     {

@@ -6,12 +6,14 @@ import std.range;
 import std.conv;
 import std.stdio;
 import std.regex;
+import std.getopt;
+import std.exception;
+import std.array;
 
 import jaypha.fig.figparser;
-import jaypha.io.print;
 
+enum module_name = "gen.router";
 
-string module_name = "router";
 string preamble;
 string error_page = null;
 
@@ -30,22 +32,46 @@ set!string modules;
 bool include_functional = false;
 bool include_string = false;
 
-/*
- * Synopsis makerouter <source>
- */
+//----------------------------------------------------------------------------
+
+void print_format(bool verbose = false)
+{
+  writeln("Format: makerouter [-h] [-d<output_dir>] <input_file>");
+}
+
+//----------------------------------------------------------------------------
 
 void main(string[] args)
 {
-  scope(success) { dump(stdout.lockingTextWriter); }
+  string output_dir = ".";
+  bool help = false;
+
+  getopt
+  (
+    args,
+    "d", &output_dir,
+    "h", &help
+  );
+
+  if (help) { print_format();  return; }
+
+  scope(success)
+  {
+    auto f1 = File(output_dir~"/router.d", "w");
+    scope(exit) { f1.close(); }
+    write_router(f1);
+
+    auto f2 = File(output_dir~"/permissions.tpl", "w");
+    scope(exit) { f2.close(); }
+    write_permissions(f2);
+    
+  }
 
   fns["route"] = make!(Queue!(string));
 
   foreach (filename; args[1..$])
   {
     Figtree figs = read_fig_file(filename);
-
-    if ("module" in figs)
-      module_name = figs["module"].get_string();
 
     if ("preamble" in figs)
       preamble = figs["preamble"].get_string();
@@ -74,9 +100,12 @@ void main(string[] args)
   }
 }
 
-void create_node_route(string fn_name, Figtree node)
+//----------------------------------------------------------------------------
+
+void create_node_route(string fn_name, Fig_Value node)
 {
-  auto pattern = node["pattern"].get_string();
+  auto members = node.get_list();
+  auto pattern = members["pattern"].get_string();
 
   if (canFind(pattern,'$'))
     create_regex_node_route(fn_name, node);
@@ -84,31 +113,39 @@ void create_node_route(string fn_name, Figtree node)
     create_static_node_route(fn_name, node);
 }
 
-void create_static_node_route(string fn_name, Figtree node)
+//----------------------------------------------------------------------------
+
+void create_static_node_route(string fn_name, Fig_Value node)
 {
   include_functional = true;
-  modules.put(node["module"].get_string());
+  auto members = node.get_list();
+
+  modules.put(members["module"].get_string());
 
   fns[fn_name] ~=
 
     text
     (
-      "mixin(match_static_route!(\"path\",\"",
-      node["pattern"].get_string(),
+      "mixin(match_static_route!(\"",
+      node.full_name,
+      "\",\"",
+      members["pattern"].get_string(),
       "\", \"",
-      node["module"].get_string(),'.',node["service"].get_string(),
+      members["module"].get_string(),'.',members["service"].get_string(),
       "\"));"
-
     );
 }
 
+//----------------------------------------------------------------------------
 
-void create_regex_node_route(string fn_name, Figtree node)
+void create_regex_node_route(string fn_name, Fig_Value node)
 {
-  Figtree formats = node["format"].get_list();
-  string pattern = node["pattern"].get_string();
+  auto members = node.get_list();
+
+  Figtree formats = members["format"].get_list();
+  string pattern = members["pattern"].get_string();
   string[] params;
-  modules.put(node["module"].get_string());
+  modules.put(members["module"].get_string());
 
   foreach(n,f; formats)
   {
@@ -121,16 +158,19 @@ void create_regex_node_route(string fn_name, Figtree node)
   fns[fn_name] ~=
     text
     (
-      "mixin(match_regex_route!(\"path\",\"rx",
+      "mixin(match_regex_route!(\"",
+      node.full_name,
+      "\",\"rx",
       place,
       "\", \"",
-      node["module"].get_string(),'.',node["service"].get_string(),
+      members["module"].get_string(),'.',members["service"].get_string(),
       "\", \"",
       join(params, "\", \""),
       "\"));"
     );
 }
 
+//----------------------------------------------------------------------------
 
 void create_sub_route(string fn_name, Figtree node)
 {
@@ -147,7 +187,7 @@ void create_sub_route(string fn_name, Figtree node)
       
         text
         (
-          "mixin(match_sub_route!(\"path\",\"",
+          "mixin(match_sub_route!(\"",
           f.get_list()["prefix"].get_string(),
           "\", \"find_",
           fn_name ~ n,
@@ -159,55 +199,134 @@ void create_sub_route(string fn_name, Figtree node)
       create_sub_route(fn_name ~ n, f.get_list());
     }
     else if ("pattern" in f.get_list())
-      create_node_route(fn_name, f.get_list());
+      create_node_route(fn_name, f);
+
+    extract_permissions(f);
   }
 }
 
-void dump(Writer)(Writer w)
+//----------------------------------------------------------------------------
+
+struct RoleInfo
 {
-  w.println("/*\n * Detrmines which function to call based on the path\n *");
+  string[] roles;
+  bool noredirect = false;
+}
+
+RoleInfo[string] allowed_roles;
+
+void extract_permissions(Fig_Value node)
+{
+  RoleInfo info;
+
+  auto list = node.get_list();
+
+  if ("roles" !in list)
+    return;
+
+  auto roles = list["roles"];
+
+  if (roles.type() == Fig_Type.Str)
+  {
+    info.roles = [ roles.get_string() ];
+  }
+  else if (roles.type() == Fig_Type.Array)
+  {
+    foreach (v; roles.get_array())
+    {
+      enforce(v.type() == Fig_Type.Str);
+      info.roles ~= v.get_string();
+    }
+  }
+  else
+    throw new Exception("Node "~node.full_name~": roles must be valid string or list of strings");
+
+  if ("noredirect" in list)
+    info.noredirect = true;
+
+  allowed_roles[node.full_name] = info;
+}
+
+//----------------------------------------------------------------------------
+
+void write_router(File writer)
+{
+  writer.writeln("/*\n * Detrmines which function to call based on the path\n *");
   if (preamble != "")
-    w.println(" * ",preamble.split("\n").join("\n * "));
+    writer.writeln(" * ",preamble.split("\n").join("\n * "));
 
-  w.println(" */");
-  w.println();
-  w.println("/*");
-  w.println(" * Generated file. Do not edit");
-  w.println(" */");
-  w.println();
-  w.println("module ",module_name,";");
-  w.println();
-  w.println("import jaypha.spinna.router_tools;");
+  writer.writeln(" */");
+  writer.writeln();
+  writer.writeln("/*");
+  writer.writeln(" * Generated file. Do not edit");
+  writer.writeln(" */");
+  writer.writeln();
+  writer.writeln("module ",module_name,";");
+  writer.writeln();
+  writer.writeln("public import jaypha.spinna.router_tools;");
   if (include_functional)
-    w.println("import std.functional;");
+    writer.writeln("import std.functional;");
   if (include_string)
-    w.println("import std.string;");
+    writer.writeln("import std.string;");
 
-  w.println();
+  writer.writeln();
   foreach (m; modules.Range)
-    w.println("static import ",m,";");
+    writer.writeln("static import ",m,";");
 
   if (error_page !is null)
-    w.println("alias error_page ",error_page,";");
+    writer.writeln("alias error_page ",error_page,";");
 
   if (regexs.size() > 0)
   {
     int count = 0;
-    w.println();
-    w.println("import std.regex;");
+    writer.writeln();
+    writer.writeln("import std.regex;");
     foreach (r;regexs.Range)
-      w.println("enum rx",count++," = ctRegex!(`^",r,"$`);");
+      writer.writeln("enum rx",count++," = ctRegex!(`^",r,"$`);");
   }
 
   foreach (n,f; fns)
   {
-    w.println();
-    w.println("void delegate() find_",n,"(string path) {");
+    writer.writeln();
+    //writer.writeln("void delegate() find_",n,"(string path) {");
+    writer.writeln("auto find_",n,"(string path) {");
     foreach (ss; f)
-      w.println("  ",ss);
-    w.println("  return null;\n}");
+      writer.writeln("  ",ss);
+    writer.writeln("  return ActionInfo(null,null);\n}");
   }
 }
+
+//----------------------------------------------------------------------------
+
+void write_permissions(File writer)
+{
+  writer.writeln("/*\n * Info about authorisation for each action\n *");
+  if (preamble != "")
+    writer.writeln(" * ",preamble.split("\n").join("\n * "));
+
+  writer.writeln(" */");
+  writer.writeln();
+  writer.writeln("/*");
+  writer.writeln(" * Generated file. Do not edit");
+  writer.writeln(" */");
+  writer.writeln();
+  writer.writeln("permissions = [");
+  string[] permission_items;
+  foreach (n,p; allowed_roles)
+  {
+    string item = "  \""~n~"\": Permission([";
+    string[] role_items;
+    foreach (r;p.roles)
+      role_items ~= "AccountRole."~r;
+    item ~= role_items.join(",");
+    item ~= "],"~(p.noredirect?"true":"false")~")";
+    permission_items ~= item;
+  }
+  writer.writeln(permission_items.join("\n,"));
+  writer.writeln("];");
+}
+
+//----------------------------------------------------------------------------
 
 struct Queue(T)
 {
@@ -234,6 +353,8 @@ struct Queue(T)
     T front() { return q.front(); }
     void popFront() { q.popFront(); }
 }
+
+//----------------------------------------------------------------------------
 
 struct set(T)
 {
