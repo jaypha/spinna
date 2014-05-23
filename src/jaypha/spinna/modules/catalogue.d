@@ -12,10 +12,10 @@ import jaypha.algorithm;
 
 import jaypha.dbms.dynamic_query;
 
-struct Catalogue(string table_prefix, Database)
-{
-  this(ref Database _database) { database = _database; }
+import db;
 
+struct Catalogue(string table_prefix)
+{
   //-----------------------------------------------------------------------------
   // Items
   //-----------------------------------------------------------------------------
@@ -39,27 +39,30 @@ struct Catalogue(string table_prefix, Database)
 
   //-----------------------------------------------------------------------------
 
-  ulong save(ulong id, strstr data)
+  ulong save(strstr data)
+  {
+    if ("title" in data)
+      data["uri_title"] = get_uri_title(data["title"]);
+    return database.quick_insert(table_prefix ~ "_catalogue", data);
+  }
+
+  //-----------------------------------------------------------------------------
+  
+  void save(strstr data, ulong id)
   {
     if ("title" in data)
       data["uri_title"] = get_uri_title(data["title"]);
     
-    if (id)
+    if ("title" in data)
     {
-      if ("title" in data)
+      auto oldtitle = database.query_value("select uri_title from " ~ table_prefix ~ "_catalogue where id="~to!string(id));
+      if (oldtitle != data["uri_title"])
       {
-        auto oldtitle = database.query_value("select uri_title from " ~ table_prefix ~ "_catalogue where id="~to!string(id));
-        if (oldtitle != data["uri_title"])
-        {
-          database.query("update " ~ table_prefix ~ "_uri_redirect set newtitle="~database.quote(data["uri_title"])~" where newtitle="~database.quote(oldtitle));
-          database.quick_insert(table_prefix ~ "_uri_redirect", ["oldtitle":oldtitle, "newtitle":data["uri_title"]]);
-        }
+        database.query("update " ~ table_prefix ~ "_uri_redirect set newtitle="~database.quote(data["uri_title"])~" where newtitle="~database.quote(oldtitle));
+        database.quick_insert(table_prefix ~ "_uri_redirect", ["oldtitle":oldtitle, "newtitle":data["uri_title"]]);
       }
-      database.set(table_prefix ~ "_catalogue", data, id);
     }
-    else
-      id = database.quick_insert(table_prefix ~ "_catalogue", data);
-    return id;
+    database.set(table_prefix ~ "_catalogue", data, id);
   }
 
   //-----------------------------------------------------------------------------
@@ -71,13 +74,20 @@ struct Catalogue(string table_prefix, Database)
 
   //-----------------------------------------------------------------------------
 
-  auto get_items(bool categories_also = false)
+  auto get_everything()
   {
     DynamicQuery dq;
     dq.table = table_prefix ~ "_catalogue";
-    if (!categories_also)
-      dq.wheres ~= "type='item'";
     dq.add_sorting("title");
+    return dq;
+  }
+
+  //-----------------------------------------------------------------------------
+
+  auto get_items()
+  {
+    auto dq = get_everything();
+    dq.wheres ~= "type='item'";
     return dq;
   }
 
@@ -85,10 +95,8 @@ struct Catalogue(string table_prefix, Database)
 
   auto get_categories()
   {
-    DynamicQuery dq;
-    dq.table = table_prefix ~ "_catalogue";
+    auto dq = get_everything();
     dq.wheres ~= "type='category'";
-    dq.add_sorting("title");
     return dq;
   }
 
@@ -251,11 +259,6 @@ struct Catalogue(string table_prefix, Database)
       //writeln("update " ~ table_prefix ~ "_links as L set list_order="~to!string(i)~" where L.category="~cid~" L.item="~to!string(id));
       database.query("update " ~ table_prefix ~ "_links set list_order="~to!string(i)~" where category="~cid~" and item="~to!string(id));
   }
-
-  //-----------------------------------------------------------------------------
-
-  private:
-    Database database;
 }
 
 string get_uri_title(string title)

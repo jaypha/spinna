@@ -17,7 +17,7 @@ import jaypha.mime.header;
 
 import jaypha.types;
 
-
+/*
 struct MimeEntity
 {
   MimeHeader[] headers;
@@ -28,7 +28,7 @@ struct MimeEntity
     MimeEntity[] multi;
   } content;
 }
-
+*/
 struct MimeEntityReader(BR)
 {
   alias BR MET;

@@ -14,19 +14,18 @@ class HtmlTableRow : HtmlElement
 {
   enum CellType : string { th = "th", td = "td" }
 
-  this(CellType ct) { super("tr"); cell_type = ct; cells = new Composite(); content = cells; }
+  this(CellType ct) { super("tr"); cell_type = ct; }
 
   HtmlElement cell()
   {
     auto c = new HtmlElement(cell_type);
     
-    cells.add(c);
+    add(c);
     return c;
   }
 
   private:
     CellType cell_type;
-    Composite cells;
 }
 
 
@@ -61,25 +60,23 @@ class HtmlTable : HtmlElement
 
   override void copy(TextOutputStream output)
   {
-    auto cn = new Composite();
     foreach (c; column_classes)
-      cn.add("<col class='"~c~"'/>");
+      add("<col class='"~c~"'/>");
     if (t_head)
     {
-      cn.add("<thead>");
-      cn.add(t_head);
-      cn.add("</thead>");
+      add("<thead>");
+      add(t_head);
+      add("</thead>");
     }
-    cn.add("<tbody>");
-    cn.add(t_body);
-    cn.add("</tbody>");
+    add("<tbody>");
+    add(t_body);
+    add("</tbody>");
     if (t_foot)
     {
-      cn.add("<tfoot>");
-      cn.add(t_foot);
-      cn.add("</tfoot>");
+      add("<tfoot>");
+      add(t_foot);
+      add("</tfoot>");
     }
-    content = cn;
     super.copy(output);
   }
 

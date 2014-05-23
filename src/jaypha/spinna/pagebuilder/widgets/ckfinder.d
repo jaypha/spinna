@@ -5,7 +5,13 @@ public import jaypha.spinna.pagebuilder.widgets.string_widget;
 
 class CKFinderWidget : StringWidget
 {
-  this(HtmlForm _form, string _name)
+  this
+  (
+    HtmlForm _form,
+    string _name,
+    string _label,
+    bool _required,
+  )
   {
     super(_form, _name);
     add_class("ckfinder");
@@ -15,6 +21,6 @@ class CKFinderWidget : StringWidget
   {
     form.doc.page_head.script_files["ckfinder"] = "/thirdparty/ckfinder/ckfinder.js";
     super.copy(output);
-		output.print("<input type='button' class='button' value='Browse Server' onclick='use_ckfinder( \"Images:/\", \""~id~"\");'/>";
+		output.print("<input type='button' class='button' value='Browse Server' onclick='use_ckfinder( \"Images:/\", \""~id~"\");'/>");
   }
 }

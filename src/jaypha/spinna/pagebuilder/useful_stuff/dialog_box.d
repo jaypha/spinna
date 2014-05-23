@@ -3,15 +3,16 @@
 module jaypha.spinna.pagebuilder.useful_stuff.dialog_box;
 
 import jaypha.spinna.pagebuilder.htmlelement;
+import jaypha.html.helpers;
 
 class DialogBox(string S) : HtmlElement
 {
-  Component header;
+  Component header, footer;
 
   class DialogTpl : Component
   {
     Composite content;
-    Component header;
+    Component header, footer;
 
     mixin TemplateCopy!S;
   }
@@ -33,7 +34,16 @@ class DialogBox(string S) : HtmlElement
   override void copy(TextOutputStream output)
   {
     tpl.header = header;
+    tpl.footer = footer;
     super.copy(output);
+    output.print
+    (
+      javascript
+      (
+        "$(function(){$('#"~id~"').jqm();"
+        "$('#"~id~"').jqmAddClose('#"~id~" .dialog-close-button');});"
+      )
+    );
   }
 
   private:
@@ -43,15 +53,18 @@ class DialogBox(string S) : HtmlElement
 
 unittest
 {
-  //import std.stdio;
+  import std.stdio;
   import std.array;
 
   auto x = new DialogBox!("jaypha/spinna/pagebuilder/useful_stuff/dialog_default.tpl")("x");
 
   x.add("hello");
+  x.footer = new TextComponent("<button class='dialog-close-button' type='button'>OK</button>");
 
   auto buf = appender!(char[])();
 
   x.copy(new TextOutputStream(output_range_stream(buf)));
-  assert(buf.data == "<div class='jqmWindow' id='x'>\n <div class='jqm-border-box'>\n  <div class='jqm-header'>\n    \n  </div>\n  <hr class='p'/>\n  <div class='dialog-content'>\n    hello\n  </div>\n  <div class='jqm-footer'>\n   <button class='dialog-ok-button' type='button'>OK</button>\n  </div>\n </div>\n\n<script type='text/javascript'>\n$(function()\n{\n  $('#x').jqm();\n  $('#x').jqmAddClose('#x .dialog-ok-button');\n  $('#about-btn').click(function(){ $('#about-dialog').jqmShow(); });\n});\n</script>\n\n</div>");
+  writeln(buf.data);
+  auto z = "<div class='jqmWindow' id='x'>\n <div class='jqm-border-box'>\n  <div class='jqm-header'>\n    \n  </div>\n  <hr class='p'/>\n  <div class='dialog-content'>\n    hello\n  </div>\n  \n   <div class='jqm-footer'>\n    <button class='dialog-close-button' type='button'>OK</button>\n   </div>\n  \n </div>\n</div><script type='text/javascript'>\n<!--\n$(function(){$('#x').jqm();$('#x').jqmAddClose('#x .dialog-close-button');});\n//-->\n</script>";
+  assert(buf.data == z);
 }

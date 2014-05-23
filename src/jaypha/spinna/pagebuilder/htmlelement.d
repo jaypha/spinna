@@ -36,13 +36,6 @@ class HtmlElement : Composite
 
   this(string _tag_name = "div")        { tag_name = _tag_name; }
 
-  @property
-  {
-    Component content()       { return _c; }
-    void content(Component o) { _cl(); add(o); }
-    void content(string t)    { _cl(); add(t); }
-  }
-
   void add_class(string class_name)
   {
     if (find(css_classes,class_name).empty)
@@ -134,7 +127,7 @@ unittest
   page.add_class("bottom");
   page.css_styles["position"] = "rela&tive";
   page.css_styles["padding"] = "5px";
-  page.content = "hello";
+  page.add("hello");
   page.copy(bos);
   assert
   (
@@ -142,14 +135,9 @@ unittest
     buf.data == "<img class='top bottom' style='padding:5px;position:rela&amp;tive' src='pig.gif'>hello</img>"
   );
 
-  buf.clear();
-  page = new HtmlElement();
   auto inner = new HtmlElement("p");
-  inner.content = "hello";
-  page.content = inner;
-  page.copy(bos);
-  assert(buf.data == "<div><p>hello</p></div>");
- 
+  inner.add("hello");
+
   buf.clear();
   page = new HtmlElement();
   page.add("abc");

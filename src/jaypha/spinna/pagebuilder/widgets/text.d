@@ -47,7 +47,7 @@ class TextWidget : Widget
   {
     if (max_length != 0) attributes["max_length"] = to!string(max_length);
     form.doc.page_head.add_script("add_string_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~",0,"~to!string(max_length)~",null);");
-    content = _value;
+    add(_value);
     super.copy(output);
   }
 

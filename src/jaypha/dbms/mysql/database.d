@@ -270,13 +270,29 @@ final class MySqlDatabase
   // constraints
   // values are expected to be already vetted. Functions will enquote.
   //
-  
+
+  ulong get_insert_id() { return mysql_insert_id(mysql); }
+
+  //---------------------------------------------------------------------------
+
   ulong quick_insert(string tablename, string[string] values)
   {
-    return quick_insert(tablename, values.keys, values.values);
+    return insert(tablename, values.keys, values.values);
   }
 
+  ulong insert(string tablename, string[string] values)
+  {
+    return insert(tablename, values.keys, values.values);
+  }
+
+  //---------------------------------------------------------------------------
+
   ulong quick_insert(string tablename, string[] columns, string[] values)
+  {
+    return insert(tablename, columns, values);
+  }
+
+  ulong insert(string tablename, string[] columns, string[] values)
   {
     query
     (
@@ -289,15 +305,31 @@ final class MySqlDatabase
     return get_insert_id();
   }
 
-  ulong get_insert_id() { return mysql_insert_id(mysql); }
-
   //---------------------------------------------------------------------------
 
+  ulong insert(string tablename, string[] columns, string[][] values)
+  {
+    auto str = appender!string();
+
+    str.put("insert into `");
+    str.put(tablename);
+    str.put("` (");
+    str.put(columns.join(","));
+    str.put(") values (");
+    //... TODO str.put(values.map!((a) => map!((b) => quote(b)).join(",")).join("),("));
+    str.put(")");
+    query(str.data);
+    return get_insert_id();
+  }
+
+  //---------------------------------------------------------------------------
 
   void quick_update(string tablename, string[string] values, string where)
   {
     quick_update(tablename, values, [ where ]);
   }
+
+  //---------------------------------------------------------------------------
 
   void quick_update(string tablename, string[string] values, string[] wheres)
   {
@@ -312,10 +344,14 @@ final class MySqlDatabase
     );
   }
 
+  //---------------------------------------------------------------------------
+
   void quick_update(string tablename, string[] columns, string[] values, string where)
   {
     quick_update(tablename, columns, values, [ where ]);
   }
+
+  //---------------------------------------------------------------------------
 
   void quick_update(string tablename, string[] columns, string[] values, string[] wheres)
   {
@@ -327,6 +363,8 @@ final class MySqlDatabase
     
     query("update `"~tablename~"` set "~join(s,",")~" where "~wheres.join(" and "));
   }
+
+  //---------------------------------------------------------------------------
 
   void replace(string tablename, string[string] values)
   {
@@ -344,7 +382,8 @@ final class MySqlDatabase
   //---------------------------------------------------------------------------
   // Shortcuts for use with ids
   //---------------------------------------------------------------------------
-
+  // Assumes the table has a column `id` of type unigned integer (or long)
+  // and hass a unique value index.
   //---------------------------------------------------------------------------
 
   string[string] get(string table, ulong id)
@@ -354,9 +393,15 @@ final class MySqlDatabase
 
   //---------------------------------------------------------------------------
 
-  void set(string tablename, string[string] values, ulong id)
+  ulong set(string tablename, string[string] values, ulong id = 0)
   {
-    quick_update(tablename, values, [ "id="~to!string(id) ]);
+    if (id == 0)
+      return insert(tablename, values);
+    else
+    {
+      quick_update(tablename, values, [ "id="~to!string(id) ]);
+      return id;
+    }
   }
 
   //---------------------------------------------------------------------------

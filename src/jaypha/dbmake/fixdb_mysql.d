@@ -245,7 +245,7 @@ string get_type_sql(ref ColumnDef def, DB db)
       s = "int(11)";
       break;
     case ColumnDef.Type.BigInt:
-      s ="bigint";
+      s ="bigint(20)";
       break;
     case ColumnDef.Type.Decimal:
       s = "decimal("~to!string(def.size)~","~to!string(def.scale)~")";

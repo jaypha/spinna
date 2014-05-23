@@ -29,7 +29,7 @@ class LinkButton : HtmlElement
   {
     super("button");
     add_class("button-widget");
-    content = label;
+    add(label);
     attributes["type"] = "button";
 
     attributes["onclick"] =  "document.location='"~link~"'";
@@ -43,10 +43,7 @@ class LinkButton : HtmlElement
   }
 }
 
-template link_button(string link, string label)
-{
-  enum link_button = "<button class='button-widget' type='button' onclick='document.location=\""~link~"\"'>"~label~"</button>";
-}
+enum link_button(string link, string label) = "<button class='button-widget' type='button' onclick='document.location=\""~link~"\"'>"~label~"</button>";
 
 class OpenButton : HtmlElement
 {
@@ -54,7 +51,7 @@ class OpenButton : HtmlElement
   {
     super("button");
     add_class("button-widget");
-    content = label;
+    add(label);
     attributes["type"] = "button";
     attributes["onclick"] = "window.open('"~link~"'); return false;";
   }
@@ -73,7 +70,7 @@ class JSButton : HtmlElement
   {
     super("button");
     add_class("button-widget");
-    content = label;
+    add(label);
     attributes["type"] = "button";
     attributes["onclick"] = script;
   }

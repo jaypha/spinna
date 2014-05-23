@@ -42,41 +42,16 @@ import std.variant;
 //----------------------------------------------------------------------------
 //
 // Various serialize functions of the general format
-// const(char)[] serialize(T)(T value) where T is a supported type.
+// string serialize(T)(T value) where T is a supported type.
 // Returns the encoded value.
 //
 //----------------------------------------------------------------------------
 
-string serialize(T:string)(T value)
-{
-  return format("s%d:%s",value.length,value);
-}
-
-string serialize(T:const(char)[])(T value)
-{
-  return format("s%d:%s",value.length,value);
-}
-
-//----------------------------------------------------------------------------
-
-string serialize(T:const(wchar)[])(T value)
-{
-  return serialize!(const(char)[])(toUTF8(value));
-}
-
-//----------------------------------------------------------------------------
-
-string serialize(T:const(dchar)[])(T value)
-{
-  return serialize!(const(char)[])(toUTF8(value));
-}
-
-//----------------------------------------------------------------------------
-
 string serialize(T)(T value) if (isSomeChar!T)
 {
-  auto v = toUTF8(value);
-  return format("s%d:%s",value.length,value);
+  char[4] v;
+  auto v2 = toUTF8(v,value);
+  return format("s%d:%s",v2.length,v2);
 }
 
 //----------------------------------------------------------------------------
@@ -104,11 +79,18 @@ string serialize(T)(T value) if (isFloatingPoint!(T))
 
 string serialize(T:T[])(T[] value)
 {
-  auto x = appender!(string);
-  formattedWrite(x,"a%d",value.length);
-  foreach (idx,val; value)
-    x.put(serialize!(T)(val));
-  return x.data;
+  static if (is(Unqual!T == char))
+    return format("s%d:%s",value.length,value);
+  else static if (is(Unqual!T == wchar) || is(Unqual!T == dchar))
+    return serialize!(const(char)[])(toUTF8(value));
+  else
+  {
+    auto x = appender!(string);
+    formattedWrite(x,"a%d",value.length);
+    foreach (idx,val; value)
+      x.put(serialize!(T)(val));
+    return x.data;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -401,6 +383,8 @@ unittest
   assert(serialize!(cstring)("abc") == "s3:abc");
   assert(serialize!(cstring)("abc\"xf\nl") == "s8:abc\"xf\nl");
   assert(serialize!(cstring)(ss) == "s3:xyz");
+  assert(serialize!(mstring)(ss) == "s3:xyz");
+  //assert(serialize!string(ss) == "s3:xyz");
 
   int[] x = [1,2,3];
   cstring x_s = serialize!(int[])(x);
@@ -417,6 +401,7 @@ unittest
   z["b"] = "y2".dup;
   z["c"] = "z3".dup;
   cstring z_s = serialize!(mstring[cstring])(z);
+  
   assert(z_s == `o3s1:as2:x1s1:bs2:y2s1:cs2:z3`,z_s);
 
   cstring[cstring] zc;

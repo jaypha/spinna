@@ -53,7 +53,7 @@ class SelectorWidget(string tpl = "jaypha/spinna/pagebuilder/widgets/selector.tp
     c.selected = selected;
     c.name = name;
     
-    content = c;
+    add(c);
 
     form.doc.page_head.add_script("add_selector_widget('"~name~"','"~label~"','"~form.id~"',"~to!string(min_options)~","~to!string(max_options)~");", true);
     super.copy(output);

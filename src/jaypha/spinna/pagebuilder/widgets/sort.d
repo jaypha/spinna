@@ -37,10 +37,10 @@ class SortWidget : Widget
   {
     form.doc.page_head.add_script("$('#"~id~"').sortable({update: function(e,u){ sort_update('"~id~"','"~name~"','"~form.id~"')}});", true);
 
-    auto c = new Composite();
+
     foreach (item; options)
-      c.add("<li id='"~id~"-"~item.value~"'>"~encode_special(item.label)~"</li>");
-    content = c;
+      add("<li id='"~id~"-"~item.value~"'>"~encode_special(item.label)~"</li>");
+
     super.copy(output);
   }
 

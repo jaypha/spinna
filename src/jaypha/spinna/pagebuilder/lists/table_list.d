@@ -48,7 +48,7 @@ class TableList : ListComponent
     foreach (c; source.headers)
     {
       auto cell = thr.cell();
-      cell.content = c;
+      cell.add(c);
     }
 
     source.reset();
@@ -64,7 +64,7 @@ class TableList : ListComponent
       foreach (c; row)
       {
         auto cell = tbr.cell();
-        cell.content = c;
+        cell.add(c);
       }
     }
 

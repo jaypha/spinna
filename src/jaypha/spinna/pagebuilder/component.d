@@ -52,8 +52,6 @@ class Composite : Component
   }
 
   private Appender!(Component[]) content;
-  protected @property Component _c() {if (length) return content.data[0]; else return null; }
-  protected void _cl() { content.clear(); }
 }
 
 //-----------------------------------------------------------------------------

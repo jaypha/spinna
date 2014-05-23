@@ -45,10 +45,12 @@ string email_link(string email)
   return a.data;
 }
 
-template javascript(string script)
+string javascript(string script)
 {
-  enum javascript = "<script type='text/javascript'>\n<!--\n"~script~"\n//-->\n</script>";
+  return "<script type='text/javascript'>\n<!--\n"~script~"\n//-->\n</script>";
 }
+
+enum js(string script) = javascript(script);
 
 /+
 

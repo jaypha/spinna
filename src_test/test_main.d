@@ -2,48 +2,57 @@
 module test_main;
 
 import std.stdio;
-import jaypha.io.output_stream;
+import std.typecons;
+import std.range;
+import std.array;
+
+import Backtrace = backtrace.backtrace;
 
 import jaypha.types;
 
-import jaypha.spinna.pagebuilder.widgets.validate;
+import jaypha.io.output_stream;
 
-import jaypha.container.hash;
+import jaypha.io.serialize;
 
-import std.typecons;
+import test_auth;
+//import test_router;
+import test_dialog;
 
-import jaypha.decimal;
-import Backtrace = backtrace.backtrace;
+struct WriteOut
+{
+  void put(const(dchar) d) { write(d); }
+  void put(const(char)[] s) { write(s); }
+  void put(const(wchar)[] s) { write(s); }
+  void put(const(dchar)[] s) { write(s); }
+}
+
+static this()
+{
+  Backtrace.install(stderr);
+}
 
 void main(string[] args)
 {
-  debug { Backtrace.install(stderr); }
+  WriteOut writer;
 
-  StrHash request;
-
-  request["wip"] = "";
-  request["bip"] = "0";
-  request["zip"] = "64";
+/*
+  static if (isOutputRange!(WriteOut,const(wchar)[]))
+    writeln("Writeout is an OR of wchar[]");
 
 
-  bool v;
+  auto buf = appender!(char[])();
+  auto bos = new TextOutputStream(output_range_stream(buf));
 
-  assert(validate_boolean(v, request, "yak", false));
-  assert(!v);
-  assert(!validate_boolean(v, request, "yak", true));
-
-  assert(validate_boolean(v, request, "wip", false));
-  assert(!v);
-  assert(!validate_boolean(v, request, "wip", true));
-
-  assert(validate_boolean(v, request, "bip", false));
-  assert(!v);
-  assert(!validate_boolean(v, request, "bip", true));
-
-  assert(validate_boolean(v, request, "zip", false));
-  assert(v);
-  assert(validate_boolean(v, request, "zip", true));
-  assert(v);
-  writeln(request["tip"]);
-
+  auto page = new HtmlElement();
+  auto inner = new HtmlElement("p");
+  inner.add("hello");
+  page.add(inner);
+  page.copy(bos);
+  writeln(buf.data);
+  buf.clear();
+  writeln();
+*/
+  //test_authorisation();
+  //test_routr();
+  dialog_test(writer);
 }

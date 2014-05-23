@@ -64,6 +64,6 @@ SPINNA_SRC_FILES = \
     $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/toolbar.d \
     $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/markitup.d \
     $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/radiogroup.d \
-    $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/all.d \
+    $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/package.d \
     $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/boolean.d \
     $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/date.d
