@@ -12,10 +12,14 @@ import jaypha.algorithm;
 
 import jaypha.dbms.dynamic_query;
 
-import db;
 
-struct Catalogue(string table_prefix)
+struct Catalogue(Database)
 {
+  string table_prefix;
+  Database database;
+
+  this(Database db, string p) { database = db; table_prefix = p; }
+
   //-----------------------------------------------------------------------------
   // Items
   //-----------------------------------------------------------------------------
@@ -253,10 +257,8 @@ struct Catalogue(string table_prefix)
 
   void save_item_ordering(ulong category_id, ulong[] new_order)
   {
-    //writeln(category_id, new_order);
     auto cid=to!string(category_id);
     foreach (i,id ; new_order)
-      //writeln("update " ~ table_prefix ~ "_links as L set list_order="~to!string(i)~" where L.category="~cid~" L.item="~to!string(id));
       database.query("update " ~ table_prefix ~ "_links set list_order="~to!string(i)~" where category="~cid~" and item="~to!string(id));
   }
 }

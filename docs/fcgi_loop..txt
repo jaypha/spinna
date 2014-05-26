@@ -1,0 +1,20 @@
+
+
+The FCGI loop serves as the interface to the web server.
+
+
+The loop uses the following steps.
+
+1. User calls FCGI_loop with a callback function.
+
+A continuous loop is executed doing the following.
+
+2. Gets the next request in the queue.
+3. Creates a new thread for the request and transfers the request information to it.
+
+Within the new thread
+
+4. Creates input and output ranges for the request in/out streams.
+5. Creates a string[string] associative array for the environment variables.
+6. Calls the callback function with the D friendly structures just created.
+
