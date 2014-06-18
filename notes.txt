@@ -39,3 +39,6 @@ class FCGI_OutStream
   }
 }
 
+
+
+Using properd instead of fig for properties increases executable size by 150K.

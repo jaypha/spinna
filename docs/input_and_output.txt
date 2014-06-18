@@ -1,0 +1,16 @@
+Web servers take input in the form of a HTTP request and supplies output in the form of an HTTP
+response. Spinna works with the request and response directly.
+
+The global variable "request" containes the URL (or GET) parameters, the environment variables and cookies. If the
+content is x-www-url-encoded or multipart/.formdata, then the contents are extracted and available
+as POST parameters and files. Otherwise the content is avaiable in raw form for the program to
+access.
+
+The global variable "response" contains methods to set the reponse headers and the content is
+an array of ubytes. The framework generates the HTTP text to be given to the output.
+
+request and response are declared in jaypha.spinna.global as instances of HTTPRequest and
+HTTPResponse respectively.
+HTTPRequest is defined in jaypha.spinna.request.
+HTTPResponse is defined in jaypha.spinna.response.
+

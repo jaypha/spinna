@@ -1,0 +1,12 @@
+The router is the part of the system that determines what service is required based on the url
+path given.
+
+In Spinna, the programmer specifies the router via a Fig definition file. This file effectively
+defines the website. It is interpereted by the "makerouter" program and D code is created which is
+compiled into the website program. The "process_request" rountine acceses the router to identify
+the service requested and the function that performs it.
+
+In addition to specifying services, the router definition also defines the roles that are allowed
+to access the service. Makerouter extracts this information and constructs a D code lookup table
+that "process_request" accesses to determine authorisation.
+

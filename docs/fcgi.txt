@@ -1,0 +1,5 @@
+The FCGI interface works on a simple loop.
+
+You initiate the loop giving it a callback. The Loop then reads requests from the fcgi feed,
+wraps the streams in D ranges, starts a thread for each one, and calls the callback.
+
