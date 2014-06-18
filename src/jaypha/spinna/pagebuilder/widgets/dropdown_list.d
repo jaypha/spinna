@@ -37,6 +37,8 @@ class DropdownListWidget : Widget
 
   override void copy(TextOutputStream output)
   {
+    auto d = new DelegateComponent(&print_innards);
+    /*
     auto c = appender!string();
     if ((_value is null || _value == "") || !required)
       c.put("<option value=''> -- none -- </option>");
@@ -52,9 +54,29 @@ class DropdownListWidget : Widget
       c.put("</option>");
     }
     add(c.data);
+    */
+    add(d);
     form.doc.page_head.add_script("add_dropdown_list_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~");", true);
 
     super.copy(output);
+  }
+
+  void print_innards(TextOutputStream c)
+  {
+    //auto c = appender!string();
+    if ((_value is null || _value == "") || !required)
+      c.put("<option value=''> -- none -- </option>");
+
+    foreach (o;options)
+    {
+      c.put("<option value='");
+      c.put(o.value);
+      if (o.value == _value)
+        c.put("' selected='selected");
+      c.put("'>");
+      c.put(o.label);
+      c.put("</option>");
+    }
   }
 
   EnumeratedOption[] options;

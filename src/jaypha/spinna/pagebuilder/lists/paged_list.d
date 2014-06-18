@@ -40,13 +40,17 @@ class PagedList
     auto ds = content.data_source;
 
     if (paginator.display_all)
-      ds.set_page_size(0);
+    {
+      ds.set_start(0);
+      ds.set_limit(0);
+    }
     else
     {
-      ds.set_page_size(paginator.page_size);
-      ds.set_page(paginator.page_number);
+      ds.set_limit(paginator.page_size);
+      ds.set_start((paginator.page_number-1)*paginator.page_size);
     }
-    paginator.num_pages = ds.num_pages;
+
+    paginator.num_pages = (ds.size + paginator.page_size - 1)/paginator.page_size;
 
     mixin(TemplateOutput!tpl);
   }

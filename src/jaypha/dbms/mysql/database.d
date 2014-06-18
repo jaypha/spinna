@@ -261,6 +261,15 @@ final class MySqlDatabase
 
   //---------------------------------------------------------------------------
 
+  void lock(string table)
+  {
+    query_raw("lock tables "~table~" write");
+  }
+
+  void unlock()
+  {
+    query_raw("unlock tables");
+  }
   
   //---------------------------------------------------------------------------
   // Database write methods
@@ -275,11 +284,6 @@ final class MySqlDatabase
 
   //---------------------------------------------------------------------------
 
-  ulong quick_insert(string tablename, string[string] values)
-  {
-    return insert(tablename, values.keys, values.values);
-  }
-
   ulong insert(string tablename, string[string] values)
   {
     return insert(tablename, values.keys, values.values);
@@ -287,14 +291,9 @@ final class MySqlDatabase
 
   //---------------------------------------------------------------------------
 
-  ulong quick_insert(string tablename, string[] columns, string[] values)
-  {
-    return insert(tablename, columns, values);
-  }
-
   ulong insert(string tablename, string[] columns, string[] values)
   {
-    query
+    query_raw
     (
       "insert into `"~tablename~"` (" ~
       columns.join(",") ~
@@ -307,6 +306,7 @@ final class MySqlDatabase
 
   //---------------------------------------------------------------------------
 
+/*
   ulong insert(string tablename, string[] columns, string[][] values)
   {
     auto str = appender!string();
@@ -321,19 +321,20 @@ final class MySqlDatabase
     query(str.data);
     return get_insert_id();
   }
+*/
 
   //---------------------------------------------------------------------------
 
-  void quick_update(string tablename, string[string] values, string where)
+  void update(string tablename, string[string] values, string where)
   {
-    quick_update(tablename, values, [ where ]);
+    update(tablename, values, [ where ]);
   }
 
   //---------------------------------------------------------------------------
 
-  void quick_update(string tablename, string[string] values, string[] wheres)
+  void update(string tablename, string[string] values, string[] wheres)
   {
-    query
+    query_raw
     (
       "update `"~tablename~"` set "~
       meld!
@@ -346,14 +347,14 @@ final class MySqlDatabase
 
   //---------------------------------------------------------------------------
 
-  void quick_update(string tablename, string[] columns, string[] values, string where)
+  void update(string tablename, string[] columns, string[] values, string where)
   {
-    quick_update(tablename, columns, values, [ where ]);
+    update(tablename, columns, values, [ where ]);
   }
 
   //---------------------------------------------------------------------------
 
-  void quick_update(string tablename, string[] columns, string[] values, string[] wheres)
+  void update(string tablename, string[] columns, string[] values, string[] wheres)
   {
     string[] s;
 
@@ -361,14 +362,14 @@ final class MySqlDatabase
       s~= columns[i] ~ "=" ~ quote(values[i]);
 
     
-    query("update `"~tablename~"` set "~join(s,",")~" where "~wheres.join(" and "));
+    query_raw("update `"~tablename~"` set "~join(s,",")~" where "~wheres.join(" and "));
   }
 
   //---------------------------------------------------------------------------
 
   void replace(string tablename, string[string] values)
   {
-    query
+    query_raw
     (
       "replace into  `"~tablename~"` set "~
       meld!
@@ -399,7 +400,7 @@ final class MySqlDatabase
       return insert(tablename, values);
     else
     {
-      quick_update(tablename, values, [ "id="~to!string(id) ]);
+      update(tablename, values, [ "id="~to!string(id) ]);
       return id;
     }
   }

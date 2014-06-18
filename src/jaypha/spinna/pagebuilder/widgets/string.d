@@ -56,6 +56,7 @@ class StringWidget : Widget
   override void copy(TextOutputStream output)
   {
     if (max_length != 0) attributes["maxlength"] = to!string(max_length);
+    if (is_password) attributes["type"] = "password";
     form.doc.page_head.add_script
     (
       "add_string_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~","~to!string(min_length)~","~to!string(max_length)~","~((regex is null || regex.length == 0)?"null":"'"~regex~"'")~");",
@@ -66,6 +67,7 @@ class StringWidget : Widget
 
   ulong min_length = 0;
   ulong max_length = 0;
+  bool is_password = false;
 
   string regex;
 }

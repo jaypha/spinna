@@ -10,8 +10,14 @@ abstract class DBDataSource(Database) : DataSource
 {
   this(DynamicQuery q, ref Database db) { query = q; database = db; }
 
-  void set_page_size(ulong s) { size = s; }
-  void set_page(ulong p) { page = p; }
+  @property ulong size()
+  {
+    return to!ulong(database.query_value(query.get_count_query()));
+  }
+
+  void set_start(ulong s) { start = s; }
+  void set_limit(ulong s) { limit = s; }
+
   @property ulong num_pages()
   {
     auto count = to!ulong(database.query_value(query.get_count_query()));
@@ -20,15 +26,19 @@ abstract class DBDataSource(Database) : DataSource
 
   void reset()
   {
-    query.limit = size;
-    query.offset = (page-1)*size;
+    if (limit != 0)
+    {
+      query.limit = limit;
+      query.offset = start;
+    }
     result = database.query(query.get_query());
     if (!result.empty) prepare_front();
   }
 
   protected:
-    ulong page = 1;
-    ulong size = 0;
+    ulong start = 0;
+    ulong limit = 0;
+
     DynamicQuery query;
     Database database;
 

@@ -5,9 +5,11 @@ public import jaypha.spinna.pagebuilder.component;
 
 interface DataSource
 {
-  void set_page_size(ulong size);
-  void set_page(ulong num);
-  @property ulong num_pages();
+  @property ulong size(); // Size of source without applying limits.
+
+  void set_start(ulong start);
+  void set_limit(ulong limit);
+
   void reset();
 }
 

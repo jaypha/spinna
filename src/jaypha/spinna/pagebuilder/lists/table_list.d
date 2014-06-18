@@ -82,9 +82,8 @@ unittest
     @property bool empty() { return i>= psize || i+offset > data.length; }
     void popFront() { ++i; }
 
-    void set_page_size(ulong size) { psize = (size == 0?data.length:size); }
-    void set_page(ulong num) { offset = psize*(num-1); }
-    @property ulong num_pages() { return (data.length + psize - 1)/psize; }
+    void set_limit(ulong num) { psize = limit; }
+    void set_start(ulong num) { offset = start; }
 
     @property string[] headers() { return [ "label", "thwonk" ]; }
 
@@ -116,9 +115,8 @@ unittest
 
   auto sl = new TableList("tablelist", ds);
 
-  ds.set_page_size(2);
-  ds.set_page(2);
-  assert(ds.num_pages == 4);
+  ds.set_limit(2);
+  ds.set_start(2);
   
   sl.copy(output);
   assert(output.data == "<table class='data list' id='tablelist-table'><thead><tr><th>label</th><th>thwonk</th></tr></thead><tbody><tr class='odd'><td>tweetle</td><td>tank</td></tr><tr class='even'><td>twobird</td><td>crank</td></tr></tbody></table>");

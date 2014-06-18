@@ -1,3 +1,15 @@
+/*
+ * Convenience functions for creating HTML.
+ *
+ * Copyright 2014 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ *
+ * Written in the D programming language.
+ */
 
 
 module jaypha.html.helpers;
@@ -33,6 +45,8 @@ string html_link(string link, string label = null)
 {
   return "<a href='"~link~"'>"~((label !is null)?label:link)~"</a>";
 }
+
+enum HtmlLink(string link, string label) = "<a href='"~link~"'>"~label~"</a>";
 
 //-----------------------------------------------------------------------------
 

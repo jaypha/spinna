@@ -25,12 +25,15 @@ import std.exception;
 
 import jaypha.fcgi.c.fcgiapp;
 
+
+// Note: HTTP input and output are octet streams. That is, an array of ubytes.
+
 //---------------------------------------------------------------------------
 
 /**
  * FCGI_Outstream
  *
- * An adapter for outgoing FCGI streams that acts as an output range.
+ * An adapter for outgoing FCGI streams that acts as an output range of ubytes.
  */
 
 struct FCGI_OutStream
@@ -58,7 +61,7 @@ struct FCGI_OutStream
 /**
  * FCGI_InStream
  *
- * An adapter for incoming FCGI streams that acts as an input range.
+ * An adapter for incoming FCGI streams that acts as an input range of ubytes.
  */
 
 struct FCGI_InStream
@@ -71,36 +74,7 @@ struct FCGI_InStream
     stream = _stream;
     popFront();
   }
-/+
-  @property bool empty()
-  {
-    if (current != -1)
-      return false;
 
-    // If current is -1, then we are either at the very beginning, or the very
-    // end.
-
-    if (FCGX_HasSeenEOF(stream) == -1) // -1 == EOF
-      return true;
-    int c = FCGX_GetChar(stream);
-    if (c == -1)
-      return true;
-    FCGX_UnGetChar(c, stream);
-    return false;
-  }
-
-  void popFront()
-  {
-    current = FCGX_GetChar(stream);
-  }
-
-  @property ubyte front()
-  {
-    if (current == -1)
-      popFront();
-    return cast(ubyte) current;
-  }
-+/
   bool empty = false;
 
   ubyte front;
@@ -113,7 +87,7 @@ struct FCGI_InStream
       front = cast(ubyte) next;
   }
 
-  /*
+  /+
   immutable(ubyte)[] grab_it_all()
   {
     auto a = appender!(ubyte[]);
@@ -125,7 +99,7 @@ struct FCGI_InStream
     }
     return assumeUnique(a.data);
   }
-  */
+  +/
 }
 
 //---------------------------------------------------------------------------

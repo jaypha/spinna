@@ -1,3 +1,16 @@
+/*
+ * main program for constructing router code
+ *
+ * Copyright 2014 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ *
+ * Written in the D programming language.
+ */
+
 module makerouter;
 
 import std.algorithm;
@@ -15,6 +28,8 @@ import jaypha.fig.figparser;
 enum module_name = "gen.router";
 
 string preamble;
+string roletype;
+string authtype;
 string error_page = null;
 
 struct fndef
@@ -75,6 +90,12 @@ void main(string[] args)
 
     if ("preamble" in figs)
       preamble = figs["preamble"].get_string();
+
+    if ("roletype" in figs)
+      roletype = figs["roletype"].get_string();
+
+    if ("authtype" in figs)
+      authtype = figs["authtype"].get_string();
 
     if ("error" in figs)
     {
@@ -310,16 +331,16 @@ void write_permissions(File writer)
   writer.writeln(" * Generated file. Do not edit");
   writer.writeln(" */");
   writer.writeln();
-  writer.writeln("permissions = [");
+  writer.writeln(authtype,".permissions = [");
   string[] permission_items;
   foreach (n,p; allowed_roles)
   {
-    string item = "  \""~n~"\": Permission([";
+    string item = "  \""~n~"\": "~authtype~".Permission([";
     string[] role_items;
     foreach (r;p.roles)
-      role_items ~= "AccountRole."~r;
+      role_items ~= roletype~"."~r;
     item ~= role_items.join(",");
-    item ~= "],"~(p.noredirect?"true":"false")~")";
+    item ~= "],"~(p.noredirect?"false":"true")~")"; // noredirect in fig, redirect in Permission.
     permission_items ~= item;
   }
   writer.writeln(permission_items.join("\n,"));

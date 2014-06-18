@@ -1,3 +1,16 @@
+/*
+ * Main processing routine for HTTP requests.
+ *
+ * Copyright 2014 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ *
+ * Written in the D programming language.
+ */
+
 module jaypha.spinna.process;
 
 import std.range;
@@ -13,12 +26,13 @@ import gen.router;
  *
  * 1. Interperet the HTTP request and put info into easy to use data structures.
  * 2. Run the router to determine which service to call. Failure results in a 404 response.
- * 3. Run the service.
- * 4. Catch any exceptions to generate an error page.
- * 5. Generate an HTTP response.
+ * 3. Test is service is authorised. Generate a 403 if not.
+ * 4. Run the service.
+ * 5. Catch any exceptions to generate an error page.
+ * 6. Generate an HTTP response.
  */
 
-void processRequest(I,O)
+void process_request(I,O,alias AuthType)
 (
   string[string] env,
   I input_stream,
@@ -41,11 +55,11 @@ void processRequest(I,O)
     }
     else
     {
-      if (action_authorised(action_info.action))
+      if (AuthType.action_authorised(action_info.action))
         action_info.service();
       else
       {
-        if (redirect_unauthorised(action_info.action) && !is_logged_in())
+        if (AuthType.redirect_unauthorised(action_info.action) && !is_logged_in())
           response.redirect("/login?url="~request.path);
         else
           error_handler(403, "Not authorised to access: "~request.path);

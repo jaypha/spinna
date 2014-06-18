@@ -7,7 +7,7 @@ import std.algorithm;
 import std.datetime;
 import std.string;
 
-alias immutable(ubyte)[] ByteArray;
+import jaypha.types;
 
 struct HttpResponse
 {

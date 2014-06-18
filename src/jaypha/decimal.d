@@ -201,6 +201,7 @@ auto mult(ubyte s1, ubyte s2)(decimal!s1 a, decimal!s2 b)
 
 alias decimal!1 dec1;
 alias decimal!2 dec2;
+alias decimal!2 dec3;
 
 //mixin decimalOps!2;
 

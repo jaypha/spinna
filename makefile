@@ -20,13 +20,13 @@ css: res/spinna.scss
 
 js: res/spinna.js
 
-bin: bin/makerouter bin/dbmake
+bin: bin/makerouter bin/makefixdb
 
 bin/makerouter: progs/makerouter.d lib/libfig.a
 	$(RDMD) $(RDFLAGS) $(LFLAGS) -ofbin/makerouter --build-only progs/makerouter.d
 
-bin/dbmake: progs/dbmake.d lib/libfig.a
-	$(RDMD) $(RDFLAGS) $(LFLAGS) -ofbin/dbmake --build-only progs/dbmake.d
+bin/makefixdb: progs/makefixdb.d lib/libfig.a src/jaypha/fixdb/literal.d src/jaypha/fixdb/dbdef.d src/jaypha/fixdb/build.d
+	$(RDMD) $(RDFLAGS) $(LFLAGS) -ofbin/makefixdb --build-only progs/makefixdb.d
 
 # --------------------------
 # makerouter for testing
@@ -48,8 +48,8 @@ lib/libfig.a:
 install:
 	cp bin/makerouter /usr/local/bin
 	strip /usr/local/bin/makerouter
-	cp bin/dbmake /usr/local/bin
-	strip /usr/local/bin/dbmake
+	cp bin/makefixdb /usr/local/bin
+	strip /usr/local/bin/makefixdb
 	cp lib/libfig.a /usr/local/lib
 
 # --------------------------
@@ -57,7 +57,7 @@ install:
 clean:
 	rm -f makerouter
 	rm -f bin/makerouter
-	rm -f bin/dbmake
+	rm -f bin/makefixdb
 	rm -f lib/libfig.a
 	rm -f res/spinna.min.js
 	rm -f res/spinna.js
@@ -78,3 +78,23 @@ res/spinna.scss: $(SCSSFILES)
 
 test:
 	$(RDMD) $(DDFLAGS) $(LFLAGS) -J./src_test -unittest src_test/test_main.d
+
+rpminstall: build
+	rm -rf $(DESTDIR)/*
+	mkdir $(DESTDIR)/usr
+	mkdir $(DESTDIR)/usr/bin
+	mkdir $(DESTDIR)/usr/lib
+	mkdir $(DESTDIR)/usr/include
+	mkdir $(DESTDIR)/usr/include/spinna
+	mkdir $(DESTDIR)/usr/include/spinna/dmd
+	cp bin/makerouter $(DESTDIR)/usr/bin
+	strip $(DESTDIR)/usr/bin/makerouter
+	cp bin/makefixdb $(DESTDIR)/usr/bin
+	strip $(DESTDIR)/usr/bin/makefixdb
+	cp -R src/backtrace $(DESTDIR)/usr/include/spinna/dmd
+	cp -R src/jaypha $(DESTDIR)/usr/include/spinna/dmd
+	cp src/*.d $(DESTDIR)/usr/include/spinna/dmd
+	cp -R thirdparty $(DESTDIR)/usr/include/spinna
+	cp -R licenses $(DESTDIR)/usr/include/spinna
+	cp -R res $(DESTDIR)/usr/include/spinna
+	cp lib/libfig.a $(DESTDIR)/usr/lib

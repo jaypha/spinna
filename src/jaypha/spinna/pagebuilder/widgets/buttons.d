@@ -31,8 +31,8 @@ class LinkButton : HtmlElement
     add_class("button-widget");
     add(label);
     attributes["type"] = "button";
-
     attributes["onclick"] =  "document.location='"~link~"'";
+    //attributes["href"] = link;
   }
 
   @property warning(string w)
@@ -43,7 +43,11 @@ class LinkButton : HtmlElement
   }
 }
 
-enum link_button(string link, string label) = "<button class='button-widget' type='button' onclick='document.location=\""~link~"\"'>"~label~"</button>";
+string button_link(string link, string label)
+{
+  return "<a class='button-widget' href='"~link~"'>"~label~"</a>";
+}
+
 
 class OpenButton : HtmlElement
 {

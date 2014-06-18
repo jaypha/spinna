@@ -26,6 +26,8 @@ alias dchar[] mdstring;
 
 alias string[string] strstr;
 
+alias immutable(ubyte)[] ByteArray;
+
 template isByteRange(R)
 {
   enum isByteRange = (isInputRange!(R) && is(ElementType!(R) : ubyte));
