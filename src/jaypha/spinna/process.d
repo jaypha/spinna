@@ -32,7 +32,7 @@ import gen.router;
  * 6. Generate an HTTP response.
  */
 
-void process_request(I,O,alias AuthType)
+void process_request(I,O,alias AuthInst = null)
 (
   string[string] env,
   I input_stream,
@@ -55,14 +55,17 @@ void process_request(I,O,alias AuthType)
     }
     else
     {
-      if (AuthType.action_authorised(action_info.action))
-        action_info.service();
-      else
+      static if (AuthInst !is null)
       {
-        if (AuthType.redirect_unauthorised(action_info.action) && !is_logged_in())
-          response.redirect("/login?url="~request.path);
+        if (AuthInst.action_authorised(action_info.action))
+          action_info.service();
         else
-          error_handler(403, "Not authorised to access: "~request.path);
+        {
+          if (AuthInst.redirect_unauthorised(action_info.action) && !is_logged_in())
+            response.redirect("/login?url="~request.path);
+          else
+            error_handler(403, "Not authorised to access: "~request.path);
+        }
       }
     }
     if (session.active)

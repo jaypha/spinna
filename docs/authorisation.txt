@@ -1,0 +1,15 @@
+
+
+== Authorisation ==
+
+Spinna uses role based authorisation. Accounts are given one or more roles. Each service
+may have a number of roles which are allowed to perform it. With each request, the framework
+matches the allowed roles for the service with the roles of the user.
+
+A service may have no roles identified, in which it is considered publicly accessible. If
+roles are defined, then the user must be logged in and have at least one of the defined
+roles assigned to their account. If the user is authorised, the service is performed
+normally. If the user is not authorised, then either a redirection to a login page occurs,
+or the request is rejected with a 403 response.
+
+Authorisation for services are defined in the router definition resource.
