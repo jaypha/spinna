@@ -1,13 +1,4 @@
 
-LIBDIR = /usr/local/lib /usr/lib64/mysql $(SPINNA_ROOT)/lib
-LIBS = fcgi fig mysqlclient
-INCDIR = $(IMPDIR) $(SPINNA_ROOT)/src
-
-LIBFLAGS= $(addprefix -L-l,$(LIBS)) $(addprefix -L-L,$(LIBDIR))
-
-JFLAGS = $(addprefix -J,$(INCDIR))
-IFLAGS = $(addprefix -I,$(INCDIR))
-
 
 JSFILES = $(SPINNA_ROOT)/src/jquery/jquery-ui.js \
           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/widgets.js \

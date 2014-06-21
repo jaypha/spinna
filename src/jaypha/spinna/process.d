@@ -17,7 +17,7 @@ import std.range;
 import std.algorithm;
 
 import jaypha.spinna.global;
-import jaypha.spinna.modules.authorisation;
+import jaypha.spinna.authorisation;
 
 import gen.router;
 
@@ -55,7 +55,7 @@ void process_request(I,O,alias AuthInst = null)
     }
     else
     {
-      static if (AuthInst !is null)
+      static if (is(AuthInst.Permission))
       {
         if (AuthInst.action_authorised(action_info.action))
           action_info.service();

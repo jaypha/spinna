@@ -101,7 +101,7 @@ void main(string[] args)
   // Output structures as D code..
 
   writeln("module "~module_name~";");
-  writeln("import jaypha.dbmake.dbdef;");
+  writeln("import jaypha.fixdb.dbdef;");
   writeln();
   writeln("DatabaseDef database_def;");
   writeln("static this() {");

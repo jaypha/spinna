@@ -3,9 +3,17 @@ RDMD = rdmd
 YUI = java -jar progs/yuicompressor-2.4.8.jar
 
 SPINNA_ROOT = .
-IMPDIR = 
 
 include makefile.include
+
+LIBDIR = /usr/lib64/mysql
+LIBS = fcgi fig mysqlclient
+IMPDIR =  $(SPINNA_ROOT)/src
+
+LIBFLAGS= $(addprefix -L-l,$(LIBS)) $(addprefix -L-L,$(LIBDIR))
+
+JFLAGS = $(addprefix -J,$(IMPDIR))
+IFLAGS = $(addprefix -I,$(IMPDIR))
 
 DFLAGS = $(IFLAGS) $(JFLAGS)
 
@@ -83,18 +91,18 @@ rpminstall: build
 	rm -rf $(DESTDIR)/*
 	mkdir $(DESTDIR)/usr
 	mkdir $(DESTDIR)/usr/bin
-	mkdir $(DESTDIR)/usr/lib
+	mkdir $(DESTDIR)/usr/lib64
 	mkdir $(DESTDIR)/usr/include
 	mkdir $(DESTDIR)/usr/include/spinna
-	mkdir $(DESTDIR)/usr/include/spinna/dmd
+	mkdir $(DESTDIR)/usr/include/spinna/src
 	cp bin/makerouter $(DESTDIR)/usr/bin
 	strip $(DESTDIR)/usr/bin/makerouter
 	cp bin/makefixdb $(DESTDIR)/usr/bin
 	strip $(DESTDIR)/usr/bin/makefixdb
-	cp -R src/backtrace $(DESTDIR)/usr/include/spinna/dmd
-	cp -R src/jaypha $(DESTDIR)/usr/include/spinna/dmd
-	cp src/*.d $(DESTDIR)/usr/include/spinna/dmd
+	cp -R src/backtrace $(DESTDIR)/usr/include/spinna/src
+	cp -R src/jaypha $(DESTDIR)/usr/include/spinna/src
+	cp src/*.d $(DESTDIR)/usr/include/spinna/src
 	cp -R thirdparty $(DESTDIR)/usr/include/spinna
 	cp -R licenses $(DESTDIR)/usr/include/spinna
 	cp -R res $(DESTDIR)/usr/include/spinna
-	cp lib/libfig.a $(DESTDIR)/usr/lib
+	cp lib/libfig.a $(DESTDIR)/usr/lib64

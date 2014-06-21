@@ -1,5 +1,5 @@
 
-module jaypha.spinna.modules.menu;
+module jaypha.spinna.menu;
 import jaypha.spinna.pagebuilder.component;
 
 struct MenuItem

@@ -13,6 +13,8 @@
 
 module jaypha.spinna.json;
 
+import jaypha.types;
+
 import jaypha.spinna.response;
 
 import std.json;

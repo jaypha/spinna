@@ -251,7 +251,7 @@ final class MySqlDatabase
 
     while ((row = mysql_fetch_row(res)) !is null)
     {
-      uint* lengths = mysql_fetch_lengths(res);
+      ulong* lengths = mysql_fetch_lengths(res);
 
       data[to!(T)(row[0][0..lengths[0]])] = to!U(row[1][0..lengths[1]]);
     }
