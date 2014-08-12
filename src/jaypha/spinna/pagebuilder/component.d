@@ -2,6 +2,13 @@
  * Basic Components for building output content.
  *
  * Copyright 2013 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ *
+ * Written in the D language.
  */
 
 module jaypha.spinna.pagebuilder.component;
@@ -11,7 +18,6 @@ public import jaypha.io.output_stream;
 import jaypha.embed;
 
 public import jaypha.html.entity;
-import std.file;
 import std.algorithm;
 import std.array;
 
@@ -20,6 +26,15 @@ import std.array;
 interface Component
 {
   void copy(TextOutputStream output);
+}
+
+//-----------------------------------------------------------------------------
+
+string to_string(Component component)
+{
+  auto buffer = new TextBuffer!string();
+  component.copy(buffer);
+  return buffer.data;
 }
 
 //-----------------------------------------------------------------------------
@@ -119,6 +134,7 @@ mixin template TemplateComponent(string S)
 
 class FileComponent(S = string) : Component
 {
+  import std.file;
   this(string _filepath) { filepath = _filepath; }
   
   override void copy(TextOutputStream output)

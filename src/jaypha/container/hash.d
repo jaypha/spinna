@@ -1,7 +1,7 @@
 /*
  * Hash table which can store more than one value for a key
  *
- * Copyright 2009-2013 Jaypha
+ * Copyright 2009-2014 Jaypha
  *
  * Distributed under the Boost Software License, Version 1.0.
  * (See http://www.boost.org/LICENSE_1_0.txt)
@@ -132,11 +132,11 @@ unittest
 
 //----------------------------------------------------------------------------
 
-debug(hash)
+debug
 {
   import std.range;
 
-  public void dump(O,T)(Hash!(T) hash, O output) if (isOutputRange!(O,dchar))
+  public void dump(O,T)(Hash!(T) hash, O output) if (isOutputRange!(O,string))
   {
     string i;
     T[] v;

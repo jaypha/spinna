@@ -1,5 +1,6 @@
 module jaypha.spinna.global;
 
+public import jaypha.types;
 public import jaypha.spinna.request;
 public import jaypha.spinna.response;
 public import jaypha.spinna.session;

@@ -280,18 +280,18 @@ final class MySqlDatabase
   // values are expected to be already vetted. Functions will enquote.
   //
 
-  ulong get_insert_id() { return mysql_insert_id(mysql); }
+  string get_insert_id() { return to!string(mysql_insert_id(mysql)); }
 
   //---------------------------------------------------------------------------
 
-  ulong insert(string tablename, string[string] values)
+  string insert(string tablename, string[string] values)
   {
     return insert(tablename, values.keys, values.values);
   }
 
   //---------------------------------------------------------------------------
 
-  ulong insert(string tablename, string[] columns, string[] values)
+  string insert(string tablename, string[] columns, string[] values)
   {
     query_raw
     (
@@ -384,32 +384,33 @@ final class MySqlDatabase
   // Shortcuts for use with ids
   //---------------------------------------------------------------------------
   // Assumes the table has a column `id` of type unigned integer (or long)
-  // and hass a unique value index.
+  // and has a unique value index. We use strings to reduce the back-and-forth
+  // conversion between string and ulong that occurs in websites.
   //---------------------------------------------------------------------------
 
-  string[string] get(string table, ulong id)
+  string[string] get(string table, string id)
   {
-    return query_row("select * from "~table~" where id="~to!string(id));
+    return query_row("select * from "~table~" where id="~id);
   }
 
   //---------------------------------------------------------------------------
 
-  ulong set(string tablename, string[string] values, ulong id = 0)
+  string set(string tablename, string[string] values, string id = null)
   {
-    if (id == 0)
+    if (id is null)
       return insert(tablename, values);
     else
     {
-      update(tablename, values, [ "id="~to!string(id) ]);
+      update(tablename, values, [ "id="~id ]);
       return id;
     }
   }
 
   //---------------------------------------------------------------------------
 
-  void remove(string tablename, ulong id)
+  void remove(string tablename, string id)
   {
-    query("delete from "~tablename~" where id="~to!string(id));
+    query("delete from "~tablename~" where id="~id);
   }
 
   //---------------------------------------------------------------------------

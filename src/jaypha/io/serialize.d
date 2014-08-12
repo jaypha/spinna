@@ -4,7 +4,7 @@
  * It does not support the ability to read/write objects, but does
  * support arrays and associative arrays.
  *
- * To serialize a value, simply cally "serialize!(Type)(value)".
+ * To serialize a value, call "serialize!(Type)(value)".
  *
  * Unserializing is a bit more tricky. You need to know the type before hand
  * and unserialise using it. An alternative would be to use Variant, but I
@@ -14,7 +14,7 @@
  * str will be updated to the remainder of the string and the decoded
  * value is returned.
  *
- * Future direction: Make it all work with ranges.
+ * Future direction: Make it all work with ranges, maybe.
  *
  * Copyright 2013 Jaypha
  *

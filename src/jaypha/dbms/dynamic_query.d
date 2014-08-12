@@ -5,6 +5,7 @@ module jaypha.dbms.dynamic_query;
 import std.array;
 import std.algorithm;
 import std.conv;
+import std.string;
 
 struct DynamicQuery
 {
@@ -128,7 +129,10 @@ struct DynamicQuery
       sql.put(t.name);
       if (t.condition)
       {
-        sql.put(" on (");
+        if (indexOf(t.condition, '=') < 0)
+          sql.put("using (");
+        else
+          sql.put(" on (");
         sql.put(t.condition);
         sql.put(")");
       }

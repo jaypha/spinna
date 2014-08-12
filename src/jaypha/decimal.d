@@ -6,9 +6,12 @@ import std.string;
 import std.math;
 import std.conv;
 
+
 struct decimal(uint scale)
 {
   enum factor = 10^^scale;
+  enum strf = std.range.repeat("0",scale).join();
+
 
   private:
     long value;
@@ -66,7 +69,13 @@ struct decimal(uint scale)
     void opAssign(double v) { value = lround(v * factor); }
     void opAssign(float v) { value = lround(v * factor); }
     void opAssign(string v)
-    { value = lround(to!double(v) * factor); } // TODO do this without FP
+    //{ value = to!long(v~strf); }
+    { value = lround(std.conv.to!double(v) * factor); } // TODO do this without FP
+
+    void opOpAssign(string op)(decimal v)
+    {
+      mixin("value = (this "~op~" v).value;");
+    }
 
     void opOpAssign(string op)(long v)
     {
@@ -85,9 +94,9 @@ struct decimal(uint scale)
 
     string toString()
     {
-      auto s = to!string(value);
+      auto s = std.conv.to!string(value);
       if (value >= factor)
-        return to!string(value/factor)~"."~to!string(value%factor);
+        return std.conv.to!string(value/factor)~"."~std.conv.to!string(value%factor);
       else
         return format("0.%0*d",scale,value);
     }
@@ -111,7 +120,7 @@ struct decimal(uint scale)
 
     decimal opBinary(string s:"/")(decimal b)
     {
-      return decimal(value*factor/b.value);
+      return decimal(lround(cast(double)(value*factor)/b.value));
     }
 
     // Operators for decimal and long
@@ -142,11 +151,11 @@ struct decimal(uint scale)
     }
     decimal opBinary(string s:"/")(long b)
     {
-      return decimal(value/b);
+      return decimal(lround(value/cast(float)b));
     }
     decimal opBinaryRight(string s:"/")(long b)
     {
-      return decimal(b/value);
+      return decimal(lround(cast(float)b/value));
     }
 
     auto conv(uint new_scale)()
@@ -191,6 +200,12 @@ struct decimal(uint scale)
 */
 }
 
+auto to_decimal(uint scale,T)(T v)
+{
+  decimal!scale d;
+  d = v;
+  return d;
+}
 
 auto mult(ubyte s1, ubyte s2)(decimal!s1 a, decimal!s2 b)
 {
@@ -201,13 +216,13 @@ auto mult(ubyte s1, ubyte s2)(decimal!s1 a, decimal!s2 b)
 
 alias decimal!1 dec1;
 alias decimal!2 dec2;
-alias decimal!2 dec3;
+alias decimal!3 dec3;
 
 //mixin decimalOps!2;
 
 unittest
 {
-  //import std.stdio;
+  import std.stdio;
 
   assert(dec2.min.value == long.min);
   assert(dec2.max.value == long.max);
@@ -234,4 +249,28 @@ unittest
   assert(amount.toString() == "0.05");
   assert(cast(long)amount == 0);
   assert(cast(double)amount == 0.05);
+
+  amount = 50;
+  assert(amount.value == 5000);
+
+  ulong mult = 2;
+  dec2 another = amount * 2;
+  assert(another.value == 10000);
+  amount *= 3;
+  assert(amount.value == 15000);
+
+  amount = "30";
+  assert(amount.value == 3000);
+
+  amount = to_decimal!(2,string)("6");
+  assert(amount.value == 600);
+
+  amount = 295;
+  amount /= 11;
+  assert(amount.value == 2682);
+
+  amount = 295;
+  another = 11;
+  assert((amount/another).value == 2682);
+
 }

@@ -15,7 +15,7 @@ import jaypha.io.output_stream;
 import jaypha.io.serialize;
 
 import test_auth;
-//import test_router;
+import test_router;
 import test_dialog;
 
 struct WriteOut
@@ -52,7 +52,7 @@ void main(string[] args)
   buf.clear();
   writeln();
 */
-  //test_authorisation();
-  //test_routr();
+  test_authorisation();
+  test_routr();
   dialog_test(writer);
 }

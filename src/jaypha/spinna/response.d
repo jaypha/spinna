@@ -1,3 +1,16 @@
+/*
+ * Server side HTTP response.
+ *
+ * Copyright 2014 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ *
+ * Written in the D programming language.
+ */
+
 module jaypha.spinna.response;
 
 import std.array;
@@ -9,19 +22,29 @@ import std.string;
 
 import jaypha.types;
 
+/*
+ * HttpResponse acts as an input range for ByteArrays to allow direct copying
+ * to output ranges.
+ */
+
 struct HttpResponse
 {
-  ByteArray entity;
-
   //---------------------------------------------------------------------------
+  // entity is the main content.
+  //---------------------------------------------------------------------------
+
+  ByteArray entity;
 
   //---------------------------------------------------------------------------
   // HttpResponse as an input range
   //---------------------------------------------------------------------------
+  // This allows for easy outputting via std.range.copy
 
   uint step = 0;
 
   @property bool empty() { return step >=3; }
+
+  //------------------------------------
 
   ByteArray front()
   {
@@ -41,10 +64,15 @@ struct HttpResponse
     else
       return null;
   }
+
+  //------------------------------------
+
   void popFront()
   {
     ++step;
   }
+
+  //------------------------------------
 
   string response_start = null;
 
@@ -66,7 +94,7 @@ struct HttpResponse
   }
 
   //---------------------------------------------------------------------------
-  // Response headers.
+  // Functions for response headers.
   //---------------------------------------------------------------------------
 
   void status(int http_status, string msg = null)
@@ -75,7 +103,7 @@ struct HttpResponse
     this.http_status_msg = msg.dup;
   }
 
-  //---------------------------------------------------------------------------
+  //------------------------------------
 
   void set_session_cookie(string name, string value, string path = "/", string domain = null)
   {
@@ -89,7 +117,7 @@ struct HttpResponse
     headers.put("\r\n");
   }
 
-  //---------------------------------------------------------------------------
+  //------------------------------------
 
   void header(string name, const string value)
   {
@@ -99,7 +127,7 @@ struct HttpResponse
     headers.put("\r\n");
   }
 
-  //---------------------------------------------------------------------------
+  //------------------------------------
 
   void content_type(string type)
   {

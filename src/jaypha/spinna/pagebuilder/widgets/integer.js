@@ -1,3 +1,13 @@
+/*
+ * JS for integer widgets.
+ *
+ * Copyright 2013 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
 
 
 function add_integer_widget(n,l,f,i,r,b,t,s)

@@ -64,7 +64,7 @@ string javascript(string script)
   return "<script type='text/javascript'>\n<!--\n"~script~"\n//-->\n</script>";
 }
 
-enum js(string script) = javascript(script);
+enum JavaScript(string script) = javascript(script);
 
 /+
 

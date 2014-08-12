@@ -1,2 +1,0 @@
-mustache-d by Masahiro Nakagawa
-proper-d by Peter Wood

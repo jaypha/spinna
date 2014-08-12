@@ -1,3 +1,13 @@
+/*
+ * JS for widgets and client side validation.
+ *
+ * Copyright 2013 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
 
 function in_array(needle, haystack)
 {
@@ -123,19 +133,19 @@ StringWidget.prototype.validate = function()
   if (v == "")
   {
     if (this.req == true)
-      msg = '"'+this.lab + '" cannot be empty';
+      msg = this.required();
   }
   else
   {
     if (this.min != 0)
     {
       if (v.length < this.min)
-        msg = '"'+this.lab + '" must be at least ' + this.min + ' characters';
+        msg = this.violate_min_msg();
     }
     if (msg === null &&  this.max != 0)
     {
       if (v.length > this.max)
-        msg = '"'+this.lab + '" cannot be more than ' + this.max + ' characters';
+        msg = this.violate_max_msg();
     }
   }
 
@@ -147,6 +157,21 @@ StringWidget.prototype.validate = function()
     $("#"+this.fid+" ."+this.nam+"-valid-indicator").removeClass("bad-input");
 
   return msg;
+}
+
+StringWidget.prototype.required = function()
+{
+  return '"'+this.lab + '" cannot be empty';
+}
+
+StringWidget.prototype.violate_min_msg = function()
+{
+  return '"'+this.lab + '" must be at least ' + this.min + ' characters';
+}
+
+StringWidget.prototype.violate_max_msg = function()
+{
+  return '"'+this.lab + '" cannot be more than ' + this.max + ' characters';
 }
 
 /*****************************************************************************
@@ -673,4 +698,7 @@ $(function()
         event.preventDefault();
     }
   );
+
+  // Set up forms to use validation.
+  $("form").submit(function(event) { return form_validate(this.attr('id'),no_valid); });
 });

@@ -70,11 +70,12 @@ unittest
 {
   import std.conv;
   
-  // Demonstrate certian D behaviours.
+  // Detect if D behaviour changes.
 
   assert("" !is null);
   assert([] is null);
-  
+
+
   char[] a = "abc".dup;
   assert(a[0..0] !is null);
   assert(a[0..0].length == 0);

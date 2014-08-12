@@ -13,16 +13,15 @@
 
 module jaypha.http.exception;
 
-
 class HttpException : Exception
 {
-  private int code_;
+  private ulong code_;
   
-  this(const(char)[] msg, int code = 400)
+  this(string msg, ulong code = 400)
   {
     code_ = code;
-    super(msg.idup);
+    super(msg);
   }
   
-  int code() { return code_; }
+  @property ulong code() { return code_; }
 }

@@ -1,3 +1,16 @@
+/*
+ * Building blocks for the router.
+ *
+ * Copyright 2014 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ *
+ * Written in the D programming language.
+ */
+
 module jaypha.spinna.router_tools;
 
 public import jaypha.types;
@@ -22,7 +35,7 @@ template match_regex_route(string action, string rx, string fn, cp ...)
   const char[] match_regex_route = 
     "{auto m = match(path, "~rx~");"
     "if (m) { strstr p; "~param_copy!(cp)~" return "
-    "ActionInfo(\""~action~"\",wrap_router(p, &"~fn~"));}}";
+    "ActionInfo(\""~action~"\",wrap_service(p, &"~fn~"));}}";
 }
 
 template match_static_route
@@ -40,7 +53,7 @@ template match_sub_route(string pattern, string fn)
   " if (s.length != path.length) return "~fn~"(s); }";
 }
 
-auto wrap_router(strstr p, void function(strstr) fn)
+auto wrap_service(strstr p, void function(strstr) fn)
 {
   void f() { fn(p); }
   return &f;

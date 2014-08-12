@@ -26,10 +26,10 @@ import gen.router;
  *
  * 1. Interperet the HTTP request and put info into easy to use data structures.
  * 2. Run the router to determine which service to call. Failure results in a 404 response.
- * 3. Test is service is authorised. Generate a 403 if not.
+ * 3. Test if service is authorised. Generate a 403 if not.
  * 4. Run the service.
  * 5. Catch any exceptions to generate an error page.
- * 6. Generate an HTTP response.
+ * 6. Output the HTTP response.
  */
 
 void process_request(I,O,alias AuthInst = null)
@@ -37,9 +37,14 @@ void process_request(I,O,alias AuthInst = null)
   string[string] env,
   I input_stream,
   O output_stream,
-  void delegate(uint, string) error_handler
+  void delegate(ulong, string) error_handler
 ) if (isOutputRange!(O,immutable(ubyte)[]))
 {
+  // Even if an unrecoverable error occurs, a minimal error message must be sent
+  // to the client.
+  // Note to self. I removed this for some reason, but don't remember why, so I put back.
+  scope(failure) { output_stream.put(cast(immutable(ubyte[]))  "Content-Type: text/plain\r\nStatus: 500 Internal Error\r\n\r\n"); }
+
   try
   {
     request.prepare(env, input_stream);
@@ -55,7 +60,7 @@ void process_request(I,O,alias AuthInst = null)
     }
     else
     {
-      static if (is(AuthInst.Permission))
+      static if (is(AuthInst.action_authorised))
       {
         if (AuthInst.action_authorised(action_info.action))
           action_info.service();
@@ -67,6 +72,8 @@ void process_request(I,O,alias AuthInst = null)
             error_handler(403, "Not authorised to access: "~request.path);
         }
       }
+      else
+        action_info.service();
     }
     if (session.active)
     {

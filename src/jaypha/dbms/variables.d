@@ -9,12 +9,7 @@ import jaypha.conv;
 struct Variables(Database, string table)
 {
   Database database;
-  strstr values;
-
-  this(Database _db)
-  {
-    database = _db;
-  }
+  private strstr values;
 
   bool is_set(string name)
   {

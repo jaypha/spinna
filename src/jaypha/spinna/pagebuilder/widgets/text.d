@@ -37,19 +37,36 @@ class TextWidget : Widget
   }
 
   this(HtmlForm _form, string _name)
+  (
+    HtmlForm _form,
+    string _name,
+    string _label,
+    bool _required,
+    ulong _min = 0,
+    ulong _max = 0
+  )
   {
     super(_form, _name,"textarea");
     add_class("text-widget");
+    label = _label;
+    required = _required;
+    attributes["type"] = "text";
+    min_length = _min;
+    max_length = _max;
+
     _value = new TextComponent();
   }
 
   override void copy(TextOutputStream output)
   {
-    if (max_length != 0) attributes["max_length"] = to!string(max_length);
+    if (max_length != 0) attributes["maxlength"] = to!string(max_length);
     form.doc.page_head.add_script("add_string_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~",0,"~to!string(max_length)~",null);");
     add(_value);
     super.copy(output);
   }
 
+  ulong min_length = 0;
   ulong max_length = 0;
+
+  string regex;
 }
