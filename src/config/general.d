@@ -9,7 +9,7 @@ enum max_timeout = 60;
 // Session configs.
 
 enum session_dir = "/tmp/";
-enum time_limit = 20*600000000; // 20 minutes;
+enum session_time_limit = 20*600000000; // 20 minutes;
 
 // jQuery
 

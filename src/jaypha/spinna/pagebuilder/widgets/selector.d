@@ -53,7 +53,7 @@ class SelectorWidget(string tpl = "jaypha/spinna/pagebuilder/widgets/selector.tp
   
   this(HtmlForm _form, string _name)
   {
-    super(_form, _name,"div");
+    super(_form, _name,null,false,"div");
     add_class("selector-widget");
 
   }
@@ -67,12 +67,7 @@ class SelectorWidget(string tpl = "jaypha/spinna/pagebuilder/widgets/selector.tp
     
     add(c);
 
-    form.doc.page_head.add_script("add_selector_widget('"~name~"','"~label~"','"~form.id~"',"~to!string(min_options)~","~to!string(max_options)~");", true);
+    //form.doc.page_head.add_script("add_selector_widget('"~name~"','"~label~"','"~form.id~"',"~to!string(min_options)~","~to!string(max_options)~");", true);
     super.copy(output);
   }
-}
-
-auto selector_widget(string tpl = "jaypha/spinna/pagebuilder/widgets/selector.tpl")(HtmlForm _form, string _name)
-{
-  return new SelectorWidget!tpl(_form, _name);
 }

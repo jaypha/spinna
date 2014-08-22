@@ -17,6 +17,7 @@ public import jaypha.spinna.pagebuilder.widgets.widget;
 
 //import std.array;
 import std.conv;
+import jaypha.html.helpers;
 
 //----------------------------------------------------------------------------
 
@@ -39,15 +40,13 @@ class StringWidget : Widget
     HtmlForm _form,
     string _name,
     string _label,
-    bool _required,
+    bool _required = false,
     ulong _min = 0,
     ulong _max = 0,
   )
   {
-    super(_form, _name,"input");
+    super(_form, _name, _label, _required, "input");
     add_class("string-widget");
-    label = _label;
-    required = _required;
     attributes["type"] = "text";
     min_length = _min;
     max_length = _max;
@@ -57,12 +56,8 @@ class StringWidget : Widget
   {
     if (max_length != 0) attributes["maxlength"] = to!string(max_length);
     if (is_password) attributes["type"] = "password";
-    form.doc.page_head.add_script
-    (
-      "add_string_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~","~to!string(min_length)~","~to!string(max_length)~","~((regex is null || regex.length == 0)?"null":"'"~regex~"'")~");",
-      true
-    );
     super.copy(output);
+    output.print(javascript("new StringWidget($('#"~id~"'), { minLen: "~to!string(min_length)~", maxLen: "~to!string(max_length)~", required: "~to!string(required)~" });"));
   }
 
   ulong min_length = 0;

@@ -30,7 +30,7 @@ import config.general;
 /*
  * config must supply the following configurations
  * - session_dir as string
- * - time_limit as ulong
+ * - session_time_limit as ulong
  */
 
 
@@ -162,7 +162,7 @@ void load(ref Session sess)
     {
       cstring contents = readText!string(filename);
       sess.timestamp = unserialize!(long)(contents);
-      if (Clock.currStdTime() - sess.timestamp > time_limit)
+      if (Clock.currStdTime() - sess.timestamp > session_time_limit)
         sess._expired = true;
       sess.activities = custom_unserialize!(unserializeActivity,Activity[string])(contents);
       //auto len = checkLengthTypeStart(contents, 'o');

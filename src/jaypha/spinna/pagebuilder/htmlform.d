@@ -1,3 +1,15 @@
+/*
+ * Form Element for HTML.
+ *
+ * Copyright (C) 2014, Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ *
+ * Written in the D language.
+ */
 
 module jaypha.spinna.pagebuilder.htmlform;
 
@@ -31,17 +43,8 @@ class HtmlForm : HtmlElement
   
   override void copy(TextOutputStream output)
   {
-    assert(doc.current_form is null, "cannot nest forms");
-
-    doc.current_form = this;
-    scope(exit) { doc.current_form = null; }
-
     add("</div>");
     add(meld!(hidden)(hiddens).join());
-
-    doc.page_head.add_script("widgets['"~id~"'] = [];");
-    doc.page_head.add_script("$('#"~id~"').submit(function(event) { return form_validate('"~id~"',no_valid); });",true);
-    //doc.page_head.add_script("$('#"~id~"').submit(function(event) { var x = form_validate('"~id~"',no_valid); return x; });",true);
 
     super.copy(output);
 

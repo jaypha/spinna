@@ -1,9 +1,7 @@
 module jaypha.properties;
 
-
-import std.algorithm;
-import std.array;
-import std.string;
+//import std.algorithm;
+//import std.array;
 
 string[string] extract_props(string source)
 {

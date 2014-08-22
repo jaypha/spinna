@@ -68,6 +68,17 @@ inout(char)[][] splitup(inout(char)[] text, inout(char)[] delimiters)
 
 //----------------------------------------------------------------------------
 
+bool is_digits(string s)
+{
+  import std.ascii;
+
+  foreach (c; s)
+    if (!isDigit(c))
+      return false;
+  return true;
+}
+
+//----------------------------------------------------------------------------
 
 unittest
 {

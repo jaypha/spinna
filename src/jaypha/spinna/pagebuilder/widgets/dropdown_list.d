@@ -4,6 +4,7 @@ public import jaypha.spinna.pagebuilder.widgets.widget;
 public import jaypha.spinna.pagebuilder.widgets.enumerated;
 
 import std.array;
+import jaypha.html.helpers;
 
 class DropdownListWidget : Widget
 {
@@ -28,42 +29,20 @@ class DropdownListWidget : Widget
     EnumeratedOption[] _options
   )
   {
-    super(_form, _name,"select");
-    label = _label;
-    required = _required;
+    super(_form, _name, _label, _required, "select");
     options = _options;
     add_class("dropselect-widget");
   }
 
   override void copy(TextOutputStream output)
   {
-    auto d = new DelegateComponent(&print_innards);
-    /*
-    auto c = appender!string();
-    if ((_value is null || _value == "") || !required)
-      c.put("<option value=''> -- none -- </option>");
-
-    foreach (o;options)
-    {
-      c.put("<option value='");
-      c.put(o.value);
-      if (o.value == _value)
-        c.put("' selected='selected");
-      c.put("'>");
-      c.put(o.label);
-      c.put("</option>");
-    }
-    add(c.data);
-    */
-    add(d);
-    form.doc.page_head.add_script("add_dropdown_list_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~");", true);
-
+    add(new DelegateComponent(&print_innards));
     super.copy(output);
+    output.print(javascript("new DropdownListWidget($('#"~id~"'),{required: "~(required?"true":"false")~"});"));
   }
 
   void print_innards(TextOutputStream c)
   {
-    //auto c = appender!string();
     if ((_value is null || _value == "") || !required)
       c.put("<option value=''> -- none -- </option>");
 

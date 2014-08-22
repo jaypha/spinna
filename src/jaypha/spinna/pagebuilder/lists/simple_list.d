@@ -18,15 +18,18 @@
  */
 
 module jaypha.spinna.pagebuilder.lists.simple_list;
-public import jaypha.spinna.pagebuilder.lists.data_source;
+
+import jaypha.types;
+public import jaypha.spinna.pagebuilder.lists.list;
 
 class SimpleList(string tpl) : ListComponent
 {
-  override @property DataSource data_source() { return source; }
+  override void set_start(ulong start) { source.set_start(start); }
+  override void set_limit(ulong limit) { source.set_start(limit); }
 
-  ListSource source;
+  ObjSource source;
 
-  this(string _name, ListSource _source)
+  this(string _name, ObjSource _source)
   {
     source = _source;
   }

@@ -1,6 +1,6 @@
 
 
-module jaypha.spinna.pagebuilder.useful_stuff.dialog_box;
+module jaypha.spinna.pagebuilder.widgets.dialog_box;
 
 import jaypha.spinna.pagebuilder.htmlelement;
 import jaypha.html.helpers;

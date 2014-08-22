@@ -27,21 +27,21 @@ LFLAGS = $(LIBFLAGS)
 
 build: bin lib js css
 
-css: res/_spinna.scss res/_spinna_widgets.scss
+css: res/_spinna.scss res/_spinna_no_widgets.scss
 
-js: res/spinna.js res/spinna_widgets.js
+js: res/spinna.js res/spinna_no_widgets.js
 
 bin: bin/makerouter
 
 # --------------------------
 
-bin/makerouter: progs/makerouter.d lib/libfig.a
-	$(RDMD) $(RDFLAGS) $(LFLAGS) -ofbin/makerouter --build-only progs/makerouter.d
+bin/makerouter: src/makerouter.d lib/libfig.a
+	$(RDMD) $(RDFLAGS) $(LFLAGS) -ofbin/makerouter --build-only src/makerouter.d
 
 # makerouter for testing
 
-makerouter: progs/makerouter.d lib/libfig.a
-	$(RDMD) $(DDFLAGS) $(LFLAGS) -ofmakerouter --build-only progs/makerouter.d
+makerouter: src/makerouter.d lib/libfig.a
+	$(RDMD) $(DDFLAGS) $(LFLAGS) -ofmakerouter --build-only src/makerouter.d
 
 # --------------------------
 
@@ -63,11 +63,9 @@ install:
 
 clean:
 	rm -f makerouter
-	rm -f bin/makerouter
-	rm -f lib/libfig.a
-	rm -f res/spinna.min.js
-	rm -f res/spinna.js
-	rm -f res/spinna.scss
+	rm -f bin/*
+	rm -f lib/*
+	rm -f res/*
 	pushd fig; make clean
 
 
@@ -75,19 +73,20 @@ res/spinna.min.js: $(JSFILES)
 	js -C $(addprefix -f ,$(JSFILES))
 	$(YUI) $(JSFILES) -o res/spinna.min.js
 
-res/spinna.js: $(JSFILES)
+res/spinna.js: $(JSFILES) $(JSWFILES)
+	js -C $(addprefix -f ,$(JSFILES)) $(addprefix -f ,$(JSWFILES))
+	cat $(JSFILES) $(JSWFILES) > res/spinna.js
+
+res/spinna_no_widgets.js: $(JSFILES)
 	js -C $(addprefix -f ,$(JSFILES))
-	cat $(JSFILES) > res/spinna.js
+	cat $(JSFILES) > res/spinna_no_widgets.js
 
-res/spinna_widgets.js: $(JSWFILES)
-	js -C $(addprefix -f ,$(JSWFILES))
-	cat $(JSWFILES) > res/spinna_widgets.js
+res/_spinna.scss: $(SCSSFILES) $(SCSSWFILES)
+	cat $(SCSSFILES) $(SCSSWFILES) > res/_spinna.scss
 
-res/_spinna.scss:
-
-
-res/_spinna_widgets.scss: $(SCSSFILES)
-	cat $(SCSSFILES) > res/_spinna_widgets.scss
+res/_spinna_no_widgets.scss: $(SCSSFILES)
+	#cat $(SCSSFILES) > res/_spinna_no_widgets.scss
+	touch res/_spinna_no_widgets.scss
 
 test:
 	$(RDMD) $(DDFLAGS) $(LFLAGS) -J./src_test -unittest src_test/test_main.d

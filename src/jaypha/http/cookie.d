@@ -57,7 +57,7 @@ HttpCookie[string] extract_cookies(const(char)[] cookiestr)
   return cookies;
 }
 
-
+// TODO better unittests.
 unittest
 {
   auto c = extract_cookies("SPINNA_SESSION=7DE75CF0AD563D3E66561704ED8B7ADA");

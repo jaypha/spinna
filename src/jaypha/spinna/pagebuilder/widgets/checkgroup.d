@@ -20,6 +20,7 @@ public import jaypha.spinna.pagebuilder.widgets.enumerated;
 import std.array;
 import std.conv;
 import std.algorithm;
+import jaypha.html.helpers;
 
 class CheckGroupWidget: Widget
 {
@@ -47,28 +48,25 @@ class CheckGroupWidget: Widget
     EnumeratedOption[] _options
   )
   {
-    super(_form, _name,"div");
-    label = _label;
-    required = _required;
+    super(_form, _name, _label, _required, "span");
     options = _options;
     add_class("enum-widget");
     add_class("checkgroup-widget");
     add_class("vertical");
+    add(new DelegateComponent(&print_innards));
   }
 
   override void copy(TextOutputStream output)
   {
-    // TODO this is not ideal.
-    if (name in form.values)
-      value = form.values[name];
+    super.copy(output);
+    output.print(javascript("new EnumGroupWidget($('#"~id~"'),'"~_name~"',{ minSel: "~(required?"1":"0")~", maxSel: 0 });"));
+  }
 
-    form.doc.page_head.add_script("add_checkgroup_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~");",true);
-    
-    auto c = appender!string();
-
+  void print_innards(TextOutputStream c)
+  {
     foreach (o;options)
     {
-      auto option_id = form.id~"-"~name~"-"~o.value;
+      auto option_id = id~"-"~o.value;
       c.put("<label for='");
       c.put(option_id);
       c.put("'>&nbsp;");
@@ -85,8 +83,6 @@ class CheckGroupWidget: Widget
         c.put(" checked='checked'");
       c.put("/>");
     }
-    add(new TextComponent(c.data));
-    super.copy(output);
   }
 
   EnumeratedOption[] options;

@@ -20,7 +20,7 @@
 
 module jaypha.spinna.pagebuilder.lists.table_list;
 
-public import jaypha.spinna.pagebuilder.lists.data_source;
+public import jaypha.spinna.pagebuilder.lists.list;
 
 import jaypha.spinna.pagebuilder.htmltable;
 
@@ -34,7 +34,8 @@ class TableList : ListComponent
   string name;
   TableSource source;
 
-  override @property DataSource data_source() { return source; }
+  override void set_start(ulong start) { source.set_start(start); }
+  override void set_limit(ulong limit) { source.set_start(limit); }
 
   this(string _name, TableSource s) { name = _name; table = new HtmlTable(); source = s; }
 
@@ -76,21 +77,21 @@ unittest
 {
   class MyTSource : TableSource
   {
-    this(string[][] _data) { data = _data; }
+    this(SourceType[] _data) { data = _data; }
 
-    @property string[] front() { return data[i+offset]; }
+    @property SourceType front() { return data[i+offset]; }
     @property bool empty() { return i>= psize || i+offset > data.length; }
     void popFront() { ++i; }
 
     void set_limit(ulong num) { psize = limit; }
     void set_start(ulong num) { offset = start; }
 
-    @property string[] headers() { return [ "label", "thwonk" ]; }
+    @property SourceType headers() { return [ "label", "thwonk" ]; }
 
     void reset() { i = 0; }
 
     private:
-      string[][] data;
+      SourceType[] data;
       ulong i = 0;
       ulong psize = 0;
       ulong offset = 0;

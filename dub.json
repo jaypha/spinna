@@ -1,0 +1,12 @@
+{
+  "libs-posix":
+  [
+    "fig"
+  ]
+	"name": "spinna",
+	"description": "Web Framework",
+	"authors": ["Jason den Dulk"],
+	"license": "Boost V1.0",
+	"dependencies": {
+	}
+}

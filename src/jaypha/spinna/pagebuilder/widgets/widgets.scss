@@ -124,24 +124,3 @@ input.integer-widget
 .spin-up { border-bottom: 1px solid $widget-border-color; padding-top:1px; }
 .spin-dn { border-top: 1px solid $widget-border-color; padding-bottom: 1px;}
 
-/*
-.integer-widget-wrapper
-{
-  display: inline-block;
-  position:relative;
-}
-
-.spinner-up, .spinner-down
-{
-  height: 50%;
-  font-size: 9px;
-  text-align: center;
-  width: 24px;
-  position:absolute;
-  right:0;
-  cursor: default;
-}
-
-.spinner-up { top: 0; border-top-right-radius: 4px; }
-.spinner-down { bottom: 0; border-bottom-right-radius: 4px; }
-*/

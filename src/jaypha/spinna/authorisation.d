@@ -106,32 +106,50 @@ template Authorisation(AccountRole)
 
 enum auth_string(string table) = "select id, roles from "~table~" where username=";
 
-ulong authenticate(Database, string table = "account")(Database database, string username, string password, bool login = true)
+string authenticate(Database, string table = "account")(Database database, string username, string password, bool login = true)
 {
   auto response = database.query_row(auth_string!table~database.quote(username)~" and password="~database.quote(password));
   if (response)
   {
-    auto id = to!ulong(response["id"]);
     if (login)
     {
-      session["login"].set!ulong("id", id);
+      session["login"].set_str("id", response["id"]);
       session["login"].set!ulong("roles", to!ulong(response["roles"]));
     }
-    return id;
+    return response["id"];
   }
 
-  return 0;
+  return null;
 }
 
 //----------------------------------------------------------------------------
 
-enum account_string(string table) = "select count(*) from "~table~" where username=";
+enum account_string(string table) = "select id from "~table~" where username=";
 
-bool account_exists(Database, string table = "account")(Database database, string username, ulong account_id = 0)
+bool account_exists(Database, string table = "account")(Database database, string username, string account_id = null)
 {
-  return (database.query_value(account_string!table ~ database.quote(username) ~ " and not id="~to!string(account_id)) != "0");
+  auto aid = database.query_value(account_string!table ~ database.quote(username));
+
+  if (aid is null) return false;
+  else return account_id != aid;
 }
 
+//----------------------------------------------------------------------------
+
+/+
+enum account_string(string table) = "select count(*) from "~table~" where username=";
+
+bool account_exists(Database, string table = "account")(Database database, string username, string account_id = null)
+{
+  import std.exception;
+  import jaypha.string;
+
+  if (id is null)
+    return (database.query_value(account_string!table ~ database.quote(username)) != "0");
+  enforce(is_digits(account_id));
+  return (database.query_value(account_string!table ~ database.quote(username) ~ " and not id="~account_id) != "0");
+}
++/
 //----------------------------------------------------------------------------
 
 bool is_logged_in()
@@ -141,10 +159,10 @@ bool is_logged_in()
 
 //----------------------------------------------------------------------------
 
-ulong get_logged_in_id()
+string get_logged_in_id()
 {
   if (session.has("login"))
-    return session["login"].get!ulong("id");
+    return session["login"].get_str("id");
   else
-    return 0;
+    return null;
 }

@@ -1,12 +1,12 @@
 
 module jaypha.spinna.pagebuilder.lists.db_data_source;
 
-import jaypha.spinna.pagebuilder.lists.data_source;
+import jaypha.spinna.pagebuilder.lists.list;
 public import jaypha.dbms.dynamic_query;
 
 import std.conv;
 
-abstract class DBDataSource(Database) : DataSource
+abstract class DBDataSource(Database) : DataSource!(string[])
 {
   this(DynamicQuery q, ref Database db) { query = q; database = db; }
 
@@ -46,7 +46,7 @@ abstract class DBDataSource(Database) : DataSource
     abstract void prepare_front();
 }
 
-abstract class DBListSource(Database) : DBDataSource!Database, ListSource
+abstract class DBListSource(Database) : DBDataSource!Database, ObjSource
 {
   this(DynamicQuery q, ref Database db) { super(q,db); }
 

@@ -56,12 +56,16 @@ function add_integer_widget(n,l,f,i,r,b,t,s)
 */
 function add_radiogroup_widget(n,l,f,r)
 {
-  widgets[f].push(new EnumGroupWidget(n, l, f, r));
+  var id = f + "-" + n;
+  var wgt = $("#"+id);
+  widgets[f].push(new EnumGroupWidget(wgt, n, { label: l, minSel : (r?1:0), maxSel : 1});
 }
 
 function add_checkgroup_widget(n,l,f,r)
 {
-  widgets[f].push(new EnumGroupWidget(n, l, f, r));
+  var id = f + "-" + n;
+  var wgt = $("#"+id);
+  widgets[f].push(new EnumGroupWidget(wgt, n, { label: l, minSel : (r?1:0)});
 }
 
 function add_date_widget(n,l,f,r)
@@ -92,6 +96,15 @@ function form_validate(formid, callback)
       messages.push(message);
     }
   }
+
+ 
+  $('.widget','#'+formid).each
+  (function()
+  {
+    var w = $(this).data('widget');
+    if (!w.validate())
+      messages.push(w.msg);
+  });
 
   if (messages.length)
   {
@@ -523,6 +536,110 @@ SelectorWidget.prototype.validate = function()
  *
  *****************************************************************************/
 
+function EnumGroupWidget(jq,name,options)
+{
+  var defs =
+  {
+    label : null,
+    minSel : 1,
+    maxSel : 0
+  }
+	this.optn = jQuery.extend({}, defs, options);
+
+  var obj = this;
+
+  this.valid = true;
+  this.msg = null;
+  this.required = this.optn.minSel > 0;
+
+  this.jq = jq;
+  this.name = name;
+
+  this.ps = {};
+
+  $("label",jq).each(function()
+  {
+    var p = $("#"+$(this).attr("for"))
+    var val = p.val();
+    if (p.prop("checked"))
+      $(this).addClass("selected");
+    p.change(function() { if ($(this).prop("checked")) obj.ps[$(this).attr("value")][0].addClass("selected"); else obj.ps[$(this).attr("value")][0].removeClass("selected"); });
+    obj.ps[val] = [$(this), p ];
+  });
+  jq.data("widget", this);
+}
+
+EnumGroupWidget.prototype.select = function(val)
+{
+  this.ps[val][1].prop("checked",true);
+  this.ps[val][1].change();
+}
+
+EnumGroupWidget.prototype.unselect = function(val)
+{
+  this.ps[val][1].prop("checked",false);
+  this.ps[val][1].change();
+}
+
+EnumGroupWidget.prototype.toggle = function(val)
+{
+  this.ps[val][1].prop("checked",!this.ps[val][1].prop("checked"));
+  this.ps[val][1].change();
+}
+
+EnumGroupWidget.prototype.validate = function()
+{
+  this.msg = null;
+
+  var numSel = 0;
+
+  for (i in this.ps)
+  {
+    if (this.ps[i][1].prop("checked"))
+      ++numSel;
+  }
+
+  if (this.optn.minSel == this.optn.maxSel && numSel != this.optn.minSel)
+  {
+    this.msg = 'Must have '+this.optn.minSel+' selected';
+  }
+  else if (numSel < this.optn.minSel)
+  {
+    this.msg = 'Must have at least '+this.optn.minSel+' selected';
+  }
+  else if (numSel > this.optn.maxSel && this.optn.maxSel != 0)
+  {
+    this.msg = 'Must have at most '+this.optn.maxSel+' selected';
+  }
+
+  this.valid = this.msg === null;
+
+  return this.valid;
+}
+
+/*
+  // Alternative code to generate HTML.
+  //jq.addClass("widget").addClass("radio-widget");
+  for (i in this.optn.selects)
+  {
+    var lab = this.optn.selects[i].label;
+    var val = this.optn.selects[i].value;
+    var id = nid++;
+    var o = $("<label for='"+id+"'>"+lab+"</label>");
+    var p = $("<input type='checkbox' name='"+this.name+"' id='"+id+"' value='"+val+"'/>");
+    this.ps[val] = [o, p ];
+    o.appendTo(this.jq);
+    p.appendTo(this.jq);
+    p.change(function() { if ($(this).prop("checked")) obj.ps[$(this).attr("value")][0].addClass("selected"); else obj.ps[$(this).attr("value")][0].removeClass("selected"); });
+  }
+  for (i in this.optn.selected)
+  {
+    this.ps[this.optn.selected[i]][1].prop("checked",true);
+    this.ps[this.optn.selected[i]][0].addClass("selected");
+  }
+*/
+
+/*
 function EnumGroupWidget(n, l, f, r)
 {
   this.nam = n;
@@ -579,6 +696,7 @@ EnumGroupWidget.prototype.validate = function()
 
   return msg;
 }
+*/
 
 /******************************************************************************
  *

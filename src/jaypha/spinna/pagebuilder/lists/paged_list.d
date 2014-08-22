@@ -15,7 +15,7 @@ module jaypha.spinna.pagebuilder.lists.paged_list;
 import jaypha.spinna.pagebuilder.lists.paginator;
 import jaypha.spinna.pagebuilder.component;
 
-import jaypha.spinna.pagebuilder.lists.data_source;
+import jaypha.spinna.pagebuilder.lists.list;
 
 class PagedList
 (
@@ -37,17 +37,15 @@ class PagedList
 
   override void copy(TextOutputStream output)
   {
-    auto ds = content.data_source;
-
     if (paginator.display_all)
     {
-      ds.set_start(0);
-      ds.set_limit(0);
+      content.set_start(0);
+      content.set_limit(0);
     }
     else
     {
-      ds.set_limit(paginator.page_size);
-      ds.set_start((paginator.page_number-1)*paginator.page_size);
+      content.set_limit(paginator.page_size);
+      content.set_start((paginator.page_number-1)*paginator.page_size);
     }
 
     paginator.num_pages = (ds.size + paginator.page_size - 1)/paginator.page_size;

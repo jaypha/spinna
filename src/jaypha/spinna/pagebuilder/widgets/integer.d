@@ -16,6 +16,7 @@ module jaypha.spinna.pagebuilder.widgets.integer;
 public import jaypha.spinna.pagebuilder.widgets.widget;
 
 import std.conv;
+import jaypha.html.helpers;
 
 //----------------------------------------------------------------------------
 
@@ -45,10 +46,8 @@ class IntegerWidget : Widget
     long _max = long.max
   )
   {
-    super(_form, _name,"input");
+    super(_form, _name, _label, _required, "input");
     add_class("integer-widget");
-    label = _label;
-    required = _required;
     min_value = _min;
     max_value = _max;
   }
@@ -56,21 +55,8 @@ class IntegerWidget : Widget
   override void copy(TextOutputStream output)
   {
     super.copy(output);
-    if (form)
-    {
-      form.doc.page_head.add_script
-      (
-        "add_integer_widget('"~name~"','"~label~"','"~form.id~"','"~id~"',"~(required?"true":"false")~","~to!string(min_value)~","~to!string(max_value)~","~(add_spinner?"true":"false")~");",
-        true
-      );
-    }
-    else
-      output.print("<script type='text/javascript'>$(function(){$('#"~id~"').IntegerWidget({max:"~to!string(max_value)~",min:"~to!string(min_value)~",spinna:"~(add_spinner?"true":"false")~"})});</script>");
-    //if (add_spinner)
-    //  output.print("<span class='integer-widget-wrapper' id='",id,"-wrapper'>");
-    //if (add_spinner)
-    //  output.print("<a class='spinner-up'>&#9650;</a><a class='spinner-down'>&#9660;</a></span>");
-    //output.print("<script type='text/javascript'>$(function(){add_integer_widget('"~name~"','"~label~"',"~(form is null?"null":"'"~form.id~"'")~",'"~id~"',"~(required?"true":"false")~","~(min_value == long.min?"null":to!string(min_value))~","~(max_value == long.max?"null":to!string(max_value))~","~(add_spinner?"true":"false")~");});</script>");
+    output.print(javascript("new IntegerWidget($('#"~id~"'), {label: '"~label~"', required: "~to!string(required)~", max:"~to!string(max_value)~",min:"~to!string(min_value)~",spinner:"~to!string(add_spinner)~"});"));
+    //output.print("<script type='text/javascript'>$(function(){$('#"~id~"').IntegerWidget({max:"~to!string(max_value)~",min:"~to!string(min_value)~",spinna:"~(add_spinner?"true":"false")~"})});</script>");
   }
 
   bool add_spinner = false;

@@ -17,6 +17,7 @@ public import jaypha.spinna.pagebuilder.widgets.widget;
 
 //import std.array;
 import std.conv;
+import jaypha.html.helpers;
 
 //----------------------------------------------------------------------------
 
@@ -36,7 +37,7 @@ class TextWidget : Widget
     override void name(string v) { attributes["name"] = v; }
   }
 
-  this(HtmlForm _form, string _name)
+  this
   (
     HtmlForm _form,
     string _name,
@@ -46,23 +47,19 @@ class TextWidget : Widget
     ulong _max = 0
   )
   {
-    super(_form, _name,"textarea");
+    _value = new TextComponent();
+    super(_form, _name, _label, _required, "textarea");
     add_class("text-widget");
-    label = _label;
-    required = _required;
-    attributes["type"] = "text";
     min_length = _min;
     max_length = _max;
-
-    _value = new TextComponent();
   }
 
   override void copy(TextOutputStream output)
   {
     if (max_length != 0) attributes["maxlength"] = to!string(max_length);
-    form.doc.page_head.add_script("add_string_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~",0,"~to!string(max_length)~",null);");
     add(_value);
     super.copy(output);
+    output.print(javascript("new StringWidget($('#"~id~"'), { minLen: "~to!string(min_length)~", maxLen: "~to!string(max_length)~", required: "~to!string(required)~" });"));
   }
 
   ulong min_length = 0;

@@ -24,14 +24,10 @@ import std.array;
 
 import std.stdio;
 
-/**
- * These elements are allowed to be printed using the empty tag shorthand.
- *
- * TODO - Need to find the full list of elements.
- */
-
 class HtmlElement : Composite
 {
+  // These elements are allowed to be printed using the empty tag shorthand.
+
   static immutable string[] empty_tags = ["area", "base", "basefont", "br", "col", "frame", "hr", "img", "input", "isindex", "link", "meta", "param" ];
 
   @property
@@ -46,13 +42,19 @@ class HtmlElement : Composite
 
   string tag_name;
 
+  //---------------------------------------------------------------------------
+
   this(string _tag_name = "div")        { tag_name = _tag_name; }
+
+  //---------------------------------------------------------------------------
 
   void add_class(string class_name)
   {
     if (find(css_classes,class_name).empty)
       css_classes ~= class_name;
   }
+
+  //---------------------------------------------------------------------------
 
   void remove_class(string class_name)
   {
@@ -64,6 +66,8 @@ class HtmlElement : Composite
         return;
       }
   }
+
+  //---------------------------------------------------------------------------
 
   override void copy(TextOutputStream output)
   {
@@ -100,6 +104,8 @@ class HtmlElement : Composite
       output.print("</",tag_name,">");
     }
   }
+
+  //---------------------------------------------------------------------------
   
   @property bool empty_tag()
   {

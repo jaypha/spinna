@@ -21,7 +21,7 @@ class SubmitButton : HtmlElement
 {
   this(string name, string value, string label)
   {
-    // $value is not used at present.
+    // value is not used at present.
     super("input");
     add_class("button-widget");
     attributes["type"] = "submit";

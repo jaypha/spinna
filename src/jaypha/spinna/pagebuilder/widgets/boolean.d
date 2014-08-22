@@ -20,6 +20,9 @@ module jaypha.spinna.pagebuilder.widgets.boolean;
 
 public import jaypha.spinna.pagebuilder.widgets.widget;
 
+import jaypha.html.helpers;
+import std.conv;
+
 class BooleanWidget : Widget
 {
   @property
@@ -46,27 +49,19 @@ class BooleanWidget : Widget
     HtmlForm _form,
     string _name,
     string _label,
-    bool _required,
-    bool _default = false
+    bool _required = false
   )
   {
-    super(_form, _name);
+    super(_form, _name, _label, _required);
     add_class("boolean-widget");
-    label = _label;
-    required = _required;
-    _v = _default;
 
     add(new DelegateComponent(&display));
   }
 
   override void copy(TextOutputStream output)
   {
-    form.doc.page_head.add_script
-    (
-      "add_boolean_widget('" ~_n~ "','" ~label~ "','" ~form.id~ "'," ~(required?"true":"false")~ ");",
-      true
-    );
     super.copy(output);
+    output.print(javascript("new BooleanWidget($('#"~id~"'), {label: '"~label~"', required: "~to!string(required)~"});"));
   }
 
   void display(TextOutputStream output)

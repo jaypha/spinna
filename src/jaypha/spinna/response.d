@@ -97,7 +97,7 @@ struct HttpResponse
   // Functions for response headers.
   //---------------------------------------------------------------------------
 
-  void status(int http_status, string msg = null)
+  void status(ulong http_status, string msg = null)
   {
     this.http_status = http_status;
     this.http_status_msg = msg.dup;
@@ -164,7 +164,7 @@ struct HttpResponse
 
   private:
     string mime_type;
-    int http_status = 200;
+    ulong http_status = 200;
     string http_status_msg = "OK";
     private Appender!string headers;
 }

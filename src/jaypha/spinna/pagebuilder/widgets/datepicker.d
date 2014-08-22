@@ -11,16 +11,17 @@
  * Written in the D language.
  */
 
-module jaypha.spinna.pagebuilder.widgets.date;
+module jaypha.spinna.pagebuilder.widgets.datepicker;
 
 public import jaypha.spinna.pagebuilder.widgets.widget;
 
 //import std.array;
 import std.conv;
+import jaypha.html.helpers;
 
 //----------------------------------------------------------------------------
 
-class DateWidget : Widget
+class DatePickerWidget : Widget
 {
   @property
   {
@@ -42,24 +43,18 @@ class DateWidget : Widget
     bool _required,
   )
   {
-    super(_form, _name,"input");
+    super(_form, _name, _label, _required, "input");
     add_class("date-widget");
-    label = _label;
-    required = _required;
   }
 
   override void copy(TextOutputStream output)
   {
-    string x = "<input name='"~name~"' style='display:none;' id='"~id~"'/>";
-    form.doc.page_head.add_script
-    (
-      "add_date_widget('"~name~"','"~label~"','"~form.id~"',"~(required?"true":"false")~");",
-      true
-    );
+    auto x = name;
     name = null;
-    id=id~"-display";
     attributes["readonly"] = "readonly";
     super.copy(output);
-    output.print(x);
+    name = x;
+    output.print("<input type='hidden' name='"~name~"' id='"~id~"-ret'/>");
+    output.print(javascript("new DatePickerWidget($('#"~id~"'), $('#"~id~"-ret'), {label: '"~label~"', required:"~(required?"true":"false")~"});"));
   }
 }

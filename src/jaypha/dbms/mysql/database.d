@@ -113,7 +113,7 @@ final class MySqlDatabase
   {
     if (list.length == 0) return ("0");
     static if (is(T == string))
-      return "("~map!(quote)(list).join(",")~")";
+      return "("~map!(a => quote(a))(list).join(",")~")";
     else
       return "("~map!(to!string)(list).join(",")~")";
   }
@@ -202,7 +202,7 @@ final class MySqlDatabase
   // first column must be unique, and of the correct type.
   //
 
-  string[string][T] query_indexed_data(T = ulong)(string sql)
+  string[string][T] query_indexed_data(T = string)(string sql)
   {
     MYSQL_RES* res = query_raw(sql);
     scope(exit) { mysql_free_result(res); }
@@ -231,7 +231,7 @@ final class MySqlDatabase
   // first column must be unique, and of the correct type.
   //
 
-  U[T] query_indexed_column(T = ulong,U = string)(string sql)
+  U[T] query_indexed_column(T = string,U = string)(string sql)
   {
     MYSQL_RES* res = query_raw(sql);
     scope(exit) { mysql_free_result(res); }

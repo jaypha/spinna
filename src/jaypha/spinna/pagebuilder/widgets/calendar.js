@@ -187,7 +187,7 @@ Calendar.prototype.make_calendar = function(year, month)
         if(cur_day == d) class_name += " selected";
         else if (to_day == d) class_name += " today";
         
-        html.push("<td class='days "+class_name+"'><a href='javascript:calendars[\""+this.id+"\"].select("+year+","+month+","+d+"); calendars[\""+this.id+"\"].hide();'>"+w+"</a></td>");
+        html.push("<td class='days "+class_name+"'><a href='javascript:calendar_select(\""+this.id+"\","+year+","+month+","+d+");'>"+w+"</a></td>");
         d++;
       } else {
         html.push("<td class='days'>&nbsp;</td>");
@@ -217,6 +217,11 @@ Calendar.prototype.clear = function()
 Calendar.prototype.hide = function()
 {
   this.cal.hide();
+}
+
+function calendar_select(cal,year,month,day)
+{
+  calendars[cal].select(year,month,day); calendars[cal].hide();
 }
 
 function get_position(ele)

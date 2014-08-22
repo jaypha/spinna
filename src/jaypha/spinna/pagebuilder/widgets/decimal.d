@@ -17,10 +17,11 @@ public import jaypha.spinna.pagebuilder.widgets.widget;
 public import jaypha.decimal;
 
 import std.conv;
+import jaypha.html.helpers;
 
 import jaypha.container.hash;
 
-class DecimalWidget(uint scale) : Widget
+class DecimalWidget(uint scale = 2) : Widget
 {
   alias decimal!scale D;
 
@@ -44,27 +45,21 @@ class DecimalWidget(uint scale) : Widget
     HtmlForm _form,
     string _name,
     string _label,
-    bool _required,
+    bool _required = false,
     D _min = D.min,
     D _max = D.max
   )
   {
-    super(_form, _name,"input");
+    super(_form, _name, _label, _required, "input");
     add_class("decimal-widget");
-    label = _label;
-    required = _required;
     min_value = _min;
     max_value = _max;
   }
 
   override void copy(TextOutputStream output)
   {
-    form.doc.page_head.add_script
-    (
-      "add_decimal_widget('"~name~"','"~label~"','"~form.id~"','"~id~"',"~(required?"true":"false")~","~to!string(scale)~","~min_value.toString()~","~max_value.toString()~");",
-      true
-    );
     super.copy(output);
+    output.print(javascript("new DecimalWidget($('#"~id~"'),{required:"~(required?"true":"false")~",min: "~min_value.toString()~",max:"~max_value.toString()~"});"));
   }
 
   D min_value;

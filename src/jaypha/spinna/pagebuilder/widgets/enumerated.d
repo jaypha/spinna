@@ -15,8 +15,8 @@ module jaypha.spinna.pagebuilder.widgets.enumerated;
 
 struct EnumeratedOption
 {
-  string value;
   string label;
+  string value;
 }
 
 alias EnumeratedOption SelectorOption;

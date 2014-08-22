@@ -22,7 +22,7 @@ public import jaypha.container.hash;
 
 import config.general;
 
-class Paginator(string tpl) : Component
+class Paginator(string tpl = "jaypha/spinna/pagebuilder/lists/paginator_default.tpl") : Component
 {
   string name;
   ulong num_pages;
@@ -83,7 +83,7 @@ unittest
   StrHash request;
 
   request["hello-page"] = "3";
-  auto pg = new_paginator("hello", "abc.com", request);
+  auto pg = new Paginator!()("hello", "abc.com", request);
 
   pg.num_pages = 12;
 

@@ -3,6 +3,10 @@
 module jaypha.dbms.database;
 
 
+template isDatabase(DB)
+{
+}
+
 interface Database
 {
   void connect();

@@ -111,6 +111,6 @@ debug(embed)
     auto x = true;
     auto title = "Heaven";
 
-    mixin(embedD(import("impt.tpl")));
+    mixin(embedD(import("embed_test.tpl")));
   }
 }
