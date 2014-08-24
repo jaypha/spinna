@@ -1,17 +1,16 @@
 RDMD = rdmd
 
-YUI = java -jar progs/yuicompressor-2.4.8.jar
-
 SPINNA_ROOT = .
 
+DYAML_PROJ = /home/jason/projects/dyaml_0.4/source
 include makefile.include
 
 BININSTALL = /usr/local/bin
 LIBINSTALL = /usr/local/lib
 
-LIBDIR = /usr/lib64/mysql
-LIBS = fcgi fig mysqlclient
-IMPDIR =  $(SPINNA_ROOT)/src
+LIBDIR = /usr/lib64/mysql .
+LIBS = fcgi dyaml mysqlclient
+IMPDIR =  $(SPINNA_ROOT)/src $(DYAML_PROJ)
 
 LIBFLAGS= $(addprefix -L-l,$(LIBS)) $(addprefix -L-L,$(LIBDIR))
 
@@ -35,21 +34,15 @@ bin: bin/makerouter
 
 # --------------------------
 
-bin/makerouter: src/makerouter.d lib/libfig.a
+bin/makerouter: src/makerouter.d
 	$(RDMD) $(RDFLAGS) $(LFLAGS) -ofbin/makerouter --build-only src/makerouter.d
 
 # makerouter for testing
 
-makerouter: src/makerouter.d lib/libfig.a
+makerouter: src/makerouter.d
 	$(RDMD) $(DDFLAGS) $(LFLAGS) -ofmakerouter --build-only src/makerouter.d
 
 # --------------------------
-
-lib: lib/libfig.a
-
-lib/libfig.a:
-	pushd fig; make lib
-	cp fig/libfig.a lib
 
 # --------------------------
 # This is for installing support programs, not finished software.
@@ -66,12 +59,6 @@ clean:
 	rm -f bin/*
 	rm -f lib/*
 	rm -f res/*
-	pushd fig; make clean
-
-
-res/spinna.min.js: $(JSFILES)
-	js -C $(addprefix -f ,$(JSFILES))
-	$(YUI) $(JSFILES) -o res/spinna.min.js
 
 res/spinna.js: $(JSFILES) $(JSWFILES)
 	js -C $(addprefix -f ,$(JSFILES)) $(addprefix -f ,$(JSWFILES))

@@ -30,19 +30,19 @@ template param_copy(R...) {
     const char[] param_copy = "";
 }
 
-template match_regex_route(string action, string rx, string fn, cp ...)
+template match_regex_route(string action, string rx, string method, string fn, cp ...)
 {
   const char[] match_regex_route = 
-    "{auto m = match(path, "~rx~");"
+    "if (method == \""~method~"\") {auto m = match(path, "~rx~");"
     "if (m) { strstr p; "~param_copy!(cp)~" return "
     "ActionInfo(\""~action~"\",wrap_service(p, &"~fn~"));}}";
 }
 
 template match_static_route
-  (string action, string pattern, string fn)
+  (string action, string pattern, string method, string fn)
 {
   const char[] match_static_route = 
-    "if (path == \""~pattern~"\") return "
+    "if (method==\""~method~"\" && path == \""~pattern~"\") return "
     "ActionInfo(\""~action~"\",toDelegate(&"~fn~"));";
 }
 

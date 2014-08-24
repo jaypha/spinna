@@ -23,7 +23,7 @@ import std.getopt;
 import std.exception;
 import std.array;
 
-import jaypha.fig.figparser;
+import dyaml.all;
 
 enum module_name = "gen.router";
 
@@ -38,7 +38,48 @@ struct fndef
   Queue!(string) commands;
 }
 
+struct Context
+{
+  string pattern;
+  string node_path;  // Node path is also cumulative.
+  string[] roles;
+  string method;
+  bool redirect;
+  string mdule;
+}
+
 Queue!(string)[string] fns;
+Stack!Context contexts;
+
+struct Coder
+{
+  ref Coder opUnary(string s: "++")()
+  {
+    ++ident;
+    return this;
+  }
+
+  ref Coder opUnary(string s: "--")()
+  {
+    --ident;
+    return this;
+  }
+
+  void put(string stuff)
+  {
+    foreach(i;0..ident)
+      code.put("  ");
+    code.put(stuff);
+  }
+
+  @property string data() { return code.data; }
+
+  private:
+    Appender!string code;
+    ulong ident;
+}
+
+Coder code;
 
 set!string regexs;
 
@@ -52,6 +93,23 @@ bool include_string = false;
 void print_format(bool verbose = false)
 {
   writeln("Format: makerouter [-h] [-d<output_dir>] <input_file>");
+}
+
+//----------------------------------------------------------------------------
+
+Context context_default;
+
+static this()
+{
+  contexts.put(Context
+  (
+    "",
+    "",
+    [],
+    "get",
+    false,
+    "",
+  ));
 }
 
 //----------------------------------------------------------------------------
@@ -70,202 +128,227 @@ void main(string[] args)
 
   if (help) { print_format();  return; }
 
-  scope(success)
-  {
-    auto f1 = File(output_dir~"/router.d", "w");
-    scope(exit) { f1.close(); }
-    write_router(f1);
+  //--------------------------------
+  // Get YAML
 
-    auto f2 = File(output_dir~"/permissions.tpl", "w");
-    scope(exit) { f2.close(); }
-    write_permissions(f2);
-    
+  auto buffer = appender!(ubyte[])();
+
+  auto chunker = stdin.byChunk(4096);
+  chunker.copy(buffer);
+
+  Node root = Loader.fromString(cast(string)buffer.data).load();
+
+  //--------------------------------
+
+
+  //--------------------------------
+
+  if (root.containsKey("preamble"))
+    preamble = root["preamble"].as!string;
+
+  if (root.containsKey("roletype"))
+    roletype = root["roletype"].as!string;
+
+  if (root.containsKey("authtype"))
+    authtype = root["authtype"].as!string;
+
+  if (root.containsKey("error"))
+  {
+    error_page = root["error"].as!string;
+    modules.put(error_page.split(".")[0..$-1].join("."));
   }
 
-  fns["route"] = make!(Queue!(string));
+  code.put("auto find_route(string path, string method)\n{\n");
+  ++code;
+  process_node(root,"root");
+  code.put("return ActionInfo(null,null);\n");
+  --code;
+  code.put("}\n");
 
-  foreach (filename; args[1..$])
-  {
-    Figtree figs = read_fig_file(filename);
+  //--------------------------------
 
-    if ("preamble" in figs)
-      preamble = figs["preamble"].get_string();
+  //writeln(code.data);
+  
+  auto f1 = File(output_dir~"/router.d", "w");
+  scope(exit) { f1.close(); }
+  write_router(f1);
 
-    if ("roletype" in figs)
-      roletype = figs["roletype"].get_string();
-
-    if ("authtype" in figs)
-      authtype = figs["authtype"].get_string();
-
-    if ("error" in figs)
-    {
-      error_page = figs["error"].get_string();
-      modules.put(error_page.split(".")[0..$-1].join("."));
-    }
-
-    if ("prefix" in figs)
-    {
-      fns["route"] ~=
-        text
-        (
-          "if (!startsWith(path, \"",
-          figs["prefix"].get_string(),
-          "\")) return null;",
-          "path = path.chompPrefix(\"",
-          figs["prefix"].get_string(),
-          "\");"
-        );
-    }
-
-    create_sub_route("route",figs);
-  }
+  auto f2 = File(output_dir~"/permissions.tpl", "w");
+  scope(exit) { f2.close(); }
+  write_permissions(f2);
 }
 
 //----------------------------------------------------------------------------
 
-void create_node_route(string fn_name, Fig_Value node)
+void process_node(Node node, string name)
 {
-  auto members = node.get_list();
-  auto pattern = members["pattern"].get_string();
-
-  if (canFind(pattern,'$'))
-    create_regex_node_route(fn_name, node);
+  auto context = create_context(node, name, contexts.front);
+  if (node.containsKey("service"))
+  {
+    // Having a service means we are defining a route.
+    create_service(node,context);
+  }
   else
-    create_static_node_route(fn_name, node);
+  {
+    create_sub_route(node, context);
+  }
 }
 
 //----------------------------------------------------------------------------
 
-void create_static_node_route(string fn_name, Fig_Value node)
+void create_service(Node node, ref Context context)
+{
+  if (canFind(context.pattern,'$'))
+    create_regex_service(node,context);
+  else
+    create_static_service(node,context);
+  extract_permissions(node, context);
+}
+
+//----------------------------------------------------------------------------
+
+void create_static_service(Node node, ref Context context)
 {
   include_functional = true;
-  auto members = node.get_list();
 
-  modules.put(members["module"].get_string());
+  modules.put(context.mdule);
 
-  fns[fn_name] ~=
-
+  code.put
+  (
     text
     (
       "mixin(match_static_route!(\"",
-      node.full_name,
+      context.node_path,
       "\",\"",
-      members["pattern"].get_string(),
+      context.pattern,
       "\", \"",
-      members["module"].get_string(),'.',members["service"].get_string(),
-      "\"));"
-    );
+      context.method,
+      "\", \"",
+      context.mdule,'.',node["service"].as!string,
+      "\"));\n"
+    )
+  );
 }
 
 //----------------------------------------------------------------------------
 
-void create_regex_node_route(string fn_name, Fig_Value node)
+void create_sub_route(Node node, ref Context context)
 {
-  auto members = node.get_list();
+  if (node.containsKey("prefix"))
+  {
+    code.put(text("if (startsWith(path, \"",node["prefix"].as!string,"\"))\n")),
+    code.put("{\n");
+    ++code;
+    code.put(text("path = path.chompPrefix(\"",node["prefix"].as!string,"\");\n")),
+    include_string = true;
+  }
 
-  Figtree formats = members["format"].get_list();
-  string pattern = members["pattern"].get_string();
+    contexts.put(context);
+
+    foreach (string n, Node f; node)
+    {
+      if (!f.isMapping)
+        continue;
+      process_node(f,n);
+    }
+    contexts.popFront();
+  if (node.containsKey("prefix"))
+  {
+    code.put("return ActionInfo(null,null);\n");
+    --code;
+    code.put("}\n");
+  }
+}
+
+//----------------------------------------------------------------------------
+
+void create_regex_service(Node node, ref Context context)
+{
+  Node formats = node["format"];
+  auto pattern = context.pattern;
   string[] params;
-  modules.put(members["module"].get_string());
+  modules.put(context.mdule);
 
-  foreach(n,f; formats)
+  foreach(string n,Node f; formats)
   {
     params ~= n;
     auto r = regex(r"\$"~n);
-    pattern = replace(pattern, r, "(?P<"~n~">"~f.get_string()~")");
+    pattern = replace(pattern, r, "(?P<"~n~">"~f.as!string~")");
   }
   auto place = regexs.put(pattern);
 
-  fns[fn_name] ~=
+  code.put
+  (
     text
     (
       "mixin(match_regex_route!(\"",
-      node.full_name,
+      context.node_path,
       "\",\"rx",
       place,
       "\", \"",
-      members["module"].get_string(),'.',members["service"].get_string(),
+      context.method,
+      "\", \"",
+      context.mdule,'.',node["service"].as!string,
       "\", \"",
       join(params, "\", \""),
-      "\"));"
-    );
+      "\"));\n"
+    )
+  );
 }
 
 //----------------------------------------------------------------------------
 
-void create_sub_route(string fn_name, Figtree node)
+Context create_context(Node node, string name, Context previous)
 {
-  foreach (n,f; node)
+  Context cntxt = previous;
+  if (cntxt.node_path.length)
+    cntxt.node_path ~= ".";
+  cntxt.node_path ~= name;
+  if (node.containsKey("pattern"))
+    cntxt.pattern = node["pattern"].as!string;
+  if (node.containsKey("method"))
+    cntxt.method = node["method"].as!string;
+  if (node.containsKey("roles"))
   {
-    if (f.type() != Fig_Type.List)
-      continue;
-
-    if ("prefix" in f.get_list())
+    if (node["roles"].isScalar)
+      cntxt.roles = [ node["roles"].as!string ];
+    else
     {
-      include_string = true;
-
-      fns[fn_name] ~=
-      
-        text
-        (
-          "mixin(match_sub_route!(\"",
-          f.get_list()["prefix"].get_string(),
-          "\", \"find_",
-          fn_name ~ n,
-          "\"));"
-        );
-
-      fns[fn_name ~ n] = make!(Queue!(string));
-
-      create_sub_route(fn_name ~ n, f.get_list());
+      cntxt.roles = [];
+      foreach (string v; node["roles"])
+        cntxt.roles ~= v;
     }
-    else if ("pattern" in f.get_list())
-      create_node_route(fn_name, f);
-
-    extract_permissions(f);
   }
+  if (node.containsKey("redirect"))
+    cntxt.redirect = node["redirect"].as!string == "true";
+  if (node.containsKey("module"))
+    cntxt.mdule = node["module"].as!string;
+
+  return cntxt;
 }
+
 
 //----------------------------------------------------------------------------
 
 struct RoleInfo
 {
   string[] roles;
-  bool noredirect = false;
+  bool redirect;
 }
 
 RoleInfo[string] allowed_roles;
 
-void extract_permissions(Fig_Value node)
+void extract_permissions(Node node, ref Context context)
 {
-  RoleInfo info;
-
-  auto list = node.get_list();
-
-  if ("roles" !in list)
+  if (!context.roles.length)
     return;
 
-  auto roles = list["roles"];
+  RoleInfo info;
 
-  if (roles.type() == Fig_Type.Str)
-  {
-    info.roles = [ roles.get_string() ];
-  }
-  else if (roles.type() == Fig_Type.Array)
-  {
-    foreach (v; roles.get_array())
-    {
-      enforce(v.type() == Fig_Type.Str);
-      info.roles ~= v.get_string();
-    }
-  }
-  else
-    throw new Exception("Node "~node.full_name~": roles must be valid string or list of strings");
+  info.roles = context.roles;
+  info.redirect = context.redirect;
 
-  if ("noredirect" in list)
-    info.noredirect = true;
-
-  allowed_roles[node.full_name] = info;
+  allowed_roles[context.node_path] = info;
 }
 
 //----------------------------------------------------------------------------
@@ -306,6 +389,9 @@ void write_router(File writer)
       writer.writeln("enum rx",count++," = ctRegex!(`^",r,"$`);");
   }
 
+  writer.writeln();
+  writer.write(code.data);
+  /*
   foreach (n,f; fns)
   {
     writer.writeln();
@@ -315,6 +401,7 @@ void write_router(File writer)
       writer.writeln("  ",ss);
     writer.writeln("  return ActionInfo(null,null);\n}");
   }
+  */
 }
 
 //----------------------------------------------------------------------------
@@ -340,10 +427,10 @@ void write_permissions(File writer)
     foreach (r;p.roles)
       role_items ~= roletype~"."~r;
     item ~= role_items.join(",");
-    item ~= "],"~(p.noredirect?"false":"true")~")"; // noredirect in fig, redirect in Permission.
+    item ~= "],"~(p.redirect?"true":"false")~")";
     permission_items ~= item;
   }
-  writer.writeln(permission_items.join("\n,"));
+  writer.writeln(permission_items.join(",\n"));
   writer.writeln("];");
 }
 
@@ -373,6 +460,26 @@ struct Queue(T)
     bool empty() { return q.empty; }
     T front() { return q.front(); }
     void popFront() { q.popFront(); }
+}
+
+//----------------------------------------------------------------------------
+
+struct Stack(T)
+{
+  private:
+
+    T[] q;
+
+  public:
+
+    void put(T t)
+    {
+      q ~= t;
+    }
+
+    bool empty() { return q.empty; }
+    T front() { return q[$-1]; }
+    void popFront() { q = q[0..$-1]; }
 }
 
 //----------------------------------------------------------------------------

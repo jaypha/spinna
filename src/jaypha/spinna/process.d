@@ -18,6 +18,7 @@ import std.algorithm;
 
 import jaypha.spinna.global;
 import jaypha.spinna.authorisation;
+import std.uni;
 
 import gen.router;
 
@@ -51,7 +52,7 @@ void process_request(I,O,alias AuthInst = null)
     if ("SPINNA_SESSION" in request.cookies)
       session.session_id = request.cookies["SPINNA_SESSION"].value;
 
-    auto action_info = find_route(request.path);
+    auto action_info = find_route(request.path,toLower(request.method));
 
     if (action_info.action is null)
     {
