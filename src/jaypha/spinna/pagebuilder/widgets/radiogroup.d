@@ -53,7 +53,7 @@ class RadioGroupWidget: Widget
   override void copy(TextOutputStream output)
   {
     super.copy(output);
-    output.print(javascript("new EnumGroupWidget($('#"~id~"'),'"~_name~"',{ minSel: "~(required?"1":"0")~", maxSel: 1 });"));
+    output.print(javascript("new EnumGroupWidget($('#"~id~"'),'"~_name~"',{ label: '"~label~"', minSel: "~(required?"1":"0")~", maxSel: 1 });"));
   }
 
   void print_innards(TextOutputStream c)

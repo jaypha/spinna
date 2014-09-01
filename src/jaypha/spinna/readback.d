@@ -81,7 +81,7 @@ string readback_info()
 
     foreach (i,ac; session)
     {
-      s.put("i: ");
+      s.put(i~": ");
       foreach (j,cs;ac)
         s.put(j~"="~cs~", ");
       s.put("\n");

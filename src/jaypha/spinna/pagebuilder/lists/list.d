@@ -15,4 +15,5 @@ interface ListComponent : Component
 {
   void set_start(ulong start);
   void set_limit(ulong limit);
+  @property ulong size();
 }

@@ -19,8 +19,9 @@ import std.algorithm;
 import jaypha.spinna.global;
 import jaypha.spinna.authorisation;
 import std.uni;
-
 import gen.router;
+import std.traits;
+import std.conv;
 
 /*
  * Procedure
@@ -33,13 +34,25 @@ import gen.router;
  * 6. Output the HTTP response.
  */
 
-void process_request(I,O,alias AuthInst = null)
+// TODO must test for service of type void Delegate()
+
+enum bool isRouterController(R) = is(typeof(
+  (inout int = 0)
+  {
+    if (R.has_route("","")) {}
+    if (R.is_authorised) {}
+    string h = R.redirect;
+    R.service();
+  }
+));
+
+void process_request(I,O,RC)
 (
   string[string] env,
   I input_stream,
   O output_stream,
   void delegate(ulong, string) error_handler
-) if (isOutputRange!(O,immutable(ubyte)[]))
+) if (isOutputRange!(O,immutable(ubyte)[]) && isRouterController!RC)
 {
   // Even if an unrecoverable error occurs, a minimal error message must be sent
   // to the client.
@@ -52,29 +65,25 @@ void process_request(I,O,alias AuthInst = null)
     if ("SPINNA_SESSION" in request.cookies)
       session.session_id = request.cookies["SPINNA_SESSION"].value;
 
-    auto action_info = find_route(request.path,toLower(request.method));
-
-    if (action_info.action is null)
+    if (!RC.has_route(request.path,toLower(request.method)))
     {
       // Could not match.
       error_handler(404, "Page not found: "~request.path);
     }
     else
     {
-      static if (is(AuthInst.action_authorised))
-      {
-        if (AuthInst.action_authorised(action_info.action))
-          action_info.service();
+        if (RC.is_authorised)
+        {
+          RC.service();
+        }
         else
         {
-          if (AuthInst.redirect_unauthorised(action_info.action) && !is_logged_in())
-            response.redirect("/login?url="~request.path);
+          auto redirect = RC.redirect;
+          if (redirect && !is_logged_in())
+            response.redirect(redirect~"?url="~request.path);
           else
             error_handler(403, "Not authorised to access: "~request.path);
         }
-      }
-      else
-        action_info.service();
     }
     if (session.active)
     {

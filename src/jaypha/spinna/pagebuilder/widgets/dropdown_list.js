@@ -9,8 +9,9 @@ function DropdownListWidget(jqo,options)
 
   this.jqo = jqo;	
   this.required = this.optn.required;
-this.valid = true;
-this.msg = null;
+  this.valid = true;
+  this.msg = null;
+  this.label = this.optn.label;
 
   this.jqo.data("widget",this);
 }

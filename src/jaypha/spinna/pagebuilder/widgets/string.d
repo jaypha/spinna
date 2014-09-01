@@ -57,7 +57,7 @@ class StringWidget : Widget
     if (max_length != 0) attributes["maxlength"] = to!string(max_length);
     if (is_password) attributes["type"] = "password";
     super.copy(output);
-    output.print(javascript("new StringWidget($('#"~id~"'), { minLen: "~to!string(min_length)~", maxLen: "~to!string(max_length)~", required: "~to!string(required)~" });"));
+    output.print(javascript("new StringWidget($('#"~id~"'), { label: '"~label~"', minLen: "~to!string(min_length)~", maxLen: "~to!string(max_length)~", required: "~to!string(required)~" });"));
   }
 
   ulong min_length = 0;

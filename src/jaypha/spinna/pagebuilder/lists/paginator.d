@@ -49,7 +49,7 @@ class Paginator(string tpl = "jaypha/spinna/pagebuilder/lists/paginator_default.
   }
 
   ulong default_page = 1;
-  ulong default_page_size = PAGE_SIZE_DEFAULT;
+  ulong default_page_size = page_size_default;
 
   this(string n, string b, ref StrHash r)
   {

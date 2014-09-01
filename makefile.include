@@ -1,7 +1,7 @@
 
 
 
-JSWFILES = $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/stringw.js \
+JSWFILES = $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/string.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/integer.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/boolean.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/enum.js \
@@ -10,7 +10,7 @@ JSWFILES = $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/stringw.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/decimal.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/calendar.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/icon_button.js \
-           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/useful_stuff/dialog_box.js \
+           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/dialog_box.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/form.js \
            $(SPINNA_ROOT)/src/jquery/jquery-ui.js \
            $(SPINNA_ROOT)/thirdparty/jquery/jquery.caret.js
@@ -19,6 +19,6 @@ JSFILES = $(SPINNA_ROOT)/thirdparty/js_date_format/js_date_format.js
 
 SCSSWFILES = $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/widgets.scss \
              $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/calendar.scss \
-             $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/useful_stuff/dialog_box.scss \
+             $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/dialog_box.scss \
 
 SCSSFILES = 

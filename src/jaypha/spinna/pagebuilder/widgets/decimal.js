@@ -25,6 +25,8 @@ function DecimalWidget(jqo, options)
   this.name = jqo.attr['name'];
   this.required = options.required;
   this.jqo.data("widget",this);
+  this.label = this.optn.label;
+
   var self = this;
 
 

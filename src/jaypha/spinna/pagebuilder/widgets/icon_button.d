@@ -35,6 +35,8 @@ class IconLinkButton : HtmlElement
       add_class("disabled");
       remove_class("hotable");
       state = "disabled";
+      attributes["onclick"] = "e.preventDefault();";
+
     }
     else
     {

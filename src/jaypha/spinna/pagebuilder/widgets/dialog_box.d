@@ -17,6 +17,8 @@ class DialogBox(string S) : HtmlElement
     mixin TemplateCopy!S;
   }
 
+  bool open_on_load;
+
   this(string _id)
   {
     super();
@@ -41,7 +43,8 @@ class DialogBox(string S) : HtmlElement
       javascript
       (
         "$(function(){$('#"~id~"').jqm();"
-        "$('#"~id~"').jqmAddClose('#"~id~" .dialog-close-button');});"
+        "$('#"~id~"').jqmAddClose('#"~id~" .dialog-close-button');" ~
+        (open_on_load?"$('#"~id~"').jqmShow();":"")~"});"
       )
     );
   }

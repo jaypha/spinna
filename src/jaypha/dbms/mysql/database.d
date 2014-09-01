@@ -381,11 +381,15 @@ final class MySqlDatabase
   }
 
   //---------------------------------------------------------------------------
-  // Shortcuts for use with ids
+  // CRUD Shortcuts for use with ids
   //---------------------------------------------------------------------------
   // Assumes the table has a column `id` of type unigned integer (or long)
   // and has a unique value index. We use strings to reduce the back-and-forth
   // conversion between string and ulong that occurs in websites.
+  //---------------------------------------------------------------------------
+
+  alias insert create;
+
   //---------------------------------------------------------------------------
 
   string[string] get(string table, string id)
@@ -395,15 +399,9 @@ final class MySqlDatabase
 
   //---------------------------------------------------------------------------
 
-  string set(string tablename, string[string] values, string id = null)
+  void set(string tablename, string[string] values, string id)
   {
-    if (id is null)
-      return insert(tablename, values);
-    else
-    {
-      update(tablename, values, [ "id="~id ]);
-      return id;
-    }
+    update(tablename, values, [ "id="~id ]);
   }
 
   //---------------------------------------------------------------------------

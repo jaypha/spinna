@@ -36,6 +36,7 @@ class TableList : ListComponent
 
   override void set_start(ulong start) { source.set_start(start); }
   override void set_limit(ulong limit) { source.set_start(limit); }
+  override @property ulong size() { return source.size; }
 
   this(string _name, TableSource s) { name = _name; table = new HtmlTable(); source = s; }
 

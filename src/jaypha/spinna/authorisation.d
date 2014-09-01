@@ -15,6 +15,7 @@ module jaypha.spinna.authorisation;
 
 import std.conv;
 import std.traits;
+import std.exception;
 
 import jaypha.types;
 import jaypha.spinna.global;
@@ -22,26 +23,15 @@ import jaypha.spinna.global;
 //----------------------------------------------------------------------------
 // Authorisation - Permission to do something.
 
-// Account Role is an enumeration of values that are bitwise mutually exclusive.
- 
-template Authorisation(AccountRole)
-{
-  struct Permission
-  {
-    AccountRole[] roles;
-    bool redirect;
-  }
-
-  Permission[string] permissions;
 
   //----------------------------------------------------------------------------
 
-  bool has_role(ulong roles, AccountRole role)
+  bool has_role(ulong roles, ulong role)
   {
     return (roles & role) != 0;
   }
 
-  bool has_role(AccountRole role)
+  bool has_role(ulong role)
   {
     if (!is_logged_in()) return false;
     return (session["login"].get!ulong("roles") & role) != 0;
@@ -49,57 +39,21 @@ template Authorisation(AccountRole)
 
   //----------------------------------------------------------------------------
 
-  AccountRole extract_role()
+  ulong extract_role(R)()
   {
     assert(is_logged_in());
-    return extract_role(session["login"].get!ulong("roles"));
+    return extract_role!R(session["login"].get!ulong("roles"));
   }
 
-  AccountRole extract_role(ulong roles)
+  ulong extract_role(R)(ulong roles)
   {
-    foreach (j; EnumMembers!AccountRole)
+    foreach (j; EnumMembers!R)
       if (roles & j)
         return j;
-    return AccountRole.None;
+    return 0;
   }
 
-  //----------------------------------------------------------------------------
 
-  bool action_authorised(string action)
-  {
-    return action_authorised
-    (
-      action,
-      is_logged_in()?session["login"].get!ulong("roles"):0
-    );
-  }
-
-  bool action_authorised(string action, ulong roles)
-  {
-    // If no permissions are defined then access is universal.
-    if (action !in permissions)
-      return true;
-
-    // Admin always has authorisation.
-    if (has_role(roles, AccountRole.Admin))
-      return true;
-
-    // Check against listed roles.
-    foreach (r; permissions[action].roles)
-      if (has_role(roles, r))
-        return true;
-
-    return false;
-  }
-
-  //----------------------------------------------------------------------------
-
-  bool redirect_unauthorised(string action)
-  {
-    assert(action in permissions);
-    return permissions[action].redirect;
-  }
-}
 
 //----------------------------------------------------------------------------
 // authenication - identify an account, login.
@@ -136,6 +90,11 @@ bool account_exists(Database, string table = "account")(Database database, strin
 
 //----------------------------------------------------------------------------
 
+void logout()
+{
+  session.clear();
+}
+
 /+
 enum account_string(string table) = "select count(*) from "~table~" where username=";
 
@@ -165,4 +124,12 @@ string get_logged_in_id()
     return session["login"].get_str("id");
   else
     return null;
+}
+
+ulong get_logged_in_roles()
+{
+  if (session.has("login"))
+    return session["login"].get!ulong("roles");
+  else
+    return 0;
 }

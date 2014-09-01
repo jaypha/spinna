@@ -26,6 +26,7 @@ class SimpleList(string tpl) : ListComponent
 {
   override void set_start(ulong start) { source.set_start(start); }
   override void set_limit(ulong limit) { source.set_start(limit); }
+  override @property ulong size() { return source.size; }
 
   ObjSource source;
 

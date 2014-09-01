@@ -40,7 +40,7 @@ class SortWidget : Widget
 
   this(HtmlForm _form, string _name)
   {
-    super(_form, _name,"ul");
+    super(_form, _name, null, true,"ul");
     add_class("sort-widget");
     _form.hiddens[_name] = "";
   }

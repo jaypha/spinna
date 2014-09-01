@@ -48,7 +48,7 @@ class PagedList
       content.set_start((paginator.page_number-1)*paginator.page_size);
     }
 
-    paginator.num_pages = (ds.size + paginator.page_size - 1)/paginator.page_size;
+    paginator.num_pages = (content.size + paginator.page_size - 1)/paginator.page_size;
 
     mixin(TemplateOutput!tpl);
   }

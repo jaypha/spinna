@@ -37,6 +37,7 @@ abstract class Widget : HtmlElement
   )
   {
     super(_tag_name);
+    form = _form;
     name = _name;
     label = _label;
     required = _required;
@@ -56,9 +57,9 @@ abstract class Widget : HtmlElement
   }
 }
 
-class WidgetComponent : Component
+class WidgetComponent(alias tpl = "jaypha/spinna/pagebuilder/widgets/default_widgets.tpl") : Component
 {
   Widget[] widgets;
 
-  mixin TemplateCopy!"jaypha/spinna/pagebuilder/widgets/default_widgets.tpl";
+  mixin TemplateCopy!tpl;
 }

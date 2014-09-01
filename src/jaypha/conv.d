@@ -30,6 +30,32 @@ string bin2hex(uint i)
 
 //-----------------------------------------------------------------------------
 
+T[] bits_to_list(T)(T v) if(__traits(isUnsigned,T))
+{
+  T c = 1;
+  T[] r;
+
+  while (v != 0)
+  {
+    if (v & 1)
+      r ~= c;
+    v = v >>> 1;
+    c = c << 1;
+  }
+  return r;
+}
+
+T list_to_bits(T)(T[] list) if(__traits(isUnsigned,T))
+{
+  T bits;
+
+  foreach (l;list)
+    bits |= l;
+  return bits;
+}
+
+//-----------------------------------------------------------------------------
+
 /+
 
 struct AsUTF16(R) if (isInputRange!R && Unqual(ElementType!R)==ubyte)

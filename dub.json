@@ -1,12 +1,15 @@
 {
   "libs-posix":
   [
-    "fig"
+    "dyaml"
   ]
 	"name": "spinna",
 	"description": "Web Framework",
+  "copyright": "Copyright 2014, Jaypha",
 	"authors": ["Jason den Dulk"],
-	"license": "Boost V1.0",
+	"license": "BSL-1.0",
 	"dependencies": {
-	}
+    "dyaml",
+    "backtrace"
+  }
 }

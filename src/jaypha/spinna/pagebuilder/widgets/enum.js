@@ -10,6 +10,7 @@ function EnumGroupWidget(jqo,name,options)
 
   var obj = this;
 
+  this.label = this.optn.label
   this.valid = true;
   this.msg = null;
   this.required = this.optn.minSel > 0;

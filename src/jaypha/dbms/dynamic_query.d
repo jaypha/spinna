@@ -130,7 +130,7 @@ struct DynamicQuery
       if (t.condition)
       {
         if (indexOf(t.condition, '=') < 0)
-          sql.put("using (");
+          sql.put(" using (");
         else
           sql.put(" on (");
         sql.put(t.condition);

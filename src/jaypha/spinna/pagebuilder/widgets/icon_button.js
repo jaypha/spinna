@@ -11,7 +11,7 @@
 
 $(function()
 {
-  $(".hotable").mouseover(function()
+  $("body").on("mouseover", ".hotable", function()
   {
     var i = $("img",this);
     var src = i.attr("src");
@@ -19,7 +19,7 @@ $(function()
     $(this).parent().addClass("highlight");
   });
 
-  $(".hotable").mouseout(function()
+  $("body").on("mouseout", ".hotable", function()
   {
     var i = $("img",this);
     var src = i.attr("src");
@@ -33,8 +33,10 @@ $(function()
     {
       var src = $("img",this).attr("src");
       $("img",this).attr("src",src.replace(/(hot|normal)/, "disabled"));
+      $("a",this).click(function( e ){e.preventDefault();});
       $(this).removeClass("hotable");
       $(this).addClass("disabled");
+      $(this).parent().removeClass("highlight");
     });
   };})(jQuery);
 
@@ -44,6 +46,7 @@ $(function()
     {
       var src = $("img",this).attr("src");
       $("img",this).attr("src",src.replace(/disabled/, "normal"));
+      $("a",this).off("click");
       $(this).addClass("hotable");
       $(this).removeClass("disabled");
     });

@@ -38,7 +38,7 @@ class DropdownListWidget : Widget
   {
     add(new DelegateComponent(&print_innards));
     super.copy(output);
-    output.print(javascript("new DropdownListWidget($('#"~id~"'),{required: "~(required?"true":"false")~"});"));
+    output.print(javascript("new DropdownListWidget($('#"~id~"'),{ label: '"~label~"', required: "~(required?"true":"false")~"});"));
   }
 
   void print_innards(TextOutputStream c)

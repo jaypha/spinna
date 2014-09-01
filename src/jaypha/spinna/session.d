@@ -63,6 +63,8 @@ struct Session
 
   int opApply(int delegate(ref string, ref Activity) dg)
   {
+    if (!active) load(this);
+
     int result = 0;
     foreach (i, v; activities)
     {
@@ -70,6 +72,12 @@ struct Session
       if (result) break;
     }
     return result;
+  }
+
+  void clear()
+  {
+    activities = activities.init;
+    active = true;
   }
 
   private:
