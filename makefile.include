@@ -7,10 +7,12 @@ JSWFILES = $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/string.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/enum.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/datepicker.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/dropdown_list.js \
+           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/autofill.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/decimal.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/calendar.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/icon_button.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/dialog_box.js \
+           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/selector.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/form.js \
            $(SPINNA_ROOT)/src/jquery/jquery-ui.js \
            $(SPINNA_ROOT)/thirdparty/jquery/jquery.caret.js

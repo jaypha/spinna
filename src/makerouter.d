@@ -315,10 +315,10 @@ void create_regex_service(ref Context context)
   (
     text
     (
-      "mixin(match_regex_route!(\"",
-      context.method,
-      "\",\"rx",
+      "mixin(match_regex_route!(\"rx",
       place,
+      "\",\"",
+      context.method,
       "\", \"",
       context.node_path,
       "\", \"",

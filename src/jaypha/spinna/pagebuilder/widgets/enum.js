@@ -26,8 +26,18 @@ function EnumGroupWidget(jqo,name,options)
     var val = p.val();
     if (p.prop("checked"))
       $(this).addClass("selected");
-    p.change(function() { if ($(this).prop("checked")) obj.ps[$(this).attr("value")][0].addClass("selected"); else obj.ps[$(this).attr("value")][0].removeClass("selected"); });
     obj.ps[val] = [$(this), p ];
+
+    p.change(function()
+    {
+      for (i in obj.ps)
+      {
+        if (obj.ps[i][1].prop("checked"))
+          obj.ps[i][0].addClass("selected");
+        else
+          obj.ps[i][0].removeClass("selected");
+      }
+    });
   });
   jqo.data("widget", this);
 }

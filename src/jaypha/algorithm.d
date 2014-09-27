@@ -74,7 +74,7 @@ T[] diff(T)(T[] primary, T[] secondary)
 
 // R1 is input range, R2 is slicable
 
-auto find_split(R1,R2)(ref R1 haystack, R2 needle) //if ((ElementType!R1 == ElementType!R2) && isInputRange!(R1) && hasSlicing!(R2))
+auto findSplit(R1,R2)(ref R1 haystack, R2 needle) //if ((ElementType!R1 == ElementType!R2) && isInputRange!(R1) && hasSlicing!(R2))
 {
   alias ElementType!R2 E;
   R2 first_part, second_part;
@@ -107,6 +107,8 @@ auto find_split(R1,R2)(ref R1 haystack, R2 needle) //if ((ElementType!R1 == Elem
     second_part = second_part[1..$];
   }
 }
+
+alias findSplit find_split;
 
 unittest
 {

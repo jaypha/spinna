@@ -162,6 +162,14 @@ struct HttpResponse
     header("Location",url);
   }
 
+  void prepare()
+  {
+    mime_type = "text/plain";
+    http_status = 200;
+    http_status_msg = "OK";
+    headers = appender!string();
+  }
+
   private:
     string mime_type;
     ulong http_status = 200;

@@ -59,7 +59,7 @@ class DecimalWidget(uint scale = 2) : Widget
   override void copy(TextOutputStream output)
   {
     super.copy(output);
-    output.print(javascript("new DecimalWidget($('#"~id~"'),{ label: '"~label~"', required:"~(required?"true":"false")~",min: "~min_value.toString()~",max:"~max_value.toString()~"});"));
+    output.print(javascript("new DecimalWidget($('#"~id~"'),{ label: '"~label~"', scale: "~to!string(scale)~", required:"~(required?"true":"false")~",min: "~min_value.toString()~",max:"~max_value.toString()~"});"));
   }
 
   D min_value;

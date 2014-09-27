@@ -42,21 +42,21 @@ struct decimal(uint scale)
     bool opEquals(long b)    { return (value == b*factor); }
     bool opEquals(double b)  { return ((cast(double)value / factor) == b); }
 
-    int opCmp(decimal b)
+    pure nothrow int opCmp(const decimal b) const
     {
       if (value < b.value) return -1;
       if (value > b.value) return 1;
       return 0;
     }
 
-    int opCmp(long b)
+    pure nothrow int opCmp(const long b) const
     {
       if (value < b*factor) return -1;
       if (value > b*factor) return 1;
       return 0;
     }
 
-    int opCmp(double b)
+    pure nothrow int opCmp(const double b) const
     {
       if (value < b*factor) return -1;
       if (value > b*factor) return 1;
@@ -203,7 +203,7 @@ struct decimal(uint scale)
 auto to_decimal(uint scale,T)(T v)
 {
   decimal!scale d;
-  d = v;
+  d.opAssign(v);
   return d;
 }
 

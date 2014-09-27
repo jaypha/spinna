@@ -32,6 +32,7 @@ template param_copy(R...) {
     const char[] param_copy = "";
 }
 
+/+
 enum string match_regex_route
 (
   string rx,
@@ -45,16 +46,16 @@ enum string match_regex_route
     "if (method == \""~method~"\") {auto m = match(path, "~rx~");"
     "if (m) { strstr p; "~param_copy!(cp)~" return "
     "ActionInfo(\""~action~"\",wrap_service(p, &"~fn~"),"~roles~","~(redirect.length == 0?"null":"\""~redirect~"\"")~");}}";
++/
 
-/*
-template match_regex_route(string action, string rx, string method, string fn, cp ...)
+template match_regex_route(string rx, string method, string action, string fn, string roles, string redirect, cp ...)
 {
   const char[] match_regex_route = 
     "if (method == \""~method~"\") {auto m = match(path, "~rx~");"
     "if (m) { strstr p; "~param_copy!(cp)~" return "
-    "ActionInfo(\""~action~"\",wrap_service(p, &"~fn~"));}}";
+    "ActionInfo(\""~action~"\",wrap_service(p, &"~fn~"),"~roles~","~(redirect.length == 0?"null":"\""~redirect~"\"")~");}}";
 }
-*/
+
 
 enum string match_static_route
 (

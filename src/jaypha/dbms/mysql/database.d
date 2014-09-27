@@ -394,21 +394,29 @@ final class MySqlDatabase
 
   string[string] get(string table, string id)
   {
-    return query_row("select * from "~table~" where id="~id);
+    return query_row("select * from `"~table~"` where id="~id);
   }
 
   //---------------------------------------------------------------------------
 
-  void set(string tablename, string[string] values, string id)
+  // If you want to insert a row with a non-empty id, use 'insert'.
+
+  string set(string tablename, string[string] values, string id = null)
   {
-    update(tablename, values, [ "id="~id ]);
+    if (id is null)
+      return insert(tablename, values);
+    else
+    {
+      update(tablename, values, [ "id="~id ]);
+      return id;
+    }
   }
 
   //---------------------------------------------------------------------------
 
   void remove(string tablename, string id)
   {
-    query("delete from "~tablename~" where id="~id);
+    query("delete from `"~tablename~"` where id="~id);
   }
 
   //---------------------------------------------------------------------------

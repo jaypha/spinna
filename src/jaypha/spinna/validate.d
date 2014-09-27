@@ -24,6 +24,7 @@
 
 module jaypha.spinna.validate;
 
+import jaypha.types;
 public import jaypha.container.hash;
 import jaypha.decimal;
 
@@ -31,6 +32,7 @@ import std.conv;
 import std.regex;
 public import std.typecons;
 import std.ascii;
+import std.array;
 
 
 //----------------------------------------------------------------------------
@@ -60,6 +62,12 @@ bool validate_id
   return true;
 }
 
+//---------------------------------------------------------
+// Shortcut mixins.
+
+enum IdGet(bool requried = false) = "string id; if (!validate_id(id, request.gets, \"id\", "~(requried?"true":"false")~")) { response.status(400); return; }";
+enum IdPost(bool requried = false) = "string id; if (!validate_id(id, request.posts, \"id\", "~(requried?"true":"false")~")) { response.status(400); return; }";
+
 //----------------------------------------------------------------------------
 // Returns - whether the validation succeded.
 
@@ -88,6 +96,24 @@ bool validate_string
   }
   return true;
 }
+
+bool validate_string
+(
+  ref strstr value,
+  StrHash source,
+  string name,
+  bool required,
+  uint min_length = 0,
+  uint max_length = 0,
+  string regex = null
+)
+{
+  string v;
+  bool x = validate_string(v, source, name, required, min_length, max_length, regex);
+  if (x) value[name] = v;
+  return x;
+}
+
 
 unittest
 {
@@ -575,6 +601,32 @@ bool validate_required_date
   }
 }
 
+bool validate_date
+(
+  ref strstr value,
+  StrHash source,
+  string name,
+  bool required
+)
+{
+  if (name !in source || source[name].empty)
+  {
+    if (required)
+      return false;
+    value[name] = null;
+  }
+  else try
+  {
+    Date.fromISOExtString(source[name]);
+    value[name] = source[name];
+  }
+  catch (DateTimeException e)
+  {
+    return false;
+  }
+  return true;
+}
+  
 //----------------------------------------------------------------------------
 
 unittest
@@ -593,6 +645,7 @@ unittest
 
   Nullable!Date d1;
   Date d2;
+  strstr d3;
 
   assert(!validate_required_date(d2,source,"rip"));
   assert(!validate_required_date(d2,source,"wip"));
@@ -603,6 +656,21 @@ unittest
   assert(validate_required_date(d2,source,"strip"));
   assert(d2.toISOExtString() == "2022-07-13");
   assert(!validate_required_date(d2,source,"strat"));
+
+  assert(validate_date(d3,source,"towick", true));
+  assert(d3["towick"] == "2001-05-22");
+  assert(!validate_date(d3,source,"quip", true));
+  assert(!validate_date(d3,source,"rip", true));
+  assert(!validate_date(d3,source,"zip", true));
+  assert(!validate_date(d3,source,"wip", true));
+  assert(validate_date(d3,source,"towick", false));
+  assert(d3["towick"] == "2001-05-22");
+  assert(!validate_date(d3,source,"quip", false));
+  assert(validate_date(d3,source,"rip", false));
+  assert(d3["rip"] is null);
+  assert(validate_date(d3,source,"wip", false));
+  assert(d3["wip"] is null);
+  assert(!validate_date(d3,source,"zip", false));
 
   assert(validate_optional_date(d1,source,"rip"));
   assert(d1.isNull);

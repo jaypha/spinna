@@ -43,7 +43,7 @@ function IntegerWidget(jqo, options)
   jqo.bind('keydown', function(event) { self.keyDown(event); });
 
   if (this.optn.spinner)
-  {
+  $(function() {
     var spin_up = $("<a class='spin-up' style='visibility:hidden'>&#9650;</a>");
     var spin_dn = $("<a class='spin-dn' style='visibility:hidden'>&#9660;</a>");
     $("body").append(spin_up);
@@ -57,7 +57,7 @@ function IntegerWidget(jqo, options)
     spin_dn.click(function() { self.increment(-self.optn.stepInc); } );
     spin_up.css('visibility','');
     spin_dn.css('visibility','');
-  }
+  });
 
   jqo.data("widget", this);
 }

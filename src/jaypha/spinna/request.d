@@ -101,6 +101,12 @@ struct HttpRequest
 void prepare(IRange)(ref HttpRequest request, strstr env, IRange input)
   if (isByteRange!IRange)
 {
+  request.gets.clear();
+  request.cookies.clear();
+  request.posts.clear();
+  request.files = request.files.init;
+  request.raw_input = request.raw_input.init;
+
   try
   {
     request.environment = env;

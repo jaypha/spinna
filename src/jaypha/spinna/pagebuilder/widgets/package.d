@@ -23,5 +23,6 @@ public import jaypha.spinna.pagebuilder.widgets.datepicker;
 public import jaypha.spinna.pagebuilder.widgets.buttons;
 public import jaypha.spinna.pagebuilder.widgets.decimal;
 public import jaypha.spinna.pagebuilder.widgets.dropdown_list;
+public import jaypha.spinna.pagebuilder.widgets.autofill;
 
 public import jaypha.spinna.pagebuilder.widgets.toolbar;

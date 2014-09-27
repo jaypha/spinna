@@ -2,6 +2,8 @@
  *
  * Date Picker Widget
  *
+ * requires calendar.js
+ *
  ****************************************************************************/
 
 function DatePickerWidget(jqo, jqr, options)

@@ -77,7 +77,8 @@ struct Session
   void clear()
   {
     activities = activities.init;
-    active = true;
+    session_id = null;
+    active = false;
   }
 
   private:
@@ -155,6 +156,16 @@ string save(ref Session sess)
 
   write(session_dir~sess.session_id,app.data);
   return sess.session_id;
+}
+
+void destroy(ref Session sess)
+{
+  if (sess.session_id !is null)
+  {
+    char[] filename = session_dir.dup ~ sess.session_id;
+    remove(filename);
+    sess.clear();
+  }
 }
 
 void load(ref Session sess)

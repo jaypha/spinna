@@ -89,7 +89,7 @@ unittest
 
   auto output = new TextBuffer!string();
 
-  assert(pg.page_size == PAGE_SIZE_DEFAULT);
+  assert(pg.page_size == page_size_default);
   assert(!pg.display_all);
   assert(pg.page_number == 3);
 

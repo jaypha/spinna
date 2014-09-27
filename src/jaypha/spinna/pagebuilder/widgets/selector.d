@@ -46,8 +46,8 @@ class SelectorWidget(string tpl = "jaypha/spinna/pagebuilder/widgets/selector.tp
     override void name(string v) { attributes["name"] = v; }
   }
 
-  uint min_options = 0;
-  uint max_options = 0;
+  ulong min_options = 0;
+  ulong max_options = 0;
   EnumeratedOption[] options;
   string[] selected;
   
@@ -67,7 +67,7 @@ class SelectorWidget(string tpl = "jaypha/spinna/pagebuilder/widgets/selector.tp
     
     add(c);
 
-    //form.doc.page_head.add_script("add_selector_widget('"~name~"','"~label~"','"~form.id~"',"~to!string(min_options)~","~to!string(max_options)~");", true);
     super.copy(output);
+    output.print(javascript("new SelectorWidget($('#"~id~"'), { label: '"~label~"', min: "~to!string(min_options)~", max: "~to!string(max_options)~"});"));
   }
 }

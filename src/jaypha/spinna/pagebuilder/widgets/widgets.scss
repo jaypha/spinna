@@ -26,11 +26,6 @@ input.widget, .selector-search, .boolean-widget, .sort-widget, .selector-box
   background-color: white;
 }
 
-.boolean-widget .false-setting, .boolean-widget .true-setting
-{
-  display: none;
-}
-
 /* Selector ---------------------------------------------------------------------*/
 
 .selector-box
@@ -124,3 +119,22 @@ input.integer-widget
 .spin-up { border-bottom: 1px solid $widget-border-color; padding-top:1px; }
 .spin-dn { border-top: 1px solid $widget-border-color; padding-bottom: 1px;}
 
+/* Autofill ----------------------------------------------------------------------*/
+
+.autofill-widget-list
+{
+  list-style: none;
+  position:absolute;
+  margin-top: 10px;
+  padding: 5px;
+  border: 1px solid $widget-border-color;
+  background-color: white;
+}
+
+.autofill-empty { color: grey; }
+.autofill-widget-list a { text-decoration: none; }
+.autofill-widget-list a:hover
+{
+  color: red;
+  cursor: pointer;
+}

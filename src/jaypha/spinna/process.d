@@ -54,14 +54,12 @@ void process_request(I,O,RC)
   void delegate(ulong, string) error_handler
 ) if (isOutputRange!(O,immutable(ubyte)[]) && isRouterController!RC)
 {
-  // Even if an unrecoverable error occurs, a minimal error message must be sent
-  // to the client.
-  // Note to self. I removed this for some reason, but don't remember why, so I put back.
-  scope(failure) { output_stream.put(cast(immutable(ubyte[]))  "Content-Type: text/plain\r\nStatus: 500 Internal Error\r\n\r\n"); }
-
+  scope(exit) { session.clear(); }
   try
   {
     request.prepare(env, input_stream);
+    response.prepare();
+
     if ("SPINNA_SESSION" in request.cookies)
       session.session_id = request.cookies["SPINNA_SESSION"].value;
 

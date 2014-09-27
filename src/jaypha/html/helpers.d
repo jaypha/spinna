@@ -59,12 +59,24 @@ string email_link(string email)
   return a.data;
 }
 
+//-----------------------------------------------------------------------------
+
 string javascript(string script)
 {
   return "<script type='text/javascript'>\n<!--\n"~script~"\n//-->\n</script>";
 }
 
 enum JavaScript(string script) = javascript(script);
+
+//-----------------------------------------------------------------------------
+
+string html_img(string src, string alt, string css_class = null, string id = null)
+{
+  return "<img src='"~src~"' alt='"~alt~"'"~(!css_class.empty?" class='"~css_class~"'":"")~(!id.empty?" class='"~id~"'":"")~"/>";
+}
+
+enum HtmlImg(string src, string alt, string css_class = null, string id = null)
+  = html_img(src,alt,css_class,id);
 
 /+
 

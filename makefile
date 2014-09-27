@@ -50,7 +50,6 @@ makerouter: src/makerouter.d
 install:
 	cp bin/makerouter $(BININSTALL)
 	strip $(BININSTALL)/makerouter
-	cp lib/libfig.a $(LIBINSTALL)
 
 # --------------------------
 
