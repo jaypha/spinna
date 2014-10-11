@@ -22,10 +22,13 @@ import jaypha.types;
 import jaypha.string;
 import jaypha.container.hash;
 import jaypha.io.lines;
-import jaypha.mime.header;
-import jaypha.mime.multipart_reader;
-public import jaypha.http.exception;
-import jaypha.http.cookie;
+
+public import jaypha.inet.http.exception;
+import jaypha.inet.http.cookie;
+
+import jaypha.inet.mime.reading;
+import jaypha.inet.mime.content_type;
+import jaypha.inet.mime.content_disposition;
 
 import std.uri;
 import std.array;
@@ -54,13 +57,16 @@ class HttpFileUpload
 
 struct HttpRequest
 {
-  public strstr environment;
-  public StrHash gets;
-  public StrHash posts;
-  public HttpCookie[string] cookies;
-  public HttpFileUpload[string] files;
+  strstr environment;
 
-  public immutable(ubyte)[] raw_input;
+  StrHash gets;
+  StrHash posts;
+  @property StrHash request() { if (isPost()) return posts; else return gets; }
+
+  HttpCookie[string] cookies;
+  HttpFileUpload[string] files;
+
+  ByteArray rawInput;
 
   //---------------------------------------------------------------------------
 
@@ -85,9 +91,18 @@ struct HttpRequest
   //---------------------------------------------------------------------------
 
   @property string method() { return environment["REQUEST_METHOD"]; }
-  @property bool is_post() { return environment["REQUEST_METHOD"] == "POST"; }
-  @property bool is_get() { return environment["REQUEST_METHOD"] == "GET"; }
-  @property StrHash request() { if (is_post()) return posts; else return gets; }
+  @property bool isPost() { return environment["REQUEST_METHOD"] == "POST"; }
+  @property bool isGet() { return environment["REQUEST_METHOD"] == "GET"; }
+
+  void clear()
+  {
+    gets.clear();
+    cookies.clear();
+    posts.clear();
+    files = files.init;
+    rawInput = rawInput.init;
+    environment = environment.init;
+  }
 }
 
 
@@ -101,46 +116,42 @@ struct HttpRequest
 void prepare(IRange)(ref HttpRequest request, strstr env, IRange input)
   if (isByteRange!IRange)
 {
-  request.gets.clear();
-  request.cookies.clear();
-  request.posts.clear();
-  request.files = request.files.init;
-  request.raw_input = request.raw_input.init;
+  request.clear();
 
   try
   {
     request.environment = env;
 
     if ("QUERY_STRING" in env && env["QUERY_STRING"].length)
-      request.gets = extract_gets(env["QUERY_STRING"]);
+      request.gets = extractGets(env["QUERY_STRING"]);
 
     if ("HTTP_COOKIE" in env)
-      request.cookies = extract_cookies(env["HTTP_COOKIE"]);
+      request.cookies = extractCookies(env["HTTP_COOKIE"]);
 
     if ("CONTENT_LENGTH" in env && env["CONTENT_LENGTH"] != "0")
     {
       if ("CONTENT_TYPE" !in env)
         throw new HttpException("Missing Content-Type");
         
-      auto content_type = get_mime_content_type(env["CONTENT_TYPE"]);
-      if (content_type.type == "multipart/form-data")
+      auto contentType = extractMimeContentType(env["CONTENT_TYPE"]);
+      if (contentType.type == "multipart/form-data")
       {
-        if (!("boundary" in content_type.parameters))
+        if (!("boundary" in contentType.parameters))
           throw new HttpException("malformed Content-Type");
-        parse_form!IRange(request, input, content_type.parameters["boundary"]);
+        parseForm!IRange(request, input, contentType.parameters["boundary"]);
       }
       else
       {
         auto a = appender!(immutable(ubyte)[])();
         input.copy(a);
         
-        if (content_type.type == "application/x-www-form-urlencoded")
+        if (contentType.type == "application/x-www-form-urlencoded")
         {
-          request.posts = extract_posts(cast(string)a.data);
+          request.posts = extractPosts(cast(string)a.data);
         }
         else
         {
-          request.raw_input = a.data;
+          request.rawInput = a.data;
         }
       }
     }
@@ -152,28 +163,26 @@ void prepare(IRange)(ref HttpRequest request, strstr env, IRange input)
 }
 
 //-----------------------------------------------------------------------------
-/* Extract parameters from a query string.
- * According to RFC1866, the query components can be separated by either '&'
- * or ';' */
+// Extract parameters from a query string.
 
-StrHash extract_gets(cstring getstr)
+StrHash extractGets(string s)
 {
   StrHash gets;
-  auto t = splitup(getstr, "&;");
-  foreach (tt;t)
-    extract_param(tt, gets);
+  auto pairs = splitter(s, '&');
+  foreach (pair; pairs)
+    extractParam(pair, gets);
   return gets;
 }
 
 //-----------------------------------------------------------------------------
 // Extract parameters from a x-www-form-urlencoded string.
 
-StrHash extract_posts(cstring poststr)
+StrHash extractPosts(string s)
 {
   StrHash posts;
-  auto t = splitup(poststr, "&");
-  foreach (tt;t)
-    extract_param(tt, posts);
+  auto pairs = splitter(s, '&');
+  foreach (pair;pairs)
+    extractParam(pair, posts);
   return posts;
 }
 
@@ -181,9 +190,9 @@ StrHash extract_posts(cstring poststr)
 
 // Extract a parameter from a url encoded string.
 
-void extract_param(cstring pair, ref StrHash p)
+void extractParam(string pair, ref StrHash p)
 {
-  auto r = split(pair,"=");
+  auto r = split(pair,'=');
   auto x = decodeComponent(replace(r[0],"+"," ").idup);
   auto y = decodeComponent(replace(r[1],"+"," ").idup);
   p.add(x,y);
@@ -197,28 +206,28 @@ void extract_param(cstring pair, ref StrHash p)
  *
  * TODO: check for unexpected end of file
  */
-void parse_form(IRange)(ref HttpRequest request, IRange input, string boundary)
+void parseForm(IRange)(ref HttpRequest request, IRange input, string boundary)
   if (isByteRange!IRange)
 {
-  auto reader = get_multipart_reader!IRange(input, boundary);
+  auto reader = mimeMultipartReader!IRange(input, boundary);
 
   while(!reader.empty)
   {
     MimeContentType ct;
     MimeContentDisposition disp;
 
-    auto part_reader = reader.front; // part_reader is a MimeEntityReader
+    auto partReader = reader.front; // part_reader is a MimeEntityReader
 
     /* Look for content-type and disposition in the header */
-    foreach (header; part_reader.headers)
+    foreach (header; partReader.headers)
     {
       switch (header.name)
       {
         case "Content-Type":
-          ct = get_mime_content_type(header.field_body);
+          ct = extractMimeContentType(header.fieldBody);
           break;
         case "Content-Disposition":
-          disp = get_mime_content_disposition(header.field_body);
+          disp = extractMimeContentDisposition(header.fieldBody);
           break;
         default:
           ; // ignore all others. 
@@ -237,15 +246,15 @@ void parse_form(IRange)(ref HttpRequest request, IRange input, string boundary)
       request.files[name] = new HttpFileUpload();
       request.files[name].client_name = disp.parameters["filename"];
       request.files[name].file = File.tmpfile();
-      part_reader.content.copy(request.files[name].file.lockingTextWriter);
+      partReader.content.copy(request.files[name].file.lockingTextWriter);
       request.files[name].file.flush();
       request.files[name].size = request.files[name].file.size;
       request.files[name].type = ct;
     }
     else
     {
-      auto data = appender!(immutable(ubyte[]))();
-      part_reader.content.copy(data);
+      auto data = appender!(ByteArray)();
+      partReader.content.copy(data);
       request.posts.add(name, cast(string)(data.data));
     }
     reader.popFront();
@@ -259,24 +268,67 @@ debug(http_request)
   import std.stdio;
   import std.range;
   import std.conv;
+  
 
-  void main()
+  import jaypha.io.dirtyio;
+
+  void main(string[] args)
   {
+    writeln("begin");
     string[string] env;
-    string txt = "r=5&q=10&t=3+12&n=8";
-
-    env["QUERY_STRING"] = "a=5&b=10;j=3+12&a=8";
-    env["REQUEST_METHOD"] = "POST";
-    env["CONTENT_LENGTH"] = to!string(txt.length);
-    env["CONTENT_TYPE"] = "application/x-www-form-urlencoded";
-    ubyte[] bytes = cast(ubyte[])txt.dup;
-    auto r1 = inputRangeObject(bytes);
-    //auto context = new Http_Context!(typeof(r1))(env, r1);
     HttpRequest request;
 
-    request.prepare(env,r1);
+    if (args.length > 1)
+    {
+      env["REQUEST_METHOD"] = args[1];
+      env["QUERY_STRING"] = args[2];
+      
+      auto win = ReadIn(stdin);
+      auto entity = mimeEntityReader(win);
+
+      foreach (h; entity.headers)
+      {
+        switch (h.name)
+        {
+          case "Content-Type":
+            env["CONTENT_TYPE"] = strip(h.fieldBody);
+            break;
+          case "Cookie":
+            env["HTTP_COOKIE"] = strip(h.fieldBody);
+            break;
+          case "Referer":
+            env["HTTP_REFERER"] = strip(h.fieldBody);
+            break;
+          case "Content-Length":
+            env["CONTENT_LENGTH"] = strip(h.fieldBody);
+            break;
+          default:
+            ;
+        }
+      }
+
+      request.prepare(env,entity.content);
+    }
+    else
+    {
+      string txt = "r=5&q=10&t=3+12&n=8";
+
+      env["QUERY_STRING"] = "a=5&b=10;j=3+12&a=8";
+      env["REQUEST_METHOD"] = "POST";
+      env["CONTENT_LENGTH"] = to!string(txt.length);
+      env["CONTENT_TYPE"] = "application/x-www-form-urlencoded";
+      ubyte[] bytes = cast(ubyte[])txt.dup;
+      auto r1 = inputRangeObject(bytes);
+      request.prepare(env,r1);
+    }
+
+    auto wout = WriteOut(stdout);
     writeln(request.method());
-    request.gets.dump(stdout.lockingTextWriter);
-    request.posts.dump(stdout.lockingTextWriter);
+
+    writeln("--gets--");
+    request.gets.dump(wout);
+    writeln("--posts--");
+    request.posts.dump(wout);
+    writeln("finish");
   }
 }

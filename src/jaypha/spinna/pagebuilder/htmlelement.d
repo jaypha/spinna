@@ -48,23 +48,26 @@ class HtmlElement : Composite
 
   //---------------------------------------------------------------------------
 
-  void add_class(string class_name)
+  HtmlElement addClass(string class_name)
   {
     if (find(css_classes,class_name).empty)
       css_classes ~= class_name;
+    return this;
   }
+  alias addClass add_class;
 
   //---------------------------------------------------------------------------
 
-  void remove_class(string class_name)
+  HtmlElement remove_class(string class_name)
   {
     uint i;
     for (; i<css_classes.length; ++i)
       if (css_classes[i] == class_name)
       {
         css_classes = remove(css_classes,i);
-        return;
+        return this;
       }
+    return this;
   }
 
   //---------------------------------------------------------------------------

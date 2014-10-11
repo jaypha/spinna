@@ -1,8 +1,19 @@
+//Written in the D programming language
 /*
- * General configurations used in the program
+ * General configurations used by Spinna. These need to be set in a file
+ * in the projects filespace. These are suitable defaults.
+ *
+ * Copyright (C) 2013-2014 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
  */
 
 module config.general;
+
+pragma(msg,"You should copy config.general into your own project");
 
 enum max_timeout = 60;
 

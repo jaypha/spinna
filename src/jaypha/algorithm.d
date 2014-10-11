@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Algorithms
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D programming language.
  */
 
 
@@ -17,6 +16,8 @@ module jaypha.algorithm;
 import std.algorithm, std.typecons, std.range, std.array, std.traits;
 
 //----------------------------------------------------------------------------
+// Map-like algorithm that merges the index and values of an associative
+// array.
 
 template meld(alias fun)
 {
@@ -56,22 +57,24 @@ unittest
 }
 
 //----------------------------------------------------------------------------
+// Returns everything in primary that is not in secondary
 
 T[] diff(T)(T[] primary, T[] secondary)
 {
-  T[] result = [];
+  auto result = appender!(T[])();
+  result.reserve(primary.length);
 
   foreach (t;primary)
   {
     if (!secondary.canFind(t))
-      result ~= t;
+      result.put(t);
   }
 
-  return result;
+  return result.data;
 }
 
 //----------------------------------------------------------------------------
-
+// Alternative to std.alogrithm.findSplit usable with non-rewindable ranges.
 // R1 is input range, R2 is slicable
 
 auto findSplit(R1,R2)(ref R1 haystack, R2 needle) //if ((ElementType!R1 == ElementType!R2) && isInputRange!(R1) && hasSlicing!(R2))
@@ -118,18 +121,18 @@ unittest
   string haystack = "donabababcbxyz";
   string needle = "ababc";
 
-  auto res = find_split(haystack, needle);
+  auto res = findSplit(haystack, needle);
   assert(res[0] == "donab");
   assert(res[1] == "ababc");
   assert(haystack == "bxyz");
 
-  auto res2 = find_split(haystack, needle);
+  auto res2 = findSplit(haystack, needle);
   assert(res2[0] == "bxyz");
   assert(res2[1] == "");
   assert(haystack == "");
 
   haystack = "asdfjkewu";
-  auto res3 = find_split(haystack, "a");
+  auto res3 = findSplit(haystack, "a");
   assert(res3[0] == "");
   assert(res3[1] == "a");
   assert(haystack == "sdfjkewu");

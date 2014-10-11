@@ -28,6 +28,14 @@ interface Component
   void copy(TextOutputStream output);
 }
 
+/*
+TextOutputStream print(TextOutputStream output, Component component)
+{
+  component.copy(output);
+  return output;
+}
+*/
+
 //-----------------------------------------------------------------------------
 
 string to_string(Component component)
@@ -57,6 +65,7 @@ class Composite : Component
 {
   Composite add(const(char)[] t) { content.put(new TextComponent(t.idup)); return this; }
   Composite add(Component o) { content.put(o); return this; }
+  alias add put;
 
   @property ulong length() { return content.data.length; }
 
@@ -71,11 +80,17 @@ class Composite : Component
 
 //-----------------------------------------------------------------------------
 
+Composite transfer(Composite source, Composite target)
+{
+  target.content.put(source.content.data);
+  source.content.clear();
+  assert(source.content.data.length == 0);
+  return source;
+}
+
 Composite wrap(Composite wrapper, Composite target)
 {
-  wrapper.content.put(target.content.data);
-  target.content.clear();
-  target.content.put(wrapper);
+  target.transfer(wrapper).add(wrapper);
   return wrapper;
 }
 

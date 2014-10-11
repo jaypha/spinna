@@ -1,26 +1,37 @@
+//Written in the D programming language
+/*
+ * Simple set implementation
+ *
+ * Copyright 2009-2014 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
 
 module jaypha.container.set;
 
 struct Set(T)
 {
-  this() { the_set = []; }
+  this() { theSet = []; }
 
   void put(T t)
   {
-    foreach (e; the_set)
+    foreach (e; theSet)
       if (t == e) return;
     
-    the_set ~= t;
+    theSet ~= t;
   }
 
-  ulong size() { return the_set.length; }
+  ulong size() { return theSet.length; }
 
   auto range()
   {
-    return the_set;
+    return theSet;
   }
 
   private:
 
-    T[] the_set;
+    T[] theSet;
 }

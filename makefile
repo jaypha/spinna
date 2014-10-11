@@ -77,6 +77,15 @@ res/_spinna_no_widgets.scss: $(SCSSFILES)
 test:
 	$(RDMD) $(DDFLAGS) $(LFLAGS) -J./src_test -unittest src_test/test_main.d
 
+#----------------------------------------------------
+# debug builds
+
+http_request:
+	$(RDMD) $(DDFLAGS) $(LFLAGS) --build-only -debug=http_request -unittest -ofrequest src/jaypha/spinna/request.d
+
+#----------------------------------------------------
+# Install for rpm
+
 rpminstall: build
 	rm -rf $(DESTDIR)/*
 	mkdir $(DESTDIR)/usr

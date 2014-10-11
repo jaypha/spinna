@@ -1,0 +1,18 @@
+Internet Message Format
+
+IMF is defined by the IETF and is used for email and HTTP.
+
+IMF is covered by the following RFCs
+
+
+RFC5322 - IMF specification
+RFC6854 - Update to allow multiple senders.
+
+
+RFC4021
+RFC5321 - envelope
+
+RFC6152 - 8-bit extension.
+
+
+RFC2387 - mulitpart/related

@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * MySQL database connection tool
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D programming language.
  */
 
 module jaypha.dbms.mysql.database;
@@ -259,18 +258,6 @@ final class MySqlDatabase
     return data;
   }
 
-  //---------------------------------------------------------------------------
-
-  void lock(string table)
-  {
-    query_raw("lock tables "~table~" write");
-  }
-
-  void unlock()
-  {
-    query_raw("unlock tables");
-  }
-  
   //---------------------------------------------------------------------------
   // Database write methods
   //---------------------------------------------------------------------------

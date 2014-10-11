@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * String utilities
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D language.
  */
 
 module jaypha.string;
@@ -17,13 +16,13 @@ import std.string;
 import std.traits;
 import std.uni;
 import std.array;
+import std.c.string;
+import std.algorithm;
 
 //----------------------------------------------------------------------------
-// splitup
-//
 // Splits a string into substrings based on a group of possible delimiters.
 
-inout(char)[][] splitup(inout(char)[] text, inout(char)[] delimiters)
+inout(char)[][] splitUp(inout(char)[] text, inout(char)[] delimiters)
 {
   inout(char)[][] result = [];
   ulong start = 0;
@@ -40,12 +39,11 @@ inout(char)[][] splitup(inout(char)[] text, inout(char)[] delimiters)
 }
 
 //----------------------------------------------------------------------------
-// to_camel_case
+// Converts a string to camel case.
 
-@trusted pure nothrow immutable(C)[] to_camel_case(C = char)(const(C)[] text, bool first = true)
-  if (isSomeChar!C)
+@trusted pure string toCamelCase(string text, bool first = true)
 {
-  immutable(C)[] result;
+  auto result = appender!string();
 
   foreach (ch; text)
   {
@@ -55,20 +53,21 @@ inout(char)[][] splitup(inout(char)[] text, inout(char)[] delimiters)
     }
     else if (first)
     {
-      result ~= toUpper(ch);
+      result.put(toUpper(ch));
       first = false;
     }
     else
     {
-      result ~= ch;
+      result.put(ch);
     }
   }
-  return result;
+  return result.data;
 }
 
 //----------------------------------------------------------------------------
+// Are all cahracter digits?
 
-bool is_digits(string s)
+@safe pure nothrow bool isDigits(string s)
 {
   import std.ascii;
 
@@ -78,15 +77,51 @@ bool is_digits(string s)
   return true;
 }
 
+//-----------------------------------------------------------------------------
+// A quick and dirty alternative indexOf. Only works with ASCII.
+
+auto altIndexOf(string s, char c)
+{
+  auto p = cast(char*)memchr(s.ptr, c, s.length);
+  return (p?p - s.ptr:s.length);
+}
+
+
+//-----------------------------------------------------------------------------
+// Grabs as much of S1, unitl a character is found that is in pattern.
+// Returns the first part while setting S1 to the remainder (including the
+// found character.
+
+S1 grab(S1, S2)(ref S1 s, S2 pattern)
+{
+  auto remainder = findAmong(s, pattern);
+  scope(exit) s = remainder;
+  return s[0..$-remainder.length];
+  /*
+
+  size_t j = s.length;
+  foreach (i, c; s)
+  {
+    if (inPattern(c, pattern))
+    {
+      j = i;
+      break;
+    }
+  }
+  scope(exit) s = s[j .. $];
+  return s[0 .. j];
+  */
+}
+
 //----------------------------------------------------------------------------
 
 unittest
 {
-  assert(to_camel_case("abc_def pip") == "AbcDefPip");
-  assert(to_camel_case("xyz_tob", false) == "xyzTob");
-  assert(to_camel_case("123_456", false) == "123456");
+  assert(toCamelCase("abc_def pip") == "AbcDefPip");
+  assert(toCamelCase("xyz_tob", false) == "xyzTob");
+  assert(toCamelCase("123_456", false) == "123456");
 
-  auto result = splitup("to be or not to be", " e");
+  auto result = splitUp("to be or not to be", " e");
   assert(result.length == 8);
   assert(result[0] == "to");
   assert(result[1] == "b");
@@ -96,4 +131,14 @@ unittest
   assert(result[5] == "to");
   assert(result[6] == "b");
   assert(result[7] == "");
+
+  string t1 = "to be or not to be";
+  auto t = grab(t1, "abc");
+  assert(t == "to ");
+  assert(t1 == "be or not to be");
+
+  t1 = "abcdefghijklmnop";
+  assert(altIndexOf(t1,'f') == 5);
+  assert(altIndexOf(t1,'a') == 0);
+  assert(altIndexOf(t1,'$') == t1.length);
 }

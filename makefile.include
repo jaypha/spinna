@@ -10,14 +10,16 @@ JSWFILES = $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/string.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/autofill.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/decimal.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/calendar.js \
-           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/icon_button.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/dialog_box.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/selector.js \
            $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/form.js \
+           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/dynamic_widgets.js \
            $(SPINNA_ROOT)/src/jquery/jquery-ui.js \
-           $(SPINNA_ROOT)/thirdparty/jquery/jquery.caret.js
+           $(SPINNA_ROOT)/thirdparty/jquery/jquery.caret.js \
+           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/form_fragment/std_layout.js \
 
-JSFILES = $(SPINNA_ROOT)/thirdparty/js_date_format/js_date_format.js
+JSFILES = $(SPINNA_ROOT)/src/jaypha/common.js \
+          $(SPINNA_ROOT)/thirdparty/js_date_format/js_date_format.js
 
 SCSSWFILES = $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/widgets.scss \
              $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/calendar.scss \

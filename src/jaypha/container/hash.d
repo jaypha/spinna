@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Hash table which can store more than one value for a key
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D programming language.
  */
 
 module jaypha.container.hash;

@@ -1,3 +1,15 @@
+//Written in the D programming language
+/*
+ * Functions for working with URLs.
+ *
+ * Copyright 2013 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
+
 module jaypha.url;
 
 import std.uri;
@@ -15,11 +27,9 @@ string create_query_parm(string name, string value)
 
 string url_add_query_parm(string url, string name, string value)
 {
-  string u = url ~ (canFind(url, '?')?"&":"?");
+  char u = (canFind(url, '?')?'&':'?');
 
-  u ~= create_query_parm(name, value);
-
-  return u;
+  return url ~ u ~ create_query_parm(name, value);;
 }
 
 string url_add_query_params(string url, strstr parms)

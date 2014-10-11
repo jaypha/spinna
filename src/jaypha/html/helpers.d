@@ -68,6 +68,11 @@ string javascript(string script)
 
 enum JavaScript(string script) = javascript(script);
 
+string startUpJavascript(string script)
+{
+  return javascript("$(function(){"~script~";});");
+}
+
 //-----------------------------------------------------------------------------
 
 string html_img(string src, string alt, string css_class = null, string id = null)

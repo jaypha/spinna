@@ -29,11 +29,11 @@ struct Rnd
   enum empty = false;
   void popFront()
   {
-    rndGen().popFront();
+    rndGen.popFront();
   }
   @property auto front()
   {
-    return rndGen().front;
+    return rndGen.front;
   }
 }
 
@@ -50,12 +50,28 @@ string rnd_hex(uint bytes)
 //-----------------------------------------------------------------------------
 // A random string of ASCII printable characters. Useful for passwords.
 
-string rnd_string(uint size)
+string rndString(uint size)
 {
-  ubyte[size] bytes;
+  auto bytes = appender!string();
+  bytes.reserve(size);
+//  ubyte[] bytes;
+  //bytes.length = size;
   foreach (j; 0..size)
-    bytes[j] = uniform(33, 126);
-  return to!string(bytes);
+    bytes.put(cast(char) uniform(33, 126));
+  return bytes.data;
 }
 
+alias rndString rnd_string;
+
 //-----------------------------------------------------------------------------
+
+string rndId(uint size)
+{
+  auto bytes = appender!string();
+  bytes.reserve(size);
+//  ubyte[] bytes;
+  //bytes.length = size;
+  foreach (j; 0..size)
+    bytes.put(cast(char) uniform(97, 123));
+  return bytes.data;
+}
