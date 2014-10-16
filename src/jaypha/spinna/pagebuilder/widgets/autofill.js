@@ -1,9 +1,14 @@
-/******************************************************************************
+// Written in javascript
+/*
  * Auto fill widget
- * Copyright (C) 2011 Jaypha.
  *
- * Author: Jason den Dulk
- *****************************************************************************/
+ * Copyright (C) 2014 Jaypha.
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
 
 /*
  * Options:
@@ -37,9 +42,10 @@ function AutofillWidget(jqo, options)
   this.valid = true;
   this.msg = null;
   this.label = this.optn.label;
-  this.no_blur = false;
+  this.noBlur = false;
   this.val = $('#'+this.id+'-ret').val();
   this.name = $('#'+this.id+'-ret').attr('name');
+  this.hasChanged = false;
   
   if ('listId' in options)
     this.listw = $('#'+options.listId);
@@ -73,21 +79,21 @@ function AutofillWidget(jqo, options)
 
   this.listw.bind('mousedown', function()
   {
-    obj.optn.no_blur = true;
+    obj.optn.noBlur = true;
   });
 
   this.listw.bind('mouseup', function()
   {
-    obj.optn.no_blur = false;
+    obj.optn.noBlur = false;
   });
 
   jqo.bind('blur',  function()
   {
-    if (obj.optn.no_blur) return;
-    if (obj.get_value($(this).val()) === null)
+    if (obj.optn.noBlur) return;
+    if (obj.getValue($(this).val()) === null)
     {
       obj.select('');
-      //$(this).val(obj.optn.labels.empty_input);
+      //$(this).val(obj.optn.labels.emptyInput);
       //$(this).addClass("autofill-empty");
       //obj.listw.hide();
     }
@@ -107,11 +113,11 @@ function AutofillWidget(jqo, options)
     {
       $(this).val("");
       $(this).removeClass("autofill-empty");
-      this.has_content = true;
+      this.hasContent = true;
     }
   });
 
-  this.loadlist(this.optn.searchCallback(""));
+  this.loadList(this.optn.searchCallback(""));
 
   this.jqo.data("widget",this);
 }
@@ -130,33 +136,37 @@ AutofillWidget.prototype.validate = function()
 
   this.msg = msg;
   this.valid = (msg === null);
-  if (this.on_validate) this.on_validate();
+  if (this.onValidate) this.onValidate();
   return this.valid;
 }
 
 AutofillWidget.prototype.select = function(val)
 {
+  this.hasChanged = (this.val != val);
   this.val = val;
+
   $('input[name='+this.name+']').val(val);
   if (val == "")
   {
     this.jqo.addClass("autofill-empty");
-    this.jqo.val(this.optn.labels.empty_input);
-    this.has_content = false;
+    this.jqo.val(this.optn.labels.emptyInput);
+    this.hasContent = false;
   }
   else
   {
     this.jqo.removeClass("autofill-empty");
-    this.jqo.val(this.get_label(val));
-    this.has_content = true;
+    this.jqo.val(this.getLabel(val));
+    this.hasContent = true;
   }
   this.optn.no_blur = false;
   this.listw.hide();
-  if ('selectCallback' in this.optn)
-    this.optn.selectCallback(val);
+
+  if (this.hasChanged)
+    if ('selectCallback' in this.optn)
+      this.optn.selectCallback(val);
 }
 
-AutofillWidget.prototype.get_value = function(label)
+AutofillWidget.prototype.getValue = function(label)
 {
   for (i in this.optn.list)
     if (label == this.optn.list[i][1])
@@ -164,7 +174,7 @@ AutofillWidget.prototype.get_value = function(label)
   return null;
 }
 
-AutofillWidget.prototype.get_label = function(val)
+AutofillWidget.prototype.getLabel = function(val)
 {
   for (i in this.optn.list)
     if (val == this.optn.list[i][0])
@@ -172,7 +182,7 @@ AutofillWidget.prototype.get_label = function(val)
   return null;
 }
 
-AutofillWidget.prototype.loadlist = function(subList)
+AutofillWidget.prototype.loadList = function(subList)
 {
   //alert("loadlist "+subList.length);
   var obj = this;
@@ -199,5 +209,5 @@ AutofillWidget.prototype.loadlist = function(subList)
 
 var AutofillLabels = 
 {
-  empty_input : "Type search here"
+  emptyInput : "Type search here"
 };

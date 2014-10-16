@@ -1,10 +1,16 @@
-/*****************************************************************************
+// Written in javascript
+/*
+ * JS for date picker
  *
- * Date Picker Widget
+ * Copyright (C) 2014 Jaypha.
  *
- * requires calendar.js
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
  *
- ****************************************************************************/
+ * Authors: Jason den Dulk
+ */
+ 
+ /* requires calendar.js */
 
 function DatePickerWidget(jqo, jqr, options)
 {
@@ -73,6 +79,6 @@ DatePickerWidget.prototype.validate = function()
 
   this.valid = (this.msg === null)
 
-  if (this.on_validate) this.on_validate();
+  if (this.onValidate) this.onValidate();
   return this.valid;
 }

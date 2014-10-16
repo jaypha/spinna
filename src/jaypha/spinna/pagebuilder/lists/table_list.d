@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Prints out a table of data based on a list given by a data source. Each row is displayed by the
  * template given.
@@ -8,8 +9,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D programming language.
  */
 
 /*
@@ -27,8 +26,11 @@ import jaypha.spinna.pagebuilder.htmltable;
 import std.traits;
 import std.range;
 import jaypha.types;
+import jaypha.algorithm;
+import jaypha.datasource;
 
-class TableList : ListComponent
+/+
+deprecated class TableList : ListComponent
 {
   HtmlTable table;
   string name;
@@ -73,53 +75,71 @@ class TableList : ListComponent
     table.copy(output);
   }
 }
-
-unittest
++/
+class TableListComponent(DS) : ListComponent if(isDataSource!(DS))
 {
-  class MyTSource : TableSource
+  alias ReturnType!(DS.apply) R;
+  alias ElementType!R E;
+  alias rtMap!(R, string[]) L;
+
+  HtmlTable table;
+  string id;
+  DS source;
+  string[] headers;
+  string[] delegate(E) mapper;
+
+  @property void start(ulong s) { _start = s; }
+  @property void limit(ulong l) { _limit = s; }
+  @property ulong length() { return source.length; }
+
+  this
+  (
+    string _id,
+    ref DS _source,
+    string[] _headers,
+    string[] delegate(E) _mapper
+  )
   {
-    this(SourceType[] _data) { data = _data; }
-
-    @property SourceType front() { return data[i+offset]; }
-    @property bool empty() { return i>= psize || i+offset > data.length; }
-    void popFront() { ++i; }
-
-    void set_limit(ulong num) { psize = limit; }
-    void set_start(ulong num) { offset = start; }
-
-    @property SourceType headers() { return [ "label", "thwonk" ]; }
-
-    void reset() { i = 0; }
-
-    private:
-      SourceType[] data;
-      ulong i = 0;
-      ulong psize = 0;
-      ulong offset = 0;
-      
+    id = _id;
+    table = new HtmlTable();
+    source = _source;
+    headers = _headers;
+    mapper = _mapper;
   }
 
+  override void copy(TextOutputStream output)
+  {
+    table.add_class("data");
+    table.add_class("list");
+    table.id = id;
 
-  auto output = new TextBuffer!string();
+    auto thr = table.headRow();
+    foreach (c; headers)
+    {
+      auto cell = thr.cell();
+      cell.add(c);
+    }
 
-  auto ds = new MyTSource
-  (
-    [
-      [ "hello", "honk" ],
-      [ "beetle", "tonk" ],
-      [ "tweetle", "tank" ],
-      [ "twobird", "crank" ],
-      [ "accost", "plank" ],
-      [ "zigzag", "pluto" ],
-      [ "mumbo", "jumbo" ]
-    ]
-  );
+    auto list = L(source[_start.._start+_limit], mapper);
 
-  auto sl = new TableList("tablelist", ds);
+    ulong count = 0;
+    foreach (row; list)
+    {
+      auto tbr = table.bodyRow();
 
-  ds.set_limit(2);
-  ds.set_start(2);
-  
-  sl.copy(output);
-  assert(output.data == "<table class='data list' id='tablelist-table'><thead><tr><th>label</th><th>thwonk</th></tr></thead><tbody><tr class='odd'><td>tweetle</td><td>tank</td></tr><tr class='even'><td>twobird</td><td>crank</td></tr></tbody></table>");
+      if (++count%2 == 0) tbr.addClass("even");
+      else tbr.addClass("odd");
+
+      foreach (c; row)
+      {
+        auto cell = tbr.cell();
+        cell.add(c);
+      }
+    }
+
+    table.copy(output);
+  }
+
+  private:
+    ulong _start, _limit; 
 }

@@ -1,15 +1,24 @@
-
-
+//Written in the D programming language
+/*
+ * Suuport functions to use with ranges.
+ *
+ * Copyright (C) 2013 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
 
 module jaypha.range;
 
 import std.algorithm;
-import std.range;
+public import std.range;
 import std.traits;
 import std.exception;
 
 //----------------------------------------------------------------------------
-// munch
+// Consumes the front of the range as long the elements are inside pattern.
 
 void munch(R,E)(ref R r, E pattern)
   if (isInputRange!R && isInputRange!E &&
@@ -21,6 +30,7 @@ void munch(R,E)(ref R r, E pattern)
 }
 
 //----------------------------------------------------------------------------
+// Consume the rest of the range.
 
 void drain(R)(ref R r) if (isInputRange!R)
 {
@@ -28,8 +38,33 @@ void drain(R)(ref R r) if (isInputRange!R)
 }
 
 //----------------------------------------------------------------------------
+// Splits a range into chunks of given length. Doesn't work with narrow
+// strings.
 
-bool skip_over_anyway(R)(ref R r, string prefix, bool all_or_nothing = false)
+struct ByChunk(R) if (!isNarrowString!R)
+{
+  R rng;
+  ulong num;
+
+  this(R r, ulong n) { rng = r; num = n; }
+
+  @property bool empty() { return rng.empty; }
+
+  @property R front() { return rng.take(num); }
+
+  void popFront() { rng = rng.drop(num); }
+}
+
+ByChunk!R byChunk(R)(R r, ulong n) { return ByChunk!R(r,n); }
+
+
+//----------------------------------------------------------------------------
+// Comsumes the front of the range as long as it matches the given prefix
+// Returns whether or not the entire prefix got matches. If all_or_nothing is
+// true, then an exception occurs if prefix is nto matched in its entirely.
+// Designed to work with ranges that cannot be rewound.
+
+deprecated bool skip_over_anyway(R)(ref R r, string prefix, bool all_or_nothing = false)
  if (isInputRange!R)
 {
   if (r.empty || r.front != prefix[0])

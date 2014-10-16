@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Button widgets.
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D programming language.
  */
 
 
@@ -23,7 +22,7 @@ class SubmitButton : HtmlElement
   {
     // value is not used at present.
     super("input");
-    add_class("button-widget");
+    addClass("button-widget");
     attributes["type"] = "submit";
     attributes["value"] = label;
     attributes["name"] = name;
@@ -40,7 +39,7 @@ class LinkButton : HtmlElement
   this(string link, string label)
   {
     super("button");
-    add_class("button-widget");
+    addClass("button-widget");
     add(label);
     attributes["type"] = "button";
     attributes["onclick"] =  "document.location='"~link~"'";
@@ -55,7 +54,7 @@ class LinkButton : HtmlElement
   }
 }
 
-string button_link(string link, string label)
+string buttonLink(string link, string label)
 {
   return "<a class='button-widget' href='"~link~"'>"~label~"</a>";
 }
@@ -66,7 +65,7 @@ class OpenButton : HtmlElement
   this(string link, string label)
   {
     super("button");
-    add_class("button-widget");
+    addClass("button-widget");
     add(label);
     attributes["type"] = "button";
     attributes["onclick"] = "window.open('"~link~"'); return false;";
@@ -85,7 +84,7 @@ class JSButton : HtmlElement
   this(string script, string label)
   {
     super("button");
-    add_class("button-widget");
+    addClass("button-widget");
     add(label);
     attributes["type"] = "button";
     attributes["onclick"] = script;
@@ -97,7 +96,7 @@ class ResetButton : HtmlElement
   this(string label = "Reset")
   {
     super("input");
-    add_class("button-widget");
+    addClass("button-widget");
     attributes["value"] = label;
     attributes["type"] = "reset";
   }

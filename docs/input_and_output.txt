@@ -4,17 +4,21 @@
 Web servers take input in the form of a HTTP request and supplies output in the form of an
 HTTP response. Spinna works with the request and response directly.
 
-The global variable "request" containes the URL (or GET) parameters, the environment
+The jaypha.spinna.global module declares two variables, "request" and "response", of types
+HttpRequest and HttpResponse respectively.
+
+HttpRequest is defined in jaypha.spinna.request.
+HttpResponse is defined in jaypha.spinna.response.
+
+HttpRequest containes the URL (or GET) parameters, the environment
 variables and cookies. If the content type is x-www-url-encoded or multipart/formdata, then the
 contents are extracted and available as POST parameters and files. Otherwise the content is
 avaiable in raw form for the program to access.
 
-The global variable "response" contains methods to set the reponse headers and the content
-is an array of ubytes. The framework generates the HTTP text to be given to the output.
+HttpResponse contains methods to set the response headers and a property "entity" of type
+ByteArray for the output body. Your code would "write" its output to HttpResponse.entity.
+You then call HttpResponse.copy to send the response to an output range.
 
-request and response are declared in jaypha.spinna.global as instances of HTTPRequest and
-HTTPResponse respectively.
-
-HTTPRequest is defined in jaypha.spinna.request.
-HTTPResponse is defined in jaypha.spinna.response.
-
+Two common ways to generate the output content is to use pagebuilder to create a HTML
+Document and use jaypha.spinna.pagebuilder.document.transfer, and to create a JSON
+structure and use jaypha.spinna.json.transfer.

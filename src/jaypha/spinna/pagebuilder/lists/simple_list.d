@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Prints out a list of items given by a data source. Each item is displayed by the
  * template given.
@@ -12,38 +13,50 @@
  * Written in the D programming language.
  */
 
-/*
- * page number, num pages and page size are things relevant to the data source.
- * List Components do not need to know about them in order to work.
- */
 
 module jaypha.spinna.pagebuilder.lists.simple_list;
 
 import jaypha.types;
 public import jaypha.spinna.pagebuilder.lists.list;
+import jaypha.datasource;
 
-class SimpleList(string tpl) : ListComponent
+
+class SimpleList(DS,string tpl) : ListComponent if(isDataSource!(DS))
 {
-  override void set_start(ulong start) { source.set_start(start); }
-  override void set_limit(ulong limit) { source.set_start(limit); }
-  override @property ulong size() { return source.size; }
+  alias ReturnType!(DS.apply) R;
+  alias ElementType!R E;
+  alias rtMap!(R, string[string]) L;
 
-  ObjSource source;
+  DS source;
+  string[string] delegate(E) mapper;
 
-  this(string _name, ObjSource _source)
+  @property void start(ulong s) { _start = s; }
+  @property void limit(ulong l) { _limit = s; }
+  @property ulong length() { return source.length; }
+
+  this
+  (
+    ref DS _source,
+    string[string] delegate(E) _mapper
+  )
   {
     source = _source;
+    mapper = _mapper;
   }
 
   void copy(TextOutputStream output)
   {
-    source.reset();
-
     ulong count = 0;
-    foreach (item; source)
+
+    auto list = L(source[_start.._start+_limit], mapper);
+
+    foreach (item; list)
     {
       mixin(TemplateOutput!tpl);
       ++count;
     }
   }
+
+  private:
+    ulong _start, _limit; 
 }

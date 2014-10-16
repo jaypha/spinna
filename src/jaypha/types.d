@@ -39,6 +39,7 @@ enum isByteRange(R) = (isInputRange!(R) && is(ElementType!(R) : ubyte));
 //-----------------------------------------------------------------------------
 // UTF encoding based on D type.
 
+/+
 template utfEnc(S) if (isSomeString!S || isSomeChar!S)
 {
   static if (is(S == string) || is(S == char))
@@ -48,3 +49,9 @@ template utfEnc(S) if (isSomeString!S || isSomeChar!S)
   else
     enum utfEnc = "UTF-32";
 }
++/
+
+enum utfEnc(C:char) = "UTF-8";
+enum utfEnc(C:wchar) = "UTF-16";
+enum utfEnc(C:dchar) = "UTF-32";
+enum utfEnc(S) if (isSomeString!S) = utfEnc!(ElementEncodingType!S);

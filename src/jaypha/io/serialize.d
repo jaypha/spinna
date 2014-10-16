@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * This module has functions to read/write data to a serialize string.
  *

@@ -39,66 +39,65 @@ import std.conv;
 enum bool isRouterController(R) = is(typeof(
   (inout int = 0)
   {
-    if (R.has_route("","")) {}
-    if (R.is_authorised) {}
+    if (R.hasRoute("","")) {}
+    if (R.isAuthorised) {}
     string h = R.redirect;
     R.service();
   }
 ));
 
-void process_request(I,O,RC)
+void processRequest(I,O,RC)
 (
   string[string] env,
-  I input_stream,
-  O output_stream,
-  void delegate(ulong, string) error_handler
+  I inputStream,
+  O outputStream,
+  void delegate(ulong, string) errorHandler
 ) if (isOutputRange!(O,immutable(ubyte)[]) && isRouterController!RC)
 {
-  scope(exit) { session.clear(); }
+  scope(exit) { session.clear(); request.clear(); response.clear(); }
   try
   {
-    request.prepare(env, input_stream);
-    response.prepare();
+    request.prepare(env, inputStream);
 
     if ("SPINNA_SESSION" in request.cookies)
-      session.session_id = request.cookies["SPINNA_SESSION"].value;
+      session.sessionId = request.cookies["SPINNA_SESSION"].value;
 
-    if (!RC.has_route(request.path,toLower(request.method)))
+    if (!RC.hasRoute(request.path,toLower(request.method)))
     {
       // Could not match.
-      error_handler(404, "Page not found: "~request.path);
+      errorHandler(404, "Page not found: "~request.path);
     }
     else
     {
-        if (RC.is_authorised)
+        if (RC.isAuthorised)
         {
           RC.service();
         }
         else
         {
           auto redirect = RC.redirect;
-          if (redirect && !is_logged_in())
+          if (redirect)
             response.redirect(redirect~"?url="~request.path);
           else
-            error_handler(403, "Not authorised to access: "~request.path);
+            errorHandler(403, "Not authorised to access: "~request.path);
         }
     }
     if (session.active)
     {
       auto sessid = save(session);
-      response.set_session_cookie("SPINNA_SESSION",sessid);
+      response.setSessionCookie("SPINNA_SESSION",sessid);
     }
   }
   catch (HttpException e)
   {
     // A malformed HTTP request
     // Give 4xx response
-    error_handler(e.code,e.msg);
+    errorHandler(e.code,e.msg);
   }
   catch (Exception e)
   {
-    error_handler(500,e.msg);
+    errorHandler(500,e.msg);
   }
 
-  response.copy(output_stream);
+  response.copy(outputStream);
 }

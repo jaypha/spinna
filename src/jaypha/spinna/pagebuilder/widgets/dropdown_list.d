@@ -1,3 +1,15 @@
+//Written in the D programming language
+/*
+ * Drop down (select) widget.
+ *
+ * Copyright 2013 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
+
 module jaypha.spinna.pagebuilder.widgets.dropdown_list;
 
 public import jaypha.spinna.pagebuilder.widgets.widget;
@@ -31,18 +43,13 @@ class DropdownListWidget : Widget
   {
     super(_form, _name, _label, _required, "select");
     options = _options;
-    add_class("dropselect-widget");
+    addClass("dropselect-widget");
   }
 
   override void copy(TextOutputStream output)
   {
-    add(new DelegateComponent(&print_innards));
-    super.copy(output);
-    output.print(javascript("new DropdownListWidget($('#"~id~"'),{ label: '"~label~"', required: "~(required?"true":"false")~"});"));
-  }
+    auto c = appender!string();
 
-  void print_innards(TextOutputStream c)
-  {
     if ((_value is null || _value == "") || !required)
       c.put("<option value=''> -- none -- </option>");
 
@@ -56,6 +63,37 @@ class DropdownListWidget : Widget
       c.put(o.label);
       c.put("</option>");
     }
+    put(c.data);
+
+    super.copy(output);
+    output.print(javascript("new DropdownListWidget($('#"~id~"'),{ label: '"~label~"', required: "~(required?"true":"false")~"});"));
+  }
+
+  override JSONValue toJson()
+  {
+    JSONValue[string] constraints = 
+    [ 
+      "max": JSONValue(1),
+      "min": JSONValue(required?1:0)
+    ];
+
+    auto ops = appender!(JSONValue[])();
+    foreach (o;options)
+      ops.put(JSONValue([ "label" : JSONValue(o.label), "value": JSONValue(o.value) ]));
+
+    JSONValue[string] retval = 
+      [
+        "name": JSONValue(name),
+        "type": JSONValue("enum"),
+        "label": JSONValue(label),
+        "constraints": JSONValue(constraints),
+        "options": JSONValue(ops.data)
+      ];
+
+    if (!value.empty)
+      retval["default"] = JSONValue(value);
+
+    return JSONValue(retval);
   }
 
   EnumeratedOption[] options;

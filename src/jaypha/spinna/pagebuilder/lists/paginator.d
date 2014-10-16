@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Paginator widget for paged lists and tables.
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D programming language.
  */
 
 module jaypha.spinna.pagebuilder.lists.paginator;
@@ -25,45 +24,45 @@ import config.general;
 class Paginator(string tpl = "jaypha/spinna/pagebuilder/lists/paginator_default.tpl") : Component
 {
   string name;
-  ulong num_pages;
-  string url_base;
+  ulong numPages;
+  string urlBase;
 
   @property
   {
-    ulong page_number()
+    ulong pageNumber()
     {
       if (name~"-page" in request)
         return to!uint(request[name~"-page"]);
       else
-        return default_page;
+        return defaultPage;
     }
 
-    bool display_all() { return ((name~"-displayall" in request) !is null); }
-    ulong page_size()
+    bool displayAll() { return ((name~"-displayall" in request) !is null); }
+    ulong pageSize()
     {
       if (name~"-page-size" in request)
         return to!uint(request[name~"-page-size"]);
       else
-        return default_page_size;
+        return defaultPageSize;
     }
   }
 
-  ulong default_page = 1;
-  ulong default_page_size = page_size_default;
+  ulong defaultPage = 1;
+  ulong defaultPageSize = pageSizeDefault;
 
   this(string n, string b, ref StrHash r)
   {
     name = n;
-    url_base = b;
+    urlBase = b;
     request = r;
   }
 
   string link(ulong page)
   {
-    if (page == default_page)
-      return url_base;
+    if (page == defaultPage)
+      return urlBase;
     else
-      return url_add_query_parm(url_base, name~"-page",to!string(page));
+      return addQueryParm(url_base, name~"-page",to!string(page));
   }
 
   mixin TemplateCopy!tpl;
@@ -72,7 +71,7 @@ class Paginator(string tpl = "jaypha/spinna/pagebuilder/lists/paginator_default.
     StrHash request;
 }
 
-auto new_paginator(string tpl = "jaypha/spinna/pagebuilder/lists/paginator_default.tpl")(string n, string b, ref StrHash r)
+auto paginator(string tpl = "jaypha/spinna/pagebuilder/lists/paginator_default.tpl")(string n, string b, ref StrHash r)
 {
   return new Paginator!tpl(n,b,r);
 }

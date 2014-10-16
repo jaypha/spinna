@@ -155,7 +155,7 @@ void main(string[] args)
     preamble = root["preamble"].as!string;
 
   if (root.containsKey("roles"))
-    define_roles(root["roles"]);
+    defineRoles(root["roles"]);
 
   if (root.containsKey("authtype"))
     authtype = root["authtype"].as!string;
@@ -181,20 +181,32 @@ void main(string[] args)
   scope(exit) { f1.close(); }
   write_router(f1);
 
-  auto f2 = File(output_dir~"/gen/roles.d", "w");
-  scope(exit) { f2.close(); }
-  write_permissions(f2);
+  if (!roles.empty)
+  {
+    auto f2 = File(output_dir~"/gen/roles.d", "w");
+    scope(exit) { f2.close(); }
+    writeRoles(f2);
+  }
 
 }
 
 //----------------------------------------------------------------------------
 
-void define_roles(Node node)
+void defineRoles(Node node)
+in
 {
-  foreach (string n, Node f; node)
+  assert(value.isSequence);
+}
+body
+{
+  ulong run = 1L;
+
+  foreach (Node f; node)
   {
-    assert(f.isScalar);
-    roles[n] = f.as!ulong;
+    assert(f.isString);
+    roleName = f.as!string;
+    roles[roleName] = run;
+    run <<= run;
   }
 }
 
@@ -448,7 +460,7 @@ void write_router(File writer)
 
 //----------------------------------------------------------------------------
 
-void write_permissions(File writer)
+void writeRoles(File writer)
 {
 
   writer.writeln("/*\n * Info about authorisation for each action\n *");
@@ -467,13 +479,12 @@ void write_permissions(File writer)
   string[] rdef;
   foreach (s,v; roles)
     rdef ~= "  "~s~" = "~to!string(v);
-  if (rdef.length)
-  {
-    writer.writeln("enum SpinnaRole : ulong\n{");
-    writer.writeln(rdef.join(",\n"));
-    writer.writeln("\n}");
-    writer.writeln();
-  }
+
+  writer.writeln("enum Role : ulong\n{");
+  writer.writeln(rdef.join(",\n"));
+  writer.writeln("\n}");
+  writer.writeln();
+  writer.writeln("alias ulong RoleGroup;");
   
   writer.writeln("immutable ulong[string] permissions;");
   if (allowed_roles.length)

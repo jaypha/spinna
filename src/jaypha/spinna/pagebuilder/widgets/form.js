@@ -1,3 +1,4 @@
+// Written in Javascript.
 /*
  * Form submission functions for use with Spinna widgets.
  *
@@ -13,9 +14,9 @@
 // validate form using spinna widgets
 // 
 
-function form_validate(form_id, invalid_callback)
+function formValidate(formId, invalidCallback)
 {
-  var invalid_widgets = [];
+  var invalidWidgets = [];
 
   $(".widget", "#"+form_id).each(function()
   {
@@ -23,13 +24,13 @@ function form_validate(form_id, invalid_callback)
 
     if (!wgt.validate())
     {
-      invalid_widgets.push(wgt);
+      invalidWidgets.push(wgt);
     }
   });
 
-  if (invalid_widgets.length)
+  if (invalidWidgets.length)
   {
-    invalid_callback(form_id,invalid_widgets);
+    invalidCallback(formId,invalidWidgets);
     return false;
   }
   return true;
@@ -39,13 +40,12 @@ function form_validate(form_id, invalid_callback)
 // Default callback for form validation failure.
 // 
 
-function form_validate_fail(form_id, invalid_widgets)
+function formValidateFail(formId, invalidWidgets)
 {
   var messages = [];
-  for (x in invalid_widgets)
-    messages.push(invalid_widgets[x].label+": "+invalid_widgets[x].msg);
+  for (x in invalidWidgets)
+    messages.push(invalidWidgets[x].label+": "+invalidWidgets[x].msg);
 
-  //alert(messages.join("\n"));
   $("#message-dialog .dialog-content").html("<h4>Form submission is not acceptable</h4>"+messages.join("<br/>"));
   $("#message-dialog").jqmShow();
 }
@@ -55,5 +55,5 @@ function form_validate_fail(form_id, invalid_widgets)
 
 $(function()
 {
-  $("form").submit(function(event) { return form_validate($(this).attr('id'),form_validate_fail); });
+  $("form").submit(function(event) { return formValidate($(this).attr('id'),formValidateFail); });
 });

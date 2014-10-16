@@ -1,4 +1,14 @@
-
+//Written in the D programming language
+/*
+ * Dialog boxes
+ *
+ * Copyright (C) 2014, Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
 
 module jaypha.spinna.pagebuilder.widgets.dialog_box;
 
@@ -17,12 +27,12 @@ class DialogBox(string S) : HtmlElement
     mixin TemplateCopy!S;
   }
 
-  bool open_on_load;
+  bool openOnLoad;
 
   this(string _id)
   {
     super();
-    add_class("jqmWindow");
+    addClass("jqmWindow");
     id = _id;
     tpl = new DialogTpl();
     tpl.content = new Composite();
@@ -30,8 +40,8 @@ class DialogBox(string S) : HtmlElement
     super.add(tpl);
   }
 
-  override Composite add(const(char)[] t) { tpl.content.add(t); return this; }
-  override Composite add(Component o) { tpl.content.add(o); return this; }
+  override Composite put(const(char)[] t) { tpl.content.add(t); return this; }
+  override Composite put(Component o) { tpl.content.add(o); return this; }
 
   override void copy(TextOutputStream output)
   {
@@ -44,30 +54,11 @@ class DialogBox(string S) : HtmlElement
       (
         "$(function(){$('#"~id~"').jqm();"
         "$('#"~id~"').jqmAddClose('#"~id~" .dialog-close-button');" ~
-        (open_on_load?"$('#"~id~"').jqmShow();":"")~"});"
+        (openOnLoad?"$('#"~id~"').jqmShow();":"")~"});"
       )
     );
   }
 
   private:
     DialogTpl tpl;
-}
-
-
-unittest
-{
-  import std.stdio;
-  import std.array;
-
-  auto x = new DialogBox!("jaypha/spinna/pagebuilder/useful_stuff/dialog_default.tpl")("x");
-
-  x.add("hello");
-  x.footer = new TextComponent("<button class='dialog-close-button' type='button'>OK</button>");
-
-  auto buf = appender!(char[])();
-
-  x.copy(new TextOutputStream(output_range_stream(buf)));
-  writeln(buf.data);
-  auto z = "<div class='jqmWindow' id='x'>\n <div class='jqm-border-box'>\n  <div class='jqm-header'>\n    \n  </div>\n  <hr class='p'/>\n  <div class='dialog-content'>\n    hello\n  </div>\n  \n   <div class='jqm-footer'>\n    <button class='dialog-close-button' type='button'>OK</button>\n   </div>\n  \n </div>\n</div><script type='text/javascript'>\n<!--\n$(function(){$('#x').jqm();$('#x').jqmAddClose('#x .dialog-close-button');});\n//-->\n</script>";
-  assert(buf.data == z);
 }

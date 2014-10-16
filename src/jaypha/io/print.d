@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Formatted output for output ranges.
  *
@@ -13,7 +14,7 @@
  * I use print instead of write to avoid conflicts with std.stdio, but
  * otherwise they should function the same.
  *
- * Most of the implementation is shamelessly ripped off from Phobos.
+ * Most of the implementation is ripped off from Phobos.
  */
 
 module jaypha.io.print;
@@ -26,9 +27,9 @@ void print(Writer,S...)(Writer w, S args)
   foreach (arg; args)
   {
     alias typeof(arg) A;
-    static if (isAggregateType!A || is(A == enum))
+    static if (is(A == enum))
     {
-      std.format.formattedWrite(w, "%s", arg);
+      std.format.formattedWrite(stream, "%s", arg);
     }
     else static if (isSomeString!A)
     {
@@ -45,6 +46,14 @@ void print(Writer,S...)(Writer w, S args)
     else static if (isSomeChar!A)
     {
       w.put(arg);
+    }
+    else static if (__traits(compiles,arg.copy(w)))
+    {
+      arg.copy(w);
+    }
+    else static if (__traits(comiles,to!string(arg))
+    {
+      w.put(to!string(arg));
     }
     else
     {

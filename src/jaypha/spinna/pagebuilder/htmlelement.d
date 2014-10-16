@@ -28,7 +28,7 @@ class HtmlElement : Composite
 {
   // These elements are allowed to be printed using the empty tag shorthand.
 
-  static immutable string[] empty_tags = ["area", "base", "basefont", "br", "col", "frame", "hr", "img", "input", "isindex", "link", "meta", "param" ];
+  static immutable string[] emptyTags = ["area", "base", "basefont", "br", "col", "frame", "hr", "img", "input", "isindex", "link", "meta", "param" ];
 
   @property
   {
@@ -37,34 +37,33 @@ class HtmlElement : Composite
   }
 
   strstr   attributes;
-  string[] css_classes;
-  strstr   css_styles;
+  string[] cssClasses;
+  strstr   cssStyles;
 
-  string tag_name;
-
-  //---------------------------------------------------------------------------
-
-  this(string _tag_name = "div")        { tag_name = _tag_name; }
+  string tagName;
 
   //---------------------------------------------------------------------------
 
-  HtmlElement addClass(string class_name)
+  this(string _tagName = "div")        { tagName = _tagName; }
+
+  //---------------------------------------------------------------------------
+
+  HtmlElement addClass(string className)
   {
-    if (find(css_classes,class_name).empty)
-      css_classes ~= class_name;
+    if (canFind(cssClasses,className))
+      cssClasses ~= className;
     return this;
   }
-  alias addClass add_class;
 
   //---------------------------------------------------------------------------
 
-  HtmlElement remove_class(string class_name)
+  HtmlElement removeClass(string className)
   {
     uint i;
     for (; i<css_classes.length; ++i)
-      if (css_classes[i] == class_name)
+      if (cssClasses[i] == className)
       {
-        css_classes = remove(css_classes,i);
+        cssClasses = remove(cssClasses,i);
         return this;
       }
     return this;
@@ -77,16 +76,16 @@ class HtmlElement : Composite
     assert(!("style" in attributes));
     assert(!("class" in attributes));
 
-    output.print("<",tag_name);
-    if (css_classes.length) output.print(" class='",encode_special(css_classes.join(" ")),"'");
-    if (css_styles.length)
+    output.print("<",tagName);
+    if (cssClasses.length) output.print(" class='",encodeSpecial(cssClasses.join(" ")),"'");
+    if (cssStyles.length)
     {
       output.print
       (
         " style='",
-        encode_special
+        encodeSpecial
         (
-          css_styles.meld!
+          cssStyles.meld!
           (
             (a,b) => (a ~":"~b)
           ).join(";")
@@ -96,23 +95,23 @@ class HtmlElement : Composite
     }
       
     foreach (name, value; attributes)
-      output.print(" ",name,"='",encode_special(value),"'");
+      output.print(" ",name,"='",encodeSpecial(value),"'");
     
-    if (empty_tag)
+    if (emptyTag)
       output.print("/>");
     else
     {
       output.print(">");
       super.copy(output);
-      output.print("</",tag_name,">");
+      output.print("</",tagName,">");
     }
   }
 
   //---------------------------------------------------------------------------
   
-  @property bool empty_tag()
+  @property bool emptyTag()
   {
-    return (length == 0 && !find(empty_tags,tag_name).empty);
+    return (length == 0 && !canFind(emptyTags,tagName));
   }
 
   //---------------------------------------------------------------------------
@@ -127,7 +126,7 @@ unittest
   import std.range;
 
   auto buf = appender!(char[])();
-  auto bos = new TextOutputStream(output_range_stream(buf));
+  auto bos = textOutputStream(buf);
 
   auto page = new HtmlElement("br");
   page.copy(bos);

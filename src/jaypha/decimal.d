@@ -200,7 +200,7 @@ struct decimal(uint scale)
 */
 }
 
-auto to_decimal(uint scale,T)(T v)
+auto toDecimal(uint scale,T)(T v)
 {
   decimal!scale d;
   d.opAssign(v);

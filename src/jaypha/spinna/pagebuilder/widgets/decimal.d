@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Widget for decimal (fixed point) values.
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D programming language.
  */
 
 module jaypha.spinna.pagebuilder.widgets.decimal;
@@ -45,23 +44,23 @@ class DecimalWidget(uint scale = 2) : Widget
     HtmlForm _form,
     string _name,
     string _label,
-    bool _required = false,
+    bool _required,
     D _min = D.min,
     D _max = D.max
   )
   {
     super(_form, _name, _label, _required, "input");
-    add_class("decimal-widget");
-    min_value = _min;
-    max_value = _max;
+    addClass("decimal-widget");
+    minValue = _min;
+    maxValue = _max;
   }
 
   override void copy(TextOutputStream output)
   {
     super.copy(output);
-    output.print(javascript("new DecimalWidget($('#"~id~"'),{ label: '"~label~"', scale: "~to!string(scale)~", required:"~(required?"true":"false")~",min: "~min_value.toString()~",max:"~max_value.toString()~"});"));
+    output.print(javascript("new DecimalWidget($('#"~id~"'),{ label: '"~label~"', scale: "~to!string(scale)~", required:"~(required?"true":"false")~",min: "~minValue.toString()~",max:"~maxValue.toString()~"});"));
   }
 
-  D min_value;
-  D max_value;
+  D minValue;
+  D maxValue;
 }

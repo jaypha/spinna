@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Widget to select items from a list.
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D language.
  */
 
 module jaypha.spinna.pagebuilder.widgets.selector;
@@ -46,15 +45,15 @@ class SelectorWidget(string tpl = "jaypha/spinna/pagebuilder/widgets/selector.tp
     override void name(string v) { attributes["name"] = v; }
   }
 
-  ulong min_options = 0;
-  ulong max_options = 0;
+  ulong minOptions = 0;
+  ulong maxOptions = 0;
   EnumeratedOption[] options;
   string[] selected;
   
   this(HtmlForm _form, string _name)
   {
     super(_form, _name,null,false,"div");
-    add_class("selector-widget");
+    addClass("selector-widget");
 
   }
 
@@ -68,6 +67,6 @@ class SelectorWidget(string tpl = "jaypha/spinna/pagebuilder/widgets/selector.tp
     add(c);
 
     super.copy(output);
-    output.print(javascript("new SelectorWidget($('#"~id~"'), { label: '"~label~"', min: "~to!string(min_options)~", max: "~to!string(max_options)~"});"));
+    output.print(javascript("new SelectorWidget($('#"~id~"'), { label: '"~label~"', min: "~to!string(minOptions)~", max: "~to!string(maxOptions)~"});"));
   }
 }

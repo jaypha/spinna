@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Simple object oriented output stream library.
  *
@@ -27,7 +28,7 @@ interface OutputStream
 }
 
 class OutputRangeStream(R) : OutputStream
-  if (isOutputRange!(R,const(dchar)))
+  if (isOutputRange!(R,dchar))
 {
   R or;
   this(ref R or) { this.or = or; }
@@ -66,21 +67,10 @@ class OutputRangeStream(R) : OutputStream
   }
 }
 
-OutputRangeStream!R output_range_stream(R)( R r)
+OutputRangeStream!R outputRangeStream(R)(ref R r)
 {
   return new OutputRangeStream!R(r);
 }
-
-/*
-class FileOutputStream(Char) : OutputStream!(Char)
-{
-  std.stdio.File f;
-  this(File f) { this.f = f; }
-
-  void put(Char c) { f.lockingTextWriter.put(c); }
-  void put(Char[] s) { f.lockingTextWriter.put(s); }
-}
-*/
 
 class TextOutputStream : OutputStream
 {
@@ -99,7 +89,7 @@ class TextOutputStream : OutputStream
     foreach (arg; args)
     {
       alias typeof(arg) A;
-      static if (isAggregateType!A || is(A == enum))
+      static if (is(A == enum))
       {
         formattedWrite(stream, "%s", arg);
       }
@@ -119,10 +109,17 @@ class TextOutputStream : OutputStream
       {
         stream.put(arg);
       }
+      else static if (__traits(compiles,arg.copy(stream)))
+      {
+        arg.copy(stream);
+      }
+      else static if (__traits(comiles,to!string(arg))
+      {
+        stream.put(to!string(arg));
+      }
       else
       {
-        // Most general case
-        formattedWrite(stream, "%s", arg);
+        static assert(false); // TODO need to find away to simply fail to allow other functions to try.
       }
     }
     return this;
@@ -153,11 +150,17 @@ class TextOutputStream : OutputStream
   }
 }
 
-class TextBuffer(S = string) : TextOutputStream if (isSomeString!S)
+TextOutputStream textOutputStream(R)(ref R r)
+{
+  return new TextOutputStream(new OutputRangeStream!R(r));
+}
+
+deprecated class TextBuffer(S = string) : TextOutputStream if (isSomeString!S)
 {
   Appender!S buffer;
 
-  this() { buffer = appender!S(); super(output_range_stream(buffer)); }
+  this() { buffer = appender!S(); super(outputRangeStream(buffer)); }
+
 
   @property S data() { return buffer.data; }
 }
@@ -171,8 +174,7 @@ unittest
 
   auto b = appender!string();
 
-  //auto bo = new OutputRangeStream!(typeof(b))(b);
-  auto bo = output_range_stream(b);
+  auto bo = outputRangeStream(b);
   auto o = new TextOutputStream(bo);
 
   auto d = "for".dup;
@@ -190,7 +192,10 @@ unittest
   o.eoln();
   assert(b.data == "ab5truegxyz\nbformata 10 format\n\n\n");
 
-  auto tb = new TextBuffer!string();
+  auto buffer = appender!string();
+
+  auto tb = textOutputStream(buffer);
   tb.print("hello there");
-  assert(tb.data == "hello there");
+
+  assert(buffer.data == "hello there");
 }

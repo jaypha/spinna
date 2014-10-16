@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Basic Components for building output content.
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D language.
  */
 
 module jaypha.spinna.pagebuilder.component;
@@ -20,6 +19,7 @@ import jaypha.embed;
 public import jaypha.html.entity;
 import std.algorithm;
 import std.array;
+import std.traits;
 
 //-----------------------------------------------------------------------------
 
@@ -28,30 +28,14 @@ interface Component
   void copy(TextOutputStream output);
 }
 
-/*
-TextOutputStream print(TextOutputStream output, Component component)
-{
-  component.copy(output);
-  return output;
-}
-*/
 
 //-----------------------------------------------------------------------------
 
-string to_string(Component component)
+class TextComponent(S = string) : Component if (isSomeString!S)
 {
-  auto buffer = new TextBuffer!string();
-  component.copy(buffer);
-  return buffer.data;
-}
-
-//-----------------------------------------------------------------------------
-
-class TextComponent : Component
-{
-  string text;
+  S text;
   
-  this(string _text = null) { text = _text; }
+  this(S _text = null) { text = _text; }
   
   override void copy(TextOutputStream output)
   {
@@ -63,9 +47,12 @@ class TextComponent : Component
 
 class Composite : Component
 {
-  Composite add(const(char)[] t) { content.put(new TextComponent(t.idup)); return this; }
-  Composite add(Component o) { content.put(o); return this; }
-  alias add put;
+  Composite put(string t) { content.put(new TextComponent!string(t)); return this; }
+  Composite put(wstring t) { content.put(new TextComponent!wstring(t)); return this; }
+  Composite put(dstring t) { content.put(new TextComponent!dstring(t)); return this; }
+  Composite put(Component o) { content.put(o); return this; }
+
+  alias put add;
 
   @property ulong length() { return content.data.length; }
 
@@ -124,16 +111,19 @@ class InputRangeComponent(R) : Component if (isInputRange!R && (is(ElementType!(
 
 //-----------------------------------------------------------------------------
 
-template TemplateOutput(string S)
+template TemplateOutput(string S, string fn = "print")
 {
-  enum TemplateOutput = embedD(import(S),"output.print");
+  enum TemplateOutput = embedD(import(S),fn);
 }
 
 mixin template TemplateCopy(string S)
 {
   override void copy(TextOutputStream output)
   {
-    mixin(TemplateOutput!S);
+    with (output)
+    {
+      mixin(TemplateOutput!(S,"print"));
+    }
   }
 }
 
@@ -172,8 +162,8 @@ unittest
   import std.stdio;
   void pp(TextOutputStream o) { o.print("--phbf--"); }
 
-  auto buf = appender!(char[])();
-  auto bos = new TextOutputStream(output_range_stream(buf));
+  auto buf = appender!string();
+  auto bos = textOutputStream(buf);
 
   auto target = new Composite();
   target.add("abc").add("xyz").add(new TextComponent("123"));
@@ -181,11 +171,14 @@ unittest
   target.add(new DelegateComponent(&pp));
   target.copy(bos);
   assert(buf.data == "abcxyz123--phbf--");
-  buf.clear();
+
+  buf = appender!string();
+  bos = textOutputStream(buf);
 
   auto wrapper = new Composite();
   wrapper.add("start!").wrap(target).add("!end");
   target.copy(bos);
+  //bos.print(target);
   writeln(buf.data);
   assert(buf.data == "start!abcxyz123--phbf--!end");
   

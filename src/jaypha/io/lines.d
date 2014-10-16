@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * byLines for input ranges.
  *
@@ -5,8 +6,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D language.
  */
 
 module jaypha.io.lines;

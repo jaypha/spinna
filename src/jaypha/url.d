@@ -20,23 +20,21 @@ import jaypha.types;
 
 import jaypha.algorithm;
 
-string create_query_parm(string name, string value)
+string createQueryParm(string name, string value)
 {
   return encodeComponent(name) ~ "=" ~ encodeComponent(value);
 }
 
-string url_add_query_parm(string url, string name, string value)
+string addQueryParm(string url, string name, string value)
 {
   char u = (canFind(url, '?')?'&':'?');
-
-  return url ~ u ~ create_query_parm(name, value);;
+  return url ~ u ~ createQueryParm(name, value);;
 }
 
-string url_add_query_params(string url, strstr parms)
+string addQueryParms(string url, strstr parms)
 {
-  string u = url ~ (canFind(url, '?')?"&":"?");
-  u ~= parms.meld!create_query_parm.join("&");
-  return u;
+  char u = (canFind(url, '?')?'&':'?');
+  return url ~ u ~ parms.meld!createQueryParm.join("&");
 }
 
 unittest
@@ -44,7 +42,7 @@ unittest
   //import std.stdio;
 
   string x = "abc.com";
-  x = url_add_query_parm(x, "a", "b");
-  x = url_add_query_parm(x, "df", "y=&4");
+  x = addQueryParm(x, "a", "b");
+  x = addQueryParm(x, "df", "y=&4");
   assert(x == "abc.com?a=b&df="~encodeComponent("y=&4"));
 }

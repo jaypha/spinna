@@ -1,4 +1,4 @@
-<table class='default-widgets'>
+<table <% if (!id.empty) output.print("id='",id,"'"); %> class='default-widgets form-frag-std-layout'>
  <col class='required-column'/>
  <col class='label-column'/>
  <col class='field-column'/>
@@ -14,7 +14,7 @@
      <td class='label <%=w.name%>-invalid-msg' style='display:none'>&lt;--<span></span></td>
     </tr>
     <script>
-     $('#<%=w.id%>').data("widget").on_validate = function()
+     $('#<%=w.id%>').data("widget").onValidate = function()
      {
         if (this.valid)
         {

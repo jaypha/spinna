@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Access Control
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D programming language.
  */
 
 module jaypha.spinna.authorisation;
@@ -20,72 +19,101 @@ import std.exception;
 import jaypha.types;
 import jaypha.spinna.global;
 
+public import gen.roles;
+
+
+// Account Role is an enumeration of ulong values that are bitwise mutually exclusive.
+
+private pure nothrow @safe /* @nogc */ bool is_valid_role_type(E)(E type) if (is(E == enum) && isImplicitylyConvertible!(E,ulong))
+{
+  ulong run = 0;
+  foreach (x;EnumMembers!E)
+  {
+    if (x & run) return false;
+    run |= x;
+  }
+  return true;
+}
+
+enum isValidRoleType(E) = is_valid_role_type!E
+
+// Check for existance of Role and RoleGroup
+static assert(isValidRoleType(Role));
+static assert(isImplicitylyConvertible!(RoleGroup,ulong));
+
+
 //----------------------------------------------------------------------------
 // Authorisation - Permission to do something.
-
-
-  //----------------------------------------------------------------------------
-
-  bool has_role(ulong roles, ulong role)
-  {
-    return (roles & role) != 0;
-  }
-
-  bool has_role(ulong role)
-  {
-    if (!is_logged_in()) return false;
-    return (session["login"].get!ulong("roles") & role) != 0;
-  }
-
-  //----------------------------------------------------------------------------
-
-  ulong extract_role(R)()
-  {
-    assert(is_logged_in());
-    return extract_role!R(session["login"].get!ulong("roles"));
-  }
-
-  ulong extract_role(R)(ulong roles)
-  {
-    foreach (j; EnumMembers!R)
-      if (roles & j)
-        return j;
-    return 0;
-  }
-
-
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-// authenication - identify an account, login.
+// Does 'r1' include any of 'r2'.
 
-enum auth_string(string table) = "select id, roles from "~table~" where username=";
-
-string authenticate(Database, string table = "account")(Database database, string username, string password, bool login = true)
+bool hasRole(RoleGroup r1, RoleGroup r2)
 {
-  auto response = database.query_row(auth_string!table~database.quote(username)~" and password="~database.quote(password));
-  if (response)
-  {
-    if (login)
-    {
-      session["login"].set_str("id", response["id"]);
-      session["login"].set!ulong("roles", to!ulong(response["roles"]));
-    }
-    return response["id"];
-  }
+  return (r1 & r2) != 0;
+}
 
-  return null;
+// Does logged in person have any of 'r2'
+bool hasRole(RoleGroup r2)
+{
+  if (!isLoggedIn) return false;
+  return (session["login"].get!ulong("roles") & r2) != 0;
+}
+
+//----------------------------------------------------------------------------
+// Returns the most significant role from 'roles'
+
+Role extractRole(RoleGroup roles)
+{
+  foreach (j; EnumMembers!AccountRole)
+    if (roles & j)
+      return j;
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+// Returns the most significant roles for logged in person.
+
+Role extractRole()
+{
+  assert(isLoggedIn);
+  return extractRole!AccountRole(session["login"].get!ulong("roles"));
 }
 
 //----------------------------------------------------------------------------
 
-enum account_string(string table) = "select id from "~table~" where username=";
-
-bool account_exists(Database, string table = "account")(Database database, string username, string account_id = null)
+bool actionAuthorised(string action)
 {
-  auto aid = database.query_value(account_string!table ~ database.quote(username));
+  return actionAuthorised
+  (
+    action,
+    isLoggedIn?session["login"].get!ulong("roles"):0
+  );
+ }
 
-  if (aid is null) return false;
-  else return account_id != aid;
+bool actionAuthorised(string action, RoleGroup roles)
+{
+  // Admin always has authorisation.
+  if (hasRole(roles, AccountRole.Admin))
+    return true;
+
+  // If no permissions are defined then access is universal.
+  if (action !in permissions)
+    return true;
+
+  // Check against permission.
+  return roles & permissions[action];
+}
+
+//----------------------------------------------------------------------------
+// authenication - login
+//----------------------------------------------------------------------------
+
+void login(string userId, ulong roles)
+{
+  session["login"].setStr("id", userId);
+  session["login"].set!ulong("roles", roles);
 }
 
 //----------------------------------------------------------------------------
@@ -95,38 +123,24 @@ void logout()
   session.clear();
 }
 
-/+
-enum account_string(string table) = "select count(*) from "~table~" where username=";
-
-bool account_exists(Database, string table = "account")(Database database, string username, string account_id = null)
-{
-  import std.exception;
-  import jaypha.string;
-
-  if (id is null)
-    return (database.query_value(account_string!table ~ database.quote(username)) != "0");
-  enforce(is_digits(account_id));
-  return (database.query_value(account_string!table ~ database.quote(username) ~ " and not id="~account_id) != "0");
-}
-+/
 //----------------------------------------------------------------------------
 
-bool is_logged_in()
+@property bool isLoggedIn()
 {
   return session.has("login");
 }
 
 //----------------------------------------------------------------------------
 
-string get_logged_in_id()
+@property string loggedInId()
 {
   if (session.has("login"))
-    return session["login"].get_str("id");
+    return session["login"].getStr("id");
   else
     return null;
 }
 
-ulong get_logged_in_roles()
+@property ulong loggedInRoles()
 {
   if (session.has("login"))
     return session["login"].get!ulong("roles");

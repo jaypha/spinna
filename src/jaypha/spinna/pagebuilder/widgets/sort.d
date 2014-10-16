@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Widget for list sorting.
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D language.
  */
 
 module jaypha.spinna.pagebuilder.widgets.sort;
@@ -41,26 +40,24 @@ class SortWidget : Widget
   this(HtmlForm _form, string _name)
   {
     super(_form, _name, null, true,"ul");
-    add_class("sort-widget");
+    addClass("sort-widget");
     _form.hiddens[_name] = "";
   }
   
   override void copy(TextOutputStream output)
   {
-    form.doc.page_head.add_script("$('#"~id~"').sortable({update: function(e,u){ sort_update('"~id~"','"~name~"','"~form.id~"')}});", true);
-
-
     foreach (item; options)
-      add("<li id='"~id~"-"~item.value~"'>"~encode_special(item.label)~"</li>");
+      add("<li id='"~id~"-"~item.value~"'>"~encodeSpecial(item.label)~"</li>");
 
     super.copy(output);
+    ouput.print(startUpJavascript("$('#"~id~"').sortable({update: function(e,u){ sortUpdate('"~id~"','"~name~"','"~form.id~"')}});"));
   }
 
   private:
     string _n;
 }
 
-string[] extract_sort_value(StrHash request, string name)
+string[] extractSortValue(StrHash request, string name)
 {
   if (!(name in request))
     return [];

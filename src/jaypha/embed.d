@@ -14,7 +14,7 @@ module jaypha.embed;
 
 enum TplDState { Code, Text, Short, Dot };
 
-@trusted pure nothrow bool is_it(const(char)[] s, uint pos, dchar c)
+@trusted pure nothrow bool isIt(const(char)[] s, uint pos, dchar c)
 {
   return  (pos < s.length && s[pos] == c);
 }
@@ -34,7 +34,7 @@ string embedD(string s, string fn = "write")
 
     if (state == TplDState.Text)
     {
-      if (ch == '<' && is_it(s, i+1,'%'))
+      if (ch == '<' && isIt(s, i+1,'%'))
       {
         /* switching to embedded D */
 
@@ -45,12 +45,12 @@ string embedD(string s, string fn = "write")
         }
         i+=2;
         
-        if (is_it(s, i,'='))
+        if (isIt(s, i,'='))
         {
           state = TplDState.Short;
           ++i;
         }
-        else if (is_it(s, i,'.'))
+        else if (isIt(s, i,'.'))
         {
           state = TplDState.Dot;
           ++i;
@@ -75,7 +75,7 @@ string embedD(string s, string fn = "write")
     }
     else
     {
-      if (ch == '%' && is_it(s, i+1,'>'))
+      if (ch == '%' && isIt(s, i+1,'>'))
       {
         /* embedded D gets printed, switching back to text */
         if (temp.length)

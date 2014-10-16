@@ -13,19 +13,16 @@
 
 module config.general;
 
-pragma(msg,"You should copy config.general into your own project");
+pragma(msg,"You should copy config.general into your own project (and remove this pragma)");
 
-enum max_timeout = 60;
+// Time limit to process request. (TODO Not yet implemented).
+enum maxTimeout = 60;
 
 // Session configs.
 
-enum session_dir = "/tmp/";
-enum session_time_limit = 20*600000000; // 20 minutes;
+enum sessionDir = "/tmp/";
+enum sessionTimeLimit = 20*600000000; // 20 minutes;
 
 // jQuery
 
-enum jquery_src = "http://code.jquery.com/jquery-1.10.2.min.js";
-
-// Directory used by IconButton.
-
-enum icon_file_dir = "/images/icons/";
+enum jquerySrc = "http://code.jquery.com/jquery-1.10.2.min.js";

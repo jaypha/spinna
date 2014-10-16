@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Widget for boolean values.
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D programming language.
  */
 
 /*
@@ -49,7 +48,7 @@ class BooleanWidget : Widget
     HtmlForm _form,
     string _name,
     string _label,
-    bool _required = false
+    bool _required
   )
   {
     super(_form, _name, _label, _required);

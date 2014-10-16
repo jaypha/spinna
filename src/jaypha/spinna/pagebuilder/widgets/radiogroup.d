@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Radio group widget.
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D language.
  */
 
 module jaypha.spinna.pagebuilder.widgets.radiogroup;
@@ -45,19 +44,14 @@ class RadioGroupWidget: Widget
   {
     super(_form, _name, _label, _required, "span");
     options = _options;
-    add_class("enum-widget");
-    add_class("radiogroup-widget");
-    add(new DelegateComponent(&print_innards));
+    addClass("enum-widget");
+    addClass("radiogroup-widget");
   }
 
   override void copy(TextOutputStream output)
   {
-    super.copy(output);
-    output.print(javascript("new EnumGroupWidget($('#"~id~"'),'"~_name~"',{ label: '"~label~"', minSel: "~(required?"1":"0")~", maxSel: 1 });"));
-  }
+    auto c = appender!string();
 
-  void print_innards(TextOutputStream c)
-  {
     foreach (o;options)
     {
       auto option_id = id~"-"~o.value;
@@ -77,10 +71,14 @@ class RadioGroupWidget: Widget
         c.put(" checked='checked'");
       c.put("/>");
     }
+    put(c.data);
+
+    super.copy(output);
+    output.print(javascript("new EnumGroupWidget($('#"~id~"'),'"~_name~"',{ label: '"~label~"', minSel: "~(required?"1":"0")~", maxSel: 1 });"));
   }
 
-  @property vertical() { add_class("vertical"); remove_class("horizontal"); }
-  @property horizontal() { add_class("horizontal"); remove_class("vertical"); }
+  @property vertical() { addClass("vertical"); removeClass("horizontal"); }
+  @property horizontal() { addClass("horizontal"); removeClass("vertical"); }
 
   EnumeratedOption[] options;
   private:

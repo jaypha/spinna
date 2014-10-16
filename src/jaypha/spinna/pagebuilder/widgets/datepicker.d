@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Widget for date values
  *
@@ -7,15 +8,12 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D language.
  */
 
 module jaypha.spinna.pagebuilder.widgets.datepicker;
 
 public import jaypha.spinna.pagebuilder.widgets.widget;
 
-//import std.array;
 import std.conv;
 import jaypha.html.helpers;
 
@@ -40,21 +38,21 @@ class DatePickerWidget : Widget
     HtmlForm _form,
     string _name,
     string _label,
-    bool _required,
+    bool _required
   )
   {
     super(_form, _name, _label, _required, "input");
-    add_class("date-widget");
+    addClass("date-widget");
   }
 
   override void copy(TextOutputStream output)
   {
+    output.print("<input type='hidden' name='"~name~"' id='"~id~"-ret'/>");
     auto x = name;
     name = null;
     attributes["readonly"] = "readonly";
     super.copy(output);
     name = x;
-    output.print("<input type='hidden' name='"~name~"' id='"~id~"-ret'/>");
     output.print(javascript("new DatePickerWidget($('#"~id~"'), $('#"~id~"-ret'), {label: '"~label~"', required:"~(required?"true":"false")~"});"));
   }
 }

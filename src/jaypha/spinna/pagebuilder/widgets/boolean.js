@@ -1,3 +1,14 @@
+// Written in javascript
+/*
+ * JS for boolean widgets
+ *
+ * Copyright (C) 2014 Jaypha.
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
 
 
 function BooleanWidget(jqo, options)
@@ -60,7 +71,7 @@ BooleanWidget.prototype.validate = function()
   this.msg = msg;
   this.valid = (msg === null);
 
-  if (this.on_validate) this.on_validate();
+  if (this.onValidate) this.onValidate();
   return this.valid;
 }
 

@@ -54,13 +54,8 @@ void extractMimeParams(string source, ref string[string] parameters)
 
 //-----------------------------------------------------------------------------
 
-import Backtrace = backtrace.backtrace;
-
 unittest
 {
-  import std.stdio;
-  Backtrace.install(stderr);
-
   string t1 = "; bean  = (not this)rock ";
   string t2 = ";dog(canine)  = \"A (canine) animal\"  ";
   string t3 = " ;(c)rabbit=jack;jack=\"\"";

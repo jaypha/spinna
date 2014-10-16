@@ -15,7 +15,7 @@
      <%
       foreach (o; options)
       {
-        output.print("<li class='selected-",o.value,"' style='display:none'>",encode_special(o.label),"</li>");
+        output.print("<li class='selected-",o.value,"' style='display:none'>",encodeSpecial(o.label),"</li>");
       }
      %>
     </ul>
@@ -25,7 +25,7 @@
      <%
       foreach (o; options)
       {
-        output.print("<li class='unselected-",o.value,"' style='display:none'>",encode_special(o.label),"</li>");
+        output.print("<li class='unselected-",o.value,"' style='display:none'>",encodeSpecial(o.label),"</li>");
       }
      %>
     </ul>

@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Widget package. Includes the common form widgets.
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D language.
  */
 
 module jaypha.spinna.pagebuilder.widgets;

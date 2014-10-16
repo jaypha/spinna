@@ -1,9 +1,26 @@
+//Written in the D programming language
+/*
+ * Extract properties from a string.
+ *
+ * Copyright (C) 2014 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
+
 module jaypha.properties;
 
 //import std.algorithm;
 //import std.array;
 
-string[string] extract_props(string source)
+/*
+ * Properties are one per line in the format "property : value".
+ * '#' indicates comment.
+ */
+
+string[string] extractProperties(string source)
 {
   import std.string : splitLines, indexOf, strip;
 

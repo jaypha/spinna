@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Base class for dynamic widgets
  *
@@ -7,14 +8,15 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D language.
  */
  
 module jaypha.spinna.pagebuilder.widgets.widget;
 
 public import jaypha.spinna.pagebuilder.htmlelement;
 public import jaypha.spinna.pagebuilder.htmlform;
+
+public import std.json;
+import std.array;
 
 abstract class Widget : HtmlElement
 {
@@ -33,10 +35,10 @@ abstract class Widget : HtmlElement
     string _name,
     string _label,
     bool _required,
-    string _tag_name = "div"
+    string _tagName = "div"
   )
   {
-    super(_tag_name);
+    super(_tagName);
     form = _form;
     name = _name;
     label = _label;
@@ -55,10 +57,13 @@ abstract class Widget : HtmlElement
       value = form.values[name];
     super.copy(output);
   }
+
+  JSONValue toJson() { return JSONValue(null); }
 }
 
 class WidgetComponent(alias tpl = "jaypha/spinna/pagebuilder/widgets/default_widgets.tpl") : Component
 {
+  string id;
   Widget[] widgets;
 
   mixin TemplateCopy!tpl;

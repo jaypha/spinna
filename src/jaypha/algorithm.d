@@ -13,7 +13,8 @@
 
 module jaypha.algorithm;
 
-import std.algorithm, std.typecons, std.range, std.array, std.traits;
+public import std.algorithm;
+import std.typecons, std.range, std.array, std.traits;
 
 //----------------------------------------------------------------------------
 // Map-like algorithm that merges the index and values of an associative
@@ -80,38 +81,39 @@ T[] diff(T)(T[] primary, T[] secondary)
 auto findSplit(R1,R2)(ref R1 haystack, R2 needle) //if ((ElementType!R1 == ElementType!R2) && isInputRange!(R1) && hasSlicing!(R2))
 {
   alias ElementType!R2 E;
-  R2 first_part, second_part;
+  R2 firstPart, secondPart;
 
   while (true)
   {
-    if (startsWith(needle, second_part))
+    if (startsWith(needle, secondPart))
     {
-      foreach (n; needle[second_part.length .. $])
+      foreach (n; needle[secondPart.length .. $])
       {
         if (haystack.empty || haystack.front != n) break;
-        second_part ~= n;
+        secondPart ~= n;
         haystack.popFront();
       }
-      if (needle.length == second_part.length)
+      if (needle.length == secondPart.length)
       {
-        assert(equal(needle, second_part));
-        return tuple(first_part, second_part);
+        assert(equal(needle, secondPart));
+        return tuple(firstPart, secondPart);
       }
       if (haystack.empty)
-        return tuple(first_part~second_part, uninitializedArray!(R2)(0));
+        return tuple(firstPart~secondPart, uninitializedArray!(R2)(0));
       else
       {
-        second_part ~= haystack.front;
+        secondPart ~= haystack.front;
         haystack.popFront();
       }
     }
 
-    first_part ~= second_part[0];
-    second_part = second_part[1..$];
+    firstPart ~= secondPart[0];
+    secondPart = secondPart[1..$];
   }
 }
 
 alias findSplit find_split;
+
 
 unittest
 {
@@ -136,4 +138,32 @@ unittest
   assert(res3[0] == "");
   assert(res3[1] == "a");
   assert(haystack == "sdfjkewu");
+}
+
+//----------------------------------------------------------------------------
+// Similar to std.algorithm.map except that the mapping function is not a
+// template parameter
+
+struct rtMap(R,T) if(isInputRange!R)
+{
+  this(R r, T delegate(ElementType!R) p)
+  {
+    result = r;
+    prepare = p;
+    _front = prepare(result.front);
+  }
+
+  @property T front() { return _front; }
+  @property bool empty() { return result.empty; }
+  void popFront()
+  {
+    result.popFront();
+    if (!result.empty)
+      _front = prepare(result.front);
+  }
+
+  private:
+    R result;
+    T _front;
+    T delegate(ElementType!R) prepare;
 }

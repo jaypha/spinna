@@ -116,8 +116,6 @@ struct HttpRequest
 void prepare(IRange)(ref HttpRequest request, strstr env, IRange input)
   if (isByteRange!IRange)
 {
-  request.clear();
-
   try
   {
     request.environment = env;

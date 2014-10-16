@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Constructs a HTML <table> element.
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D language.
  */
 
 module jaypha.spinna.pagebuilder.htmltable;
@@ -19,47 +18,47 @@ class HtmlTableRow : HtmlElement
 {
   enum CellType : string { th = "th", td = "td" }
 
-  this(CellType ct) { super("tr"); cell_type = ct; }
+  this(CellType ct) { super("tr"); cellType = ct; }
 
   HtmlElement cell()
   {
-    auto c = new HtmlElement(cell_type);
+    auto c = new HtmlElement(cellType);
     
     add(c);
     return c;
   }
 
   private:
-    CellType cell_type;
+    CellType cellType;
 }
 
 
 class HtmlTable : HtmlElement
 {
-  string[] column_classes;
+  string[] columnClasses;
 
-  this() { super("table"); t_body = new Composite(); }
+  this() { super("table"); tBody = new Composite(); }
 
-  HtmlTableRow head_row()
+  HtmlTableRow headRow()
   {
-    if (!t_head) t_head = new Composite();
+    if (!tHead) tHead = new Composite();
     auto c = new HtmlTableRow(HtmlTableRow.CellType.th);
-    t_head.add(c);
+    tHead.add(c);
     return c;
   }
 
-  HtmlTableRow body_row()
+  HtmlTableRow bodyRow()
   {
     auto c = new HtmlTableRow(HtmlTableRow.CellType.td);
-    t_body.add(c);
+    tBody.add(c);
     return c;
   }
 
-  HtmlTableRow foot_row()
+  HtmlTableRow footRow()
   {
-    if (!t_foot) t_foot = new Composite();
+    if (!tFoot) tFoot = new Composite();
     auto c = new HtmlTableRow(HtmlTableRow.CellType.td);
-    t_foot.add(c);
+    tFoot.add(c);
     return c;
   }
 
@@ -67,24 +66,24 @@ class HtmlTable : HtmlElement
   {
     foreach (c; column_classes)
       add("<col class='"~c~"'/>");
-    if (t_head)
+    if (tHead)
     {
       add("<thead>");
-      add(t_head);
+      add(tHead);
       add("</thead>");
     }
     add("<tbody>");
-    add(t_body);
+    add(tBody);
     add("</tbody>");
-    if (t_foot)
+    if (tFoot)
     {
       add("<tfoot>");
-      add(t_foot);
+      add(tFoot);
       add("</tfoot>");
     }
     super.copy(output);
   }
 
   private:
-    Composite t_head, t_body, t_foot;
+    Composite tHead, tBody, tFoot;
 }

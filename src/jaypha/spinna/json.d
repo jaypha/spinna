@@ -23,12 +23,12 @@ import std.conv;
 //--------------------------------------------------------------------------
 // Transfers the contents of a JSON structure into an HTTP response.
 
-void transfer(ref JSONValue doc, ref HttpResponse response, bool no_cache = true)
+void transfer(ref JSONValue doc, ref HttpResponse response, bool noCache = true)
 {
   auto s = toJSON(&doc);
 
-  if (no_cache)
-    response.no_cache();
+  if (noCache)
+    response.noCache();
   response.content_type("application/json; charset=utf-8");
   response.header("Content-Length", to!string(s.length));
   response.entity = cast(ByteArray)s;

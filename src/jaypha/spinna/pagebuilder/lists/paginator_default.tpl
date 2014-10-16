@@ -1,38 +1,38 @@
 <%
-  ulong start_num = ((page_number <= 2) ? 1 : (page_number - 2));
+  ulong startNum = ((pageNumber <= 2) ? 1 : (pageNumber - 2));
 
-  ulong finish_num = start_num + 5;
-  if (finish_num > num_pages)
+  ulong finishNum = startNum + 5;
+  if (finishNum > numPages)
   {
-    finish_num = num_pages+1;
-    if (finish_num <= 5)
-      start_num = 1;
+    finishNum = numPages+1;
+    if (finishNum <= 5)
+      startNum = 1;
     else
-      start_num = finish_num - 5;
+      startNum = finishNum - 5;
   }
 %>
 <table class='paginator paginator-<%=name%>'>
  <tbody>
   <tr>
    <%
-      if (page_number != 1)
+      if (pageNumber != 1)
       {
-        output.print("<td>",html_link(link(1),encode_special("<<")),"</td>");
-        output.print("<td>",html_link(link(page_number-1),encode_special("<")),"</td>");
+        output.print("<td>",htmlLink(link(1),encodeSpecial("<<")),"</td>");
+        output.print("<td>",htmlLink(link(pageNumber-1),encodeSpecial("<")),"</td>");
       }
    
-      foreach (i; start_num..finish_num)
+      foreach (i; startNum..finishNum)
       {
-        if (i == page_number)
+        if (i == pageNumber)
           output.print("<td class='paginator-current'>",i,"</td>");
         else
-          output.print("<td>",html_link(link(i),to!string(i)),"</td>");
+          output.print("<td>",htmlLink(link(i),to!string(i)),"</td>");
       }
 
-      if (page_number != num_pages)
+      if (pageNumber != numPages)
       {
-        output.print("<td>",html_link(link(page_number+1),encode_special(">")),"</td>");
-        output.print("<td>",html_link(link(num_pages),encode_special(">>")),"</td>");
+        output.print("<td>",htmlLink(link(pageNumber+1),encodeSpecial(">")),"</td>");
+        output.print("<td>",htmlLink(link(numPages),encodeSpecial(">>")),"</td>");
       }
    %>
   </tr>

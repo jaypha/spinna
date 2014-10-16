@@ -1,0 +1,21 @@
+processRequest() is the main function that handles requests. It performs the following steps
+
+1. Interperet the HTTP request data and put into an HttpRequest structure.
+2. Run the router to determine which service to call. Failure results in a 404 response.
+3. Test if service is authorised. Generate either a 303 or a 403 if not.
+4. Run the service. The service will fill out the HttpResponse object.
+5. Catch any exceptions to generate an error page.
+6. Output the HTTP response.
+
+
+processRequest() is in the jaypha.spinna.process module.
+
+
+env - An AA of environment variables. As a concession to FCGI, the headers of the HTTP
+input are assumed to have been extracted and put into the env array before calling.
+
+inputStream - an input range for bytes.
+outputStream - an output range for byte arrays.
+errorHandler - callback for error handling.
+
+

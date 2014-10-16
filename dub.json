@@ -1,15 +1,25 @@
 {
-  "libs-posix":
-  [
-    "dyaml"
-  ]
 	"name": "spinna",
 	"description": "Web Framework",
   "copyright": "Copyright 2014, Jaypha",
 	"authors": ["Jason den Dulk"],
 	"license": "BSL-1.0",
 	"dependencies": {
-    "dyaml",
-    "backtrace"
-  }
+    "fcgi-loop" : "",
+  },
+  "configurations":
+  [
+    {
+      "name": "makerouter",
+      "libs-posix": [ "dyaml" ],
+      "targetType": "executable",
+      "dependencies": { "dyaml" : "", "backtrace": "" },
+      "mainSourceFile": "makerouter.d"
+      "postBuildCommands":
+      [
+        "strip makerouter",
+        "mv makerouter /usr/local/bin"
+      ]
+    }
+  ]
 }

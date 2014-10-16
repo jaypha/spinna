@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Widget for integers
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D language.
  */
 
 module jaypha.spinna.pagebuilder.widgets.integer;
@@ -47,19 +46,18 @@ class IntegerWidget : Widget
   )
   {
     super(_form, _name, _label, _required, "input");
-    add_class("integer-widget");
-    min_value = _min;
-    max_value = _max;
+    addClass("integer-widget");
+    minValue = _min;
+    maxValue = _max;
   }
 
   override void copy(TextOutputStream output)
   {
     super.copy(output);
-    output.print(javascript("new IntegerWidget($('#"~id~"'), {label: '"~label~"', required: "~to!string(required)~", max:"~to!string(max_value)~",min:"~to!string(min_value)~",spinner:"~to!string(add_spinner)~"});"));
-    //output.print("<script type='text/javascript'>$(function(){$('#"~id~"').IntegerWidget({max:"~to!string(max_value)~",min:"~to!string(min_value)~",spinna:"~(add_spinner?"true":"false")~"})});</script>");
+    output.print(javascript("new IntegerWidget($('#"~id~"'), {label: '"~label~"', required: "~to!string(required)~", max:"~to!string(maxValue)~",min:"~to!string(minValue)~",spinner:"~to!string(addSpinner)~"});"));
   }
 
-  bool add_spinner = false;
-  long min_value;
-  long max_value;
+  bool addSpinner = false;
+  long minValue;
+  long maxValue;
 }

@@ -4,14 +4,13 @@
 The router is the part of the system that determines what service is required based on the
 url path given.
 
-In Spinna, the programmer specifies the router via a number of definition resource files.
-These files are written in the Fig language.
+In Spinna, the programmer specifies the router via a YAML definition file.
 
 The router definition effectively defines the website. It is interpereted by the
 "makerouter" program and D code is created which is compiled into the website program.
 
-The "process_request" rountine acceses the router code to identify the service requested
-and the function that performs it.
+The "processRequest" (jaypha.spinna.process) routine acceses the router code
+to identify the service requested and the function that performs it.
 
 In addition to specifying services, the router definition also defines the roles that are
 allowed to access the service. Makerouter extracts this information and constructs a D code

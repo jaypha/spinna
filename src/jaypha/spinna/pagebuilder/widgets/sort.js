@@ -1,10 +1,16 @@
-/******************************************************************************
+//Written in Javascript
+/*
+ * JS for sort widgets
  *
- * Sort Widget
+ * Copyright 2013 Jaypha
  *
- *****************************************************************************/
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
 
-function sort_update(id, name, formid)
+function sortUpdate(id, name, formid)
 {
   var a = $('#'+id).sortable('toArray');
   var s = a[0].replace(id+'-','');

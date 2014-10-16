@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Widget for multi line strings
  *
@@ -7,15 +8,13 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D language.
  */
 
 module jaypha.spinna.pagebuilder.widgets.text;
 
 public import jaypha.spinna.pagebuilder.widgets.widget;
 
-//import std.array;
+import std.array;
 import std.conv;
 import jaypha.html.helpers;
 
@@ -49,21 +48,44 @@ class TextWidget : Widget
   {
     _value = new TextComponent();
     super(_form, _name, _label, _required, "textarea");
-    add_class("text-widget");
-    min_length = _min;
-    max_length = _max;
+    addClass("text-widget");
+    minLength = _min;
+    maxLength = _max;
   }
 
   override void copy(TextOutputStream output)
   {
-    if (max_length != 0) attributes["maxlength"] = to!string(max_length);
+    if (maxLength != 0) attributes["maxlength"] = to!string(maxLength);
     add(_value);
     super.copy(output);
-    output.print(javascript("new StringWidget($('#"~id~"'), { label: '"~label~"', minLen: "~to!string(min_length)~", maxLen: "~to!string(max_length)~", required: "~to!string(required)~" });"));
+    output.print(javascript("new StringWidget($('#"~id~"'), { label: '"~label~"', minLength: "~to!string(min_length)~", maxLength: "~to!string(max_length)~", required: "~to!string(required)~" });"));
   }
 
-  ulong min_length = 0;
-  ulong max_length = 0;
+  ulong minLength = 0;
+  ulong maxLength = 0;
 
   string regex;
+
+  override JSONValue toJson()
+  {
+    JSONValue[string] retval = 
+    [
+      "name": JSONValue(name),
+      "type": JSONValue("string"),
+      "label": JSONValue(label),
+      "required" : JSONValue(required),
+      "subtype" : JSONValue("textarea")
+    ];
+    if (maxLength != 0)
+      retval["maxLength"] = JSONValue(maxLength);
+    if (minLength != 0)
+      retval["minLength"] = JSONValue(minLength);
+    if (!regex.empty)
+      retval["regex"] = JSONValue(regex);
+
+    if (!value.empty)
+      retval["default"] = JSONValue(value);
+
+    return JSONValue(retval);
+  }
 }

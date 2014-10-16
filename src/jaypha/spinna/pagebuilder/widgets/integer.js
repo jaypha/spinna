@@ -144,7 +144,7 @@ IntegerWidget.prototype.validate = function()
   this.msg = msg;
   this.valid = (msg === null);
 
-  if (this.on_validate) this.on_validate();
+  if (this.onValidate) this.onValidate();
   return this.valid;
 }
 

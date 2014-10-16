@@ -1,14 +1,13 @@
+//Written in the D programming language
 /*
  * Server side HTTP response.
  *
- * Copyright 2014 Jaypha
+ * Copyright (C) 2014 Jaypha
  *
  * Distributed under the Boost Software License, Version 1.0.
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D programming language.
  */
 
 module jaypha.spinna.response;
@@ -22,10 +21,7 @@ import std.string;
 
 import jaypha.types;
 
-/*
- * HttpResponse acts as an input range for ByteArrays to allow direct copying
- * to output ranges.
- */
+import jaypha.inet.mime.header;
 
 struct HttpResponse
 {
@@ -35,77 +31,43 @@ struct HttpResponse
 
   ByteArray entity;
 
-  //---------------------------------------------------------------------------
-  // HttpResponse as an input range
-  //---------------------------------------------------------------------------
-  // This allows for easy outputting via std.range.copy
-
-  uint step = 0;
-
-  @property bool empty() { return step >=3; }
-
-  //------------------------------------
-
-  ByteArray front()
+  void copy(R)(R range) if (isOutputRange!(R,ByteArray))
   {
-    if (step == 0)
+    // Headers
+    range.put(cast(ByteArray)"Content-Type: ");
+    range.put(cast(ByteArray)mimeType);
+    range.put(cast(ByteArray)MimeEoln);
+
+    range.put(cast(ByteArray)"Status: ");
+    range.put(cast(ByteArray)to!string(httpStatus));
+    if (httpStatusMsg !is null)
     {
-      if (!response_start)
-        response_start = get_response_start();
-
-      return cast(ByteArray) response_start;
+      range.put(cast(ByteArray)" ");
+      range.put(cast(ByteArray)httpStatusMsg);
     }
-    else if (step == 1)
-    {
-      return cast(ByteArray) (headers.data ~ "\r\n");
-    }
-    else if (step == 2)
-      return entity;
-    else
-      return null;
-  }
+    range.put(cast(ByteArray)MimeEoln);
 
-  //------------------------------------
+    range.put(cast(ByteArray)headers.data);
+    range.put(cast(ByteArray)MimeEoln);
 
-  void popFront()
-  {
-    ++step;
-  }
-
-  //------------------------------------
-
-  string response_start = null;
-
-  string get_response_start()
-  {
-    auto b = appender!string();
-    b.put("Content-Type: ");
-    b.put(mime_type);
-    b.put("\r\n");
-    b.put("Status: ");
-    b.put(to!string(http_status));
-    if (http_status_msg !is null)
-    {
-      b.put(" ");
-      b.put(http_status_msg);
-    }
-    b.put("\r\n");
-    return b.data;
+    // Body
+  
+    range.put(entity);
   }
 
   //---------------------------------------------------------------------------
   // Functions for response headers.
   //---------------------------------------------------------------------------
 
-  void status(ulong http_status, string msg = null)
+  void status(ulong status, string msg = null)
   {
-    this.http_status = http_status;
-    this.http_status_msg = msg.dup;
+    httpStatus = status;
+    httpStatusMsg = msg;
   }
 
   //------------------------------------
 
-  void set_session_cookie(string name, string value, string path = "/", string domain = null)
+  void setSessionCookie(string name, string value, string path = "/", string domain = null)
   {
     headers.put("Set-Cookie: ");
     headers.put(name);
@@ -117,7 +79,7 @@ struct HttpResponse
     headers.put("\r\n");
   }
 
-  //------------------------------------
+  //-------------------------------------------------------
 
   void header(string name, const string value)
   {
@@ -127,17 +89,17 @@ struct HttpResponse
     headers.put("\r\n");
   }
 
-  //------------------------------------
+  //-------------------------------------------------------
 
-  void content_type(string type)
+  @property void contentType(string type)
   {
-    mime_type = type;
+    mimeType = type;
   }
 
-  //---------------------------------------------------------------------------
+  //-------------------------------------------------------
   // Ensures that the page will not be cached
 
-  void no_cache()
+  void noCache()
   {
     // Date in the past
     header("Expires", "Mon, 26 Jul 1997 05:00:00 GMT");
@@ -154,26 +116,30 @@ struct HttpResponse
     //header("Pragma", "no-cache");
   }
 
-  //---------------------------------------------------------------------------
+  //-------------------------------------------------------
 
-  void redirect(string url, int http_status = 303)
+  void redirect(string url, int httpStatus = 303)
   {
-    status(http_status);
+    status(httpStatus);
     header("Location",url);
   }
 
-  void prepare()
+  //-------------------------------------------------------
+  // Resets to initial state
+
+  void clear()
   {
-    mime_type = "text/plain";
-    http_status = 200;
-    http_status_msg = "OK";
+    mimeType = "text/plain";
+    httpStatus = 200;
+    httpStatusMsg = "OK";
     headers = appender!string();
+    entity = entity.init;
   }
 
   private:
-    string mime_type;
-    ulong http_status = 200;
-    string http_status_msg = "OK";
+    string mimeType = "text/plain";
+    ulong httpStatus = 200;
+    string httpStatusMsg = "OK";
     private Appender!string headers;
 }
 
@@ -187,7 +153,7 @@ unittest
 
   response.entity = cast(ByteArray)("Hello Goodbye\n");
 
-  response.content_type("text/plain");
+  response.contentType = "text/plain";
   response.status(202, "yahoo");
   response.header("X-Content", "just");
   response.copy(napp);

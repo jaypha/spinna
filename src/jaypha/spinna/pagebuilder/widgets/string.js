@@ -1,5 +1,8 @@
+// Written in Javascript
 /*
  * JS for string widgets.
+ *
+ * Part of the Spinna framework
  *
  * Copyright 2013-4 Jaypha
  *
@@ -9,12 +12,16 @@
  * Authors: Jason den Dulk
  */
 
-function make_string_widget(name, options)
+function makeStringWidget(id, name, def, value)
 {
-  var jq = $("<input type='text' class='widget string-widget' name='"+name+" id='"+name+"'/>");
-  new StringWidget(jq,options);
+  var jq = $("<input type='text' class='widget string-widget' name='"+name+" id='"+id+"'/>");
+  new StringWidget(jq,def);
+  if (typeof value != 'undefined')
+    jq.val(value);
   return jq;
 }
+
+//----------------------------------------------------------------------------
 
 function StringWidget(jqo, options)
 {
@@ -22,8 +29,8 @@ function StringWidget(jqo, options)
   {
     label: null,
     requried: false,
-    minLen: 0,
-    maxLen: 0,
+    minLength: 0,
+    maxLength: 0,
     regex: null
   };
   this.optns = jQuery.extend({}, defs, options);
@@ -55,30 +62,30 @@ StringWidget.prototype.validate = function()
   if (v == "")
   {
     if (this.required)
-      msg = this.required_msg();
+      msg = this.requiredMsg();
   }
   else
   {
-    if (this.optns.minLen != 0)
+    if (this.optns.minLength != 0)
     {
-      if (v.length < this.optns.minLen)
-        msg = this.violate_min_msg(this.optns.minLen);
+      if (v.length < this.optns.minLength)
+        msg = this.violateMinMsg(this.optns.minLength);
     }
-    if (msg === null &&  this.optns.maxLen != 0)
+    if (msg === null &&  this.optns.maxLength != 0)
     {
-      if (v.length > this.optns.maxLen)
-        msg = this.violate_max_msg(this.optns.maxLen);
+      if (v.length > this.optns.maxLength)
+        msg = this.violateMaxMsg(this.optns.maxLength);
     }
 
     if (msg === null && this.optns.regex !== null)
       if (!(regex.test(v)))
-        msg = this.invalid_msg();
+        msg = this.invalidMsg();
   }
 
   this.msg = msg;
   this.valid = msg === null;
 
-  if (this.on_validate) this.on_validate();
+  if (this.onValidate) this.onValidate();
   return this.valid;
 }
 
@@ -86,22 +93,22 @@ StringWidget.prototype.validate = function()
  * Default functions.
  */
 
-StringWidget.prototype.required_msg = function()
+StringWidget.prototype.requiredMsg = function()
 {
   return 'Cannot be empty';
 }
 
-StringWidget.prototype.invalid_msg = function()
+StringWidget.prototype.invalidMsg = function()
 {
   return 'Must be valid';
 }
 
-StringWidget.prototype.violate_min_msg = function(minLen)
+StringWidget.prototype.violateMinMsg = function(minLen)
 {
   return 'Must be at least ' + minLen + ' characters';
 }
 
-StringWidget.prototype.violate_max_msg = function(maxLen)
+StringWidget.prototype.violateMaxMsg = function(maxLen)
 {
   return 'Cannot be more than ' + maxLen + ' characters';
 }

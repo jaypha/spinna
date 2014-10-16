@@ -1,5 +1,6 @@
+//Written in the D programming language
 /*
- * A persistant storage of values.
+ * A session persistant storage of values.
  *
  * Copyright 2013 Jaypha
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D programming language.
  */
 
 module jaypha.spinna.session;
@@ -37,7 +36,7 @@ import config.general;
 struct Session
 {
   @property bool expired() { if (!active) load(this); return _expired; }
-  string session_id;
+  string sessionId;
 
   Activity opIndex(string name) { return get(name); }
 
@@ -57,7 +56,7 @@ struct Session
 
 
   void renew() { _expired = false; }
-  this(string sessionid = null) { this.session_id = session_id; }
+  this(string sid = null) { this.sessionId = sid; }
 
   bool active = false;
 
@@ -77,7 +76,7 @@ struct Session
   void clear()
   {
     activities = activities.init;
-    session_id = null;
+    sessionId = null;
     active = false;
   }
 
@@ -92,8 +91,8 @@ class Activity
   final void set(T)(string name, T value) { values[name] = serialize!(T)(value); }
   final void unset(string name) { values.remove(name); }
   
-  alias set!(int)    set_int;
-  alias set!(cstring) set_str;
+  alias set!(long)   setInt;
+  alias set!(string) setStr;
 
   final T get(T)(string name)
   {
@@ -106,10 +105,10 @@ class Activity
       return T.init;
   }
 
-  alias get!(int)   get_int;
-  alias get!(string) get_str;
+  alias get!(long)   getInt;
+  alias get!(string) getStr;
 
-  final bool is_set(string name) { return !((name in values) is null); }
+  final bool isSet(string name) { return !((name in values) is null); }
 
   int opApply(int delegate(ref string, ref cstring) dg)
   {
@@ -144,25 +143,25 @@ string save(ref Session sess)
     (sess.activities)
   );
 
-  if (sess.session_id is null)
+  if (sess.sessionId is null)
   {
     while (true)
     {
-      sess.session_id = rndGen().take(4).map!(bin2hex).join();
-      if (!exists(session_dir~sess.session_id))
+      sess.sessionId = rndGen().take(4).map!(bin2hex).join();
+      if (!exists(sessionDir~sess.sessionId))
         break;
     }
   }
 
-  write(session_dir~sess.session_id,app.data);
-  return sess.session_id;
+  write(sessionDir~sess.sessionId,app.data);
+  return sess.sessionId;
 }
 
 void destroy(ref Session sess)
 {
   if (sess.session_id !is null)
   {
-    char[] filename = session_dir.dup ~ sess.session_id;
+    char[] filename = sessionDir.dup ~ sess.sessionId;
     remove(filename);
     sess.clear();
   }
@@ -173,7 +172,7 @@ void load(ref Session sess)
   sess.active = true;
   if (sess.session_id !is null)
   {
-    char[] filename = session_dir.dup ~ sess.session_id;
+    char[] filename = sessionDir.dup ~ sess.sessionId;
 
     if (!exists(filename))
       sess._expired = true;
@@ -181,7 +180,7 @@ void load(ref Session sess)
     {
       cstring contents = readText!string(filename);
       sess.timestamp = unserialize!(long)(contents);
-      if (Clock.currStdTime() - sess.timestamp > session_time_limit)
+      if (Clock.currStdTime() - sess.timestamp > sessionTimeLimit)
         sess._expired = true;
       sess.activities = custom_unserialize!(unserializeActivity,Activity[string])(contents);
       //auto len = checkLengthTypeStart(contents, 'o');

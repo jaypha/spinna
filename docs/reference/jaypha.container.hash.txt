@@ -90,6 +90,10 @@ Allows foreach over values. Elements are arrays, so all stored values can be acc
 
 Same as above but supplies keys as well.
 
+- void clear()
+
+Clears the structure, setting it to empty.
+
 == alias Hash!string StrHash ==
 
 Convenience type for string hash tables.

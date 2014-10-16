@@ -1,14 +1,13 @@
+//Written in the D programming language
 /*
  * Convenience functions for creating HTML.
  *
- * Copyright 2014 Jaypha
+ * Copyright (C) 2014 Jaypha
  *
  * Distributed under the Boost Software License, Version 1.0.
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D programming language.
  */
 
 
@@ -20,12 +19,12 @@ import std.array;
 
 string hidden(string name, string value)
 {
-  return "<input type='hidden' name='"~name~"' value='"~encode_special(value)~"'/>";
+  return "<input type='hidden' name='"~name~"' value='"~encodeSpecial(value)~"'/>";
 }
 
 //-----------------------------------------------------------------------------
 
-string truncated_text(string text, uint length)
+string truncatedText(string text, uint length)
 {
   if (text.length <= length) return text;
   else
@@ -34,23 +33,23 @@ string truncated_text(string text, uint length)
   }
 }
 
-string nltobr(string text)
+string nl2br(string text)
 {
   return replace(text, "\n", "<br>");
 }
 
 //-----------------------------------------------------------------------------
 
-string html_link(string link, string label = null)
+string htmlLink(string link, string label = null)
 {
   return "<a href='"~link~"'>"~((label !is null)?label:link)~"</a>";
 }
 
-enum HtmlLink(string link, string label) = "<a href='"~link~"'>"~label~"</a>";
+enum HtmlLink(string link, string label) = htmlLink(link,label);
 
 //-----------------------------------------------------------------------------
 
-string email_link(string email)
+string emailLink(string email)
 {
   auto a = appender!string();
   a.put("&#x6d;&#x61;&#105;&#108;&#116;&#111;&#x3a;"); // encoded "mailto:"
@@ -66,7 +65,7 @@ string javascript(string script)
   return "<script type='text/javascript'>\n<!--\n"~script~"\n//-->\n</script>";
 }
 
-enum JavaScript(string script) = javascript(script);
+enum Javascript(string script) = javascript(script);
 
 string startUpJavascript(string script)
 {
@@ -75,13 +74,13 @@ string startUpJavascript(string script)
 
 //-----------------------------------------------------------------------------
 
-string html_img(string src, string alt, string css_class = null, string id = null)
+string htmlImg(string src, string alt, string cssClass = null, string id = null)
 {
-  return "<img src='"~src~"' alt='"~alt~"'"~(!css_class.empty?" class='"~css_class~"'":"")~(!id.empty?" class='"~id~"'":"")~"/>";
+  return "<img src='"~src~"' alt='"~alt~"'"~(!cssClass.empty?" class='"~cssClass~"'":"")~(!id.empty?" class='"~id~"'":"")~"/>";
 }
 
-enum HtmlImg(string src, string alt, string css_class = null, string id = null)
-  = html_img(src,alt,css_class,id);
+enum HtmlImg(string src, string alt, string cssClass = null, string id = null)
+  = htmlImg(src,alt,cssClass,id);
 
 /+
 

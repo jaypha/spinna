@@ -2,7 +2,7 @@
 /*
  * Conversion routines.
  *
- * Copyright 2013 Jaypha
+ * Copyright (C) 2013 Jaypha
  *
  * Distributed under the Boost Software License, Version 1.0.
  * (See http://www.boost.org/LICENSE_1_0.txt)
@@ -12,7 +12,7 @@
 
 module jaypha.conv;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 // Converts an unsigned interger into a hex string.
 
 string bin2hex(uint i)
@@ -27,9 +27,11 @@ string bin2hex(uint i)
   return x.idup;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+// Extract the bits from a number and puts them into an aray.
+// eg. 01101b => [ 1000b, 100b, 1b ].
 
-T[] bits_to_list(T)(T v) if(__traits(isUnsigned,T))
+T[] bitsToList(T)(T v) if(__traits(isUnsigned,T))
 {
   T c = 1;
   T[] r;
@@ -44,7 +46,11 @@ T[] bits_to_list(T)(T v) if(__traits(isUnsigned,T))
   return r;
 }
 
-T list_to_bits(T)(T[] list) if(__traits(isUnsigned,T))
+//----------------------------------------------------------------------------
+// Reduces an array to a single value by or-ing them together.
+// TODO explore using std.algorithm.reduce.
+
+T listToBits(T)(T[] list) if(__traits(isUnsigned,T))
 {
   T bits;
 
@@ -53,7 +59,7 @@ T list_to_bits(T)(T[] list) if(__traits(isUnsigned,T))
   return bits;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 /+
 
@@ -106,4 +112,6 @@ unittest
   assert(bin2hex(0xB4C58A6E) == "B4C58A6E");
   assert(bin2hex(0x8765432)  == "08765432");
   assert(bin2hex(0x4B8DA00C) == "4B8DA00C");
+  assert(bitsToList(0x7A) == [ 64, 32, 16,  8, 2 ]);
+  assert(listToBits([ 64, 32, 16,  8, 2 ]) == 0x7A);
 }

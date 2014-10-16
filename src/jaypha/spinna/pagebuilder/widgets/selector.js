@@ -1,8 +1,14 @@
-/*****************************************************************************
+// Written in javascript
+/*
+ * JS for selector widgets
  *
- * Selector Widget
+ * Copyright (C) 2014 Jaypha.
  *
- ****************************************************************************/
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
 
 function SelectorWidget(jqo, options)
 {
@@ -34,10 +40,10 @@ function SelectorWidget(jqo, options)
     var v = $(this).val();
     var uv = $(".unselected-"+v, jqo);
     uv.click(function() { obj.sel(v); });
-    uv.get(0).selector_value = v;
+    uv.get(0).selectorValue = v;
     var sv = $(".selected-"+v, jqo);
     sv.click(function() { obj.unsel(v); });
-    sv.get(0).selector_value = v;
+    sv.get(0).selectorValue = v;
     if ($(this).prop("checked"))
       sv.show();
     else
@@ -46,8 +52,8 @@ function SelectorWidget(jqo, options)
 
   var x = $(".selector-search", jqo);
   x.bind('keyup', function() { obj.search(); });
-  x.bind('blur', function() { if ($(this).val() == "") { $(this).val("Search"); $(this).addClass("selector-search-empty"); this.has_content = false; } });
-  x.bind('focus', function() { if (!this.has_content) { $(this).val(""); $(this).removeClass("selector-search-empty"); this.has_content = true; } });
+  x.bind('blur', function() { if ($(this).val() == "") { $(this).val("Search"); $(this).addClass("selector-search-empty"); this.hasContent = false; } });
+  x.bind('focus', function() { if (!this.hasContent) { $(this).val(""); $(this).removeClass("selector-search-empty"); this.hasContent = true; } });
   x.val("Search");
 
   $(".selector-clear", jqo).bind("click", function() { obj.clear(); });
@@ -126,9 +132,9 @@ SelectorWidget.prototype.addButton = function(label, list)
     var button = this;
     $(".unselected li", obj.jqo).each(function()
     {
-      if (in_array(this.selector_value, button.list))
+      if (in_array(this.selectorValue, button.list))
       {
-        obj.sel(this.selector_value);
+        obj.sel(this.selectorValue);
       }
     });
   });
@@ -142,6 +148,6 @@ SelectorWidget.prototype.validate = function()
   this.msg = null;
   this.valid = true;
 
-  if (this.on_validate) this.on_validate();
+  if (this.onValidate) this.onValidate();
   return this.valid;
 }

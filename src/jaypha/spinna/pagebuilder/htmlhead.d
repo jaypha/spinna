@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Head Element for HTML.
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D language.
  */
 
 module jaypha.spinna.pagebuilder.htmlhead;
@@ -30,33 +29,31 @@ class HtmlHead : Composite
   {
     string content;
     string name;
-    string http_equiv;
+    string httpEquiv;
     string scheme;
     string lang;
     string dir;
-    
-    string get_html()
+
+    void copy(TextOutputStream output)
     {
-      auto app = appender!string();
-      app.print("<meta content='",content,"'");
+      output.print("<meta content='",content,"'");
       if (name.length)
-        app.print(" name='",name,"'");
+        output.print(" name='",name,"'");
       if (http_equiv.length)
-        app.print(" http-equiv='",http_equiv,"'");
+        output.print(" http-equiv='",httpEquiv,"'");
       if (scheme.length)
-        app.print(" scheme='",scheme,"'");
+        output.print(" scheme='",scheme,"'");
       if (lang.length)
-        app.print(" lang='",lang,"'");
+        output.print(" lang='",lang,"'");
       if (dir.length)
-        app.print(" dir='",dir,"'");
-      app.put(">");
-      return app.data;
+        output.print(" dir='",dir,"'");
+      output.println(">");
     }
   }
 
-  bool use_jquery = false;
+  bool useJquery = false;
 
-  MetaTag[] metatags;
+  MetaTag[] metaTags;
 
   string title;         // The web page title.
   string description;   // Short description of the web page.
@@ -64,23 +61,35 @@ class HtmlHead : Composite
 
   string comment;       // Primary comment.
 
-  strstr script_files;   // Scripts that are stored in external files.
-  strstr css_files;      // Stylesheet files.
-  string[] css_text;     // Styles to be printed in the page
+  string[] scriptFiles; // Scripts that are stored in external files.
+  string[] cssFiles;    // Stylesheet files.
+  string[] cssText;    // Styles to be printed in the page
 
-  void set_script(string name, string text, bool onload = false)
+  void addScriptFile(string file)
   {
-    if (onload) named_onload_scripts[name] = text;
-    else named_scripts[name] = text;
+    if (!canFind(scriptFiles,file))
+      scriptFiles ~= file;
   }
 
-  void add_script(string text, bool onload = false)
+  void addCssFile(string file)
   {
-    if (onload) ordinary_onload_scripts ~= text;
-    else ordinary_scripts ~= text;
+    if (!canFind(cssFiles,file))
+      cssFiles ~= file;
   }
 
-  void add_seo(strstr data)
+  void setScript(string name, string text, bool onload = false)
+  {
+    if (onload) namedOnloadScripts[name] = text;
+    else namedScripts[name] = text;
+  }
+
+  void addScript(string text, bool onload = false)
+  {
+    if (onload) ordinaryOnloadScripts ~= text;
+    else ordinaryScripts ~= text;
+  }
+
+  void addSeo(strstr data)
   {
     if ("meta_keywords" in data)
       keywords ~= data["meta_keywords"];
@@ -103,18 +112,23 @@ class HtmlHead : Composite
     if (description.length)
     {
       output.println("<meta name='description' content=");
-      output.println("'",encode_special(description),"'");
+      output.println("'",encodeSpecial(description),"'");
       output.println("/>");
     }
 
     if (keywords.length)
     {
       output.println("<meta name='keywords' content='");
-      output.println(keywords.map!encode_special().join(" "));
+      output.println(keywords.map!encodeSpecial().join(" "));
       output.println("'/>");
     }
 
+    foreach (mt; metaTags)
+      mt.copy(output);
+
     foreach (f;css_files)
+      output.println("<link rel='stylesheet' type='text/css' href='",f,"'/>");
+    foreach (f;cssFiles)
       output.println("<link rel='stylesheet' type='text/css' href='",f,"'/>");
 
     if (css_text.length)
@@ -125,27 +139,29 @@ class HtmlHead : Composite
       output.println("-->\n</style>");
     }
 
-    if (use_jquery || named_onload_scripts.length || ordinary_onload_scripts.length)
+    if (useJquery || namedOnloadScripts.length || ordinaryOnloadScripts.length)
       output.println("<script type='text/javascript' src='",jquery_src,"'></script>");
     foreach (f;script_files)
       output.println("<script type='text/javascript' src='",f,"'></script>");
+    foreach (f;scriptFiles)
+      output.println("<script type='text/javascript' src='",f,"'></script>");
 
-    if (named_onload_scripts.length || named_scripts.length ||
-        ordinary_onload_scripts.length || ordinary_scripts.length)
+    if (namedOnloadScripts.length || namedScripts.length ||
+        ordinaryOnloadScripts.length || ordinaryScripts.length)
     {
       output.println("<script type='text/javascript'>");
       output.println("<!--");
-      foreach (t;named_scripts)
+      foreach (t;namedScripts)
         output.println(t);
-      foreach (t;ordinary_scripts)
+      foreach (t;ordinaryScripts)
         output.println(t);
 
-      if (named_onload_scripts.length || ordinary_onload_scripts.length)
+      if (namedOnloadScripts.length || ordinaryOnloadScripts.length)
       {
         output.println("$(function(){");
-        foreach (t;named_onload_scripts)
+        foreach (t;namedOnloadScripts)
           output.println(t);
-        foreach (t;ordinary_onload_scripts)
+        foreach (t;ordinaryOnloadScripts)
           output.println(t);
         output.println("});");
       }
@@ -158,9 +174,9 @@ class HtmlHead : Composite
   }
 
   private:
-    strstr named_scripts;
-    strstr named_onload_scripts;
-    string[] ordinary_scripts;
-    string[] ordinary_onload_scripts;
+    strstr namedScripts;
+    strstr namedOnloadScripts;
+    string[] ordinaryScripts;
+    string[] ordinaryOnloadScripts;
 
 }

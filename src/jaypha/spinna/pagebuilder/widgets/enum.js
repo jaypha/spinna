@@ -1,3 +1,17 @@
+// Written in Javascript
+/*
+ * JS for check box and radio group widgets
+ *
+ * Part of the Spinna framework
+ *
+ * Copyright 2013-4 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
+
 function EnumGroupWidget(jqo,name,options)
 {
   var defs =
@@ -87,6 +101,6 @@ EnumGroupWidget.prototype.validate = function()
 
   this.valid = (this.msg === null);
 
-  if (this.on_validate) this.on_validate();
+  if (this.onValidate) this.onValidate();
   return this.valid;
 }

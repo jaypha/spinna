@@ -1,3 +1,4 @@
+//Written in the D programming language
 /*
  * Component for paginator managed lists.
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D programming language.
  */
 
 module jaypha.spinna.pagebuilder.lists.paged_list;
@@ -37,18 +36,18 @@ class PagedList
 
   override void copy(TextOutputStream output)
   {
-    if (paginator.display_all)
+    if (paginator.displayAll)
     {
-      content.set_start(0);
-      content.set_limit(0);
+      content.start = 0;
+      content.limit = 0;
     }
     else
     {
-      content.set_limit(paginator.page_size);
-      content.set_start((paginator.page_number-1)*paginator.page_size);
+      content.limit = paginator.pageSize;
+      content.start = (paginator.pageNumber-1)*paginator.pageSize;
     }
 
-    paginator.num_pages = (content.size + paginator.page_size - 1)/paginator.page_size;
+    paginator.numPages = (content.length + paginator.pageSize - 1)/paginator.pageSize;
 
     mixin(TemplateOutput!tpl);
   }
