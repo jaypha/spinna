@@ -1,0 +1,22 @@
+table.toolbar-ex { width: auto; }
+
+.toolbar-ex  td
+{
+	vertical-align: top;
+}
+
+.widget-row td
+{
+	padding:1px;
+}
+
+.widget-row td.gap1 { padding: 0 1px; border-right:1px solid #F58220; }
+.widget-row td.gap2 { padding: 0 1px; }
+
+.toolbar-label
+{
+  text-align:center;
+	font-size: 11px;
+	font-weight:bold;
+	color: #25408F;
+}

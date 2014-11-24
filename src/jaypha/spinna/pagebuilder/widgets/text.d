@@ -22,12 +22,12 @@ import jaypha.html.helpers;
 
 class TextWidget : Widget
 {
-  TextComponent _value;
+  string _value;
 
   @property
   {
-    override string value() { return _value.text; }
-    override void value(string v) { _value.text = v; }
+    override string value() { return _value; }
+    override void value(string v) { _value = v; }
   }
 
   @property
@@ -46,7 +46,6 @@ class TextWidget : Widget
     ulong _max = 0
   )
   {
-    _value = new TextComponent();
     super(_form, _name, _label, _required, "textarea");
     addClass("text-widget");
     minLength = _min;
@@ -56,9 +55,9 @@ class TextWidget : Widget
   override void copy(TextOutputStream output)
   {
     if (maxLength != 0) attributes["maxlength"] = to!string(maxLength);
-    add(_value);
+    put(_value);
     super.copy(output);
-    output.print(javascript("new StringWidget($('#"~id~"'), { label: '"~label~"', minLength: "~to!string(min_length)~", maxLength: "~to!string(max_length)~", required: "~to!string(required)~" });"));
+    output.print(javascript("new StringWidget($('#"~id~"'), { label: '"~label~"', minLength: "~to!string(minLength)~", maxLength: "~to!string(maxLength)~", required: "~to!string(required)~" });"));
   }
 
   ulong minLength = 0;

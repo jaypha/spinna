@@ -39,6 +39,7 @@ struct Session
   string sessionId;
 
   Activity opIndex(string name) { return get(name); }
+  Activity* opBinaryRight(string op : "in")(string name) { return (name in activities); }
 
   Activity get(string name)
   {
@@ -50,7 +51,11 @@ struct Session
     return activities[name];
   }
 
-  bool has(string name) { if (!active) load(this); return !((name in activities) is null); }
+  bool has(string name)
+  {
+    if (!active) load(this);
+    return !((name in activities) is null);
+  }
 
   void remove(string name) { if (!active) load(this); activities.remove(name); }
 
@@ -80,6 +85,16 @@ struct Session
     active = false;
   }
 
+  void clobber()
+  {
+    if (sessionId !is null)
+    {
+      char[] filename = sessionDir.dup ~ sessionId;
+      .remove(filename);
+      clear();
+    }
+  }
+
   private:
     Activity[string] activities;
     bool _expired = false;
@@ -98,7 +113,7 @@ class Activity
   {
     if (name in values)
     {
-      cstring s = values[name];
+      string s = values[name];
       return unserialize!(T)(s);
     }
     else
@@ -110,7 +125,7 @@ class Activity
 
   final bool isSet(string name) { return !((name in values) is null); }
 
-  int opApply(int delegate(ref string, ref cstring) dg)
+  int opApply(int delegate(ref string, ref string) dg)
   {
     int result = 0;
     foreach (i, v; values)
@@ -122,12 +137,12 @@ class Activity
   }
 
   private:
-    cstring[string] values;
+    string[string] values;
 }
 
 string save(ref Session sess)
 {
-  auto app = appender!cstring();
+  auto app = appender!string();
 
   if (sess.expired)
     app.put(serialize!(long)(sess.timestamp));
@@ -135,7 +150,7 @@ string save(ref Session sess)
     app.put(serialize!(long)(Clock.currStdTime()));
   app.put
   (
-    custom_serialize!
+    customSerialize!
     (
       serializeActivity,
       Activity[string]
@@ -157,20 +172,10 @@ string save(ref Session sess)
   return sess.sessionId;
 }
 
-void destroy(ref Session sess)
-{
-  if (sess.session_id !is null)
-  {
-    char[] filename = sessionDir.dup ~ sess.sessionId;
-    remove(filename);
-    sess.clear();
-  }
-}
-
 void load(ref Session sess)
 {
   sess.active = true;
-  if (sess.session_id !is null)
+  if (sess.sessionId !is null)
   {
     char[] filename = sessionDir.dup ~ sess.sessionId;
 
@@ -178,11 +183,11 @@ void load(ref Session sess)
       sess._expired = true;
     else
     {
-      cstring contents = readText!string(filename);
+      string contents = readText!string(filename);
       sess.timestamp = unserialize!(long)(contents);
       if (Clock.currStdTime() - sess.timestamp > sessionTimeLimit)
         sess._expired = true;
-      sess.activities = custom_unserialize!(unserializeActivity,Activity[string])(contents);
+      sess.activities = customUnserialize!(unserializeActivity,Activity[string])(contents);
       //auto len = checkLengthTypeStart(contents, 'o');
       //foreach (i;0..len)
       //{
@@ -194,45 +199,20 @@ void load(ref Session sess)
   }
 }
 
-/*
 
-cstring serialize(T:Session)(T a)
+string serializeActivity(Activity a)
 {
-  auto a = appender!(cstring);
-  a.put("a2");  // array of two items
-  a.put(serialize!(ulong)(timestamp));
-  a.put(serialize!(Activity[string])(a.activities));
-  return app.data;
-}
-
-T unserialize (T:Session)(ref cstring str))
-{
-  T session = T("");
-  auto len checkLengthStart(str, 'a');
-  if (len != 2) throw new Exception("Bad Serialize string");
-  auto timestamp = unserialize!(ulong)(timestamp);
-  session.expired = (timestamp < x);
-  session.activities = unserilize!(Activity[string])(str);
-  return session;
-}
-
-void unserialize(ref Session session, cstring str)
-*/
-
-
-cstring serializeActivity(Activity a)
-{
-  return serialize!(const(char)[][string])(a.values);
+  return serialize!(string[string])(a.values);
 }
 
 
-Activity unserializeActivity(ref cstring str)
+Activity unserializeActivity(ref string str)
 {
   auto a = new Activity();
-  a.values = unserialize!(cstring[string])(str);
+  a.values = unserialize!(string[string])(str);
   return a;
 }
-
+/+
 unittest
 {
   import std.stdio;
@@ -285,3 +265,4 @@ unittest
   assert(wa.get!(int)("def") == 63);
   assert(wa.get!(long)("long") == 200);
 }
++/

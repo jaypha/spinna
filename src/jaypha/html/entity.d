@@ -16,6 +16,7 @@ module jaypha.html.entity;
 import std.array;
 import std.string;
 import std.traits;
+import std.range;
 
 //-----------------------------------------------------------------------------
 // Encodes any character into an HTML entity.
@@ -28,16 +29,19 @@ immutable(C)[] encode(C = char)(dchar c) if (isSomeChar!C)
 //-----------------------------------------------------------------------------
 // Encodes only special chars. All others are retuned as is.
 
-S encodeSpecial(S = string)(dchar c) if (isSomeString!S)
+immutable(C)[] encodeSpecial(C = char)(dchar c) if (isSomeChar!C)
 {
   // We use #39 instead of apos because IE does not handle it properly.
-  S[dchar] mkchars = [ '"': "&quot;", '\'': "&#39;", '&' : "&amp;", '<' : "&lt;", '>' : "&gt;" ];
+  immutable(C)[][dchar] mkchars = [ '"': "&quot;", '\'': "&#39;", '&' : "&amp;", '<' : "&lt;", '>' : "&gt;" ];
 
-  static if (is (C : char)) assert(cast(uint)c <= 0xFF);
-  else static if (is (C : wchar)) assert(cast(uint)c <= 0xFFFF);
+  debug
+  {
+    static if (is (C : char)) assert(cast(uint)c <= 0xFF);
+    else static if (is (C : wchar)) assert(cast(uint)c <= 0xFFFF);
+  }
 
   if (c in mkchars) return mkchars[c];
-  else return [c];
+  else return [cast(C)c];
 }
 
 //-----------------------------------------------------------------------------
@@ -45,7 +49,7 @@ S encodeSpecial(S = string)(dchar c) if (isSomeString!S)
 
 S encodeSpecial(S)(S s) if (isSomeString!S)
 {
-  alias ElementEcodingType!S C;
+  alias ElementEncodingType!S C;
 
   auto buf = appender!S;
   foreach (C c; s) // Do not decode
@@ -63,12 +67,8 @@ unittest
   import std.algorithm;
 
   assert(encodeSpecial('"') == "&quot;"c);
-  try {
-    encodeSpecial('\u4f3e');
-    assert(false);
-  } catch(Exception e)
-  {
-  }
+
+  //encodeSpecial('\u4f3e'); <- should fail.
 
   assert(encodeSpecial!(wchar)('"') == "&quot;"w);
   assert(encodeSpecial!(wchar)('\u4f3e') == "\u4f3e"w);

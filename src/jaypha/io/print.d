@@ -29,7 +29,7 @@ void print(Writer,S...)(Writer w, S args)
     alias typeof(arg) A;
     static if (is(A == enum))
     {
-      std.format.formattedWrite(stream, "%s", arg);
+      std.format.formattedWrite(w, "%s", arg);
     }
     else static if (isSomeString!A)
     {
@@ -51,7 +51,7 @@ void print(Writer,S...)(Writer w, S args)
     {
       arg.copy(w);
     }
-    else static if (__traits(comiles,to!string(arg))
+    else static if (__traits(compiles,to!string(arg)))
     {
       w.put(to!string(arg));
     }

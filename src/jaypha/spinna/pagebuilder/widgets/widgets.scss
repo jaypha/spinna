@@ -1,17 +1,18 @@
 .simple-toolbar * { margin-right: 5px; }
 
-input.widget, .selector-search, .boolean-widget, .sort-widget, .selector-box
+input.widget, .selector-search, .boolean-widget, .sort-widget, .selector-box, .text-widget, .dropselect-widget
 {
   border: $widget-border;
   border-radius: $widget-corner;
   padding: $widget-padding;
+  background-color: white;
 }
 
 /* String -----------------------------------------------------------------*/
 
-.string-widget { width: $string-width; }
+.string-widget, .text-widget { width: $string-width; }
 
-/* Selector ---------------------------------------------------------------*/
+/* Boolean ---------------------------------------------------------------*/
 
 .boolean-widget
 {

@@ -97,8 +97,8 @@ struct HttpRequest
   void clear()
   {
     gets.clear();
-    cookies.clear();
     posts.clear();
+    cookies = cookies.init;
     files = files.init;
     rawInput = rawInput.init;
     environment = environment.init;

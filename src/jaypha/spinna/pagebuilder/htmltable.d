@@ -24,9 +24,14 @@ class HtmlTableRow : HtmlElement
   {
     auto c = new HtmlElement(cellType);
     
-    add(c);
+    super.add(c);
     return c;
   }
+
+  override Composite put(string t) { auto c = cell(); cell.add(new TextComponent!string(t)); return this; }
+  override Composite put(wstring t) { auto c = cell(); cell.put(new TextComponent!wstring(t)); return this; }
+  override Composite put(dstring t) { auto c = cell(); cell.add(new TextComponent!dstring(t)); return this; }
+  override Composite put(Component o) { auto c = cell(); cell.add(o); return this; }
 
   private:
     CellType cellType;
@@ -64,7 +69,7 @@ class HtmlTable : HtmlElement
 
   override void copy(TextOutputStream output)
   {
-    foreach (c; column_classes)
+    foreach (c; columnClasses)
       add("<col class='"~c~"'/>");
     if (tHead)
     {

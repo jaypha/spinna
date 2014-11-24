@@ -29,58 +29,9 @@ import jaypha.types;
 import jaypha.algorithm;
 import jaypha.datasource;
 
-/+
-deprecated class TableList : ListComponent
-{
-  HtmlTable table;
-  string name;
-  TableSource source;
-
-  override void set_start(ulong start) { source.set_start(start); }
-  override void set_limit(ulong limit) { source.set_start(limit); }
-  override @property ulong size() { return source.size; }
-
-  this(string _name, TableSource s) { name = _name; table = new HtmlTable(); source = s; }
-
-  override void copy(TextOutputStream output)
-  {
-    table.add_class("data");
-    table.add_class("list");
-    table.id = name~"-table";
-
-    auto thr = table.head_row();
-    foreach (c; source.headers)
-    {
-      auto cell = thr.cell();
-      cell.add(c);
-    }
-
-    source.reset();
-
-    ulong count = 0;
-    foreach (row; source)
-    {
-      auto tbr = table.body_row();
-
-      if (++count%2 == 0) tbr.add_class("even");
-      else tbr.add_class("odd");
-
-      foreach (c; row)
-      {
-        auto cell = tbr.cell();
-        cell.add(c);
-      }
-    }
-
-    table.copy(output);
-  }
-}
-+/
 class TableListComponent(DS) : ListComponent if(isDataSource!(DS))
 {
-  alias ReturnType!(DS.apply) R;
-  alias ElementType!R E;
-  alias rtMap!(R, string[]) L;
+  alias DataSourceElementType!DS E;
 
   HtmlTable table;
   string id;
@@ -89,7 +40,7 @@ class TableListComponent(DS) : ListComponent if(isDataSource!(DS))
   string[] delegate(E) mapper;
 
   @property void start(ulong s) { _start = s; }
-  @property void limit(ulong l) { _limit = s; }
+  @property void limit(ulong l) { _limit = l; }
   @property ulong length() { return source.length; }
 
   this
@@ -109,8 +60,8 @@ class TableListComponent(DS) : ListComponent if(isDataSource!(DS))
 
   override void copy(TextOutputStream output)
   {
-    table.add_class("data");
-    table.add_class("list");
+    table.addClass("data");
+    table.addClass("list");
     table.id = id;
 
     auto thr = table.headRow();
@@ -120,7 +71,8 @@ class TableListComponent(DS) : ListComponent if(isDataSource!(DS))
       cell.add(c);
     }
 
-    auto list = L(source[_start.._start+_limit], mapper);
+    auto r = (_limit == 0)?source[_start..$]:source[_start..(_start+_limit)];
+    auto list = rtMap!(typeof(r),string[])(r,mapper);
 
     ulong count = 0;
     foreach (row; list)

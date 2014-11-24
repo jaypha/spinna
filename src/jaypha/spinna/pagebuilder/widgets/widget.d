@@ -1,6 +1,6 @@
 //Written in the D programming language
 /*
- * Base class for dynamic widgets
+ * Base class for form widgets
  *
  * Copyright (C) 2014, Jaypha
  *
@@ -43,7 +43,7 @@ abstract class Widget : HtmlElement
     name = _name;
     label = _label;
     required = _required;
-    add_class("widget");
+    addClass("widget");
 
     if (_form !is null)
       id = _form.id~"-"~_name;

@@ -1,0 +1,44 @@
+// Written in CSS
+/*
+ * CSS styles for Tabbed class.
+ *
+ * Copyright (C) 2014 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
+
+div.tab-panel.inactive {
+	display: none;
+}
+
+.tab-list
+{
+  list-style: none;
+}
+
+.tab-list a {
+    background-color: $inactive-background-color;
+    color: $inactive-color;
+    display: block;
+    float: left;
+    padding: 5px 10px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.tab-list a:hover {
+    background-color: $inactive-highlight-background-color;
+}
+
+.tab-list li {
+    float: left;
+    margin: 0 1px -1px 0;
+}
+
+.tab-list li a.active {
+    background-color: $active-background-color;
+    color: $active-color;
+}

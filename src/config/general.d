@@ -18,6 +18,10 @@ pragma(msg,"You should copy config.general into your own project (and remove thi
 // Time limit to process request. (TODO Not yet implemented).
 enum maxTimeout = 60;
 
+// Paginator configs
+
+enum pageSizeDefault = 50;
+
 // Session configs.
 
 enum sessionDir = "/tmp/";

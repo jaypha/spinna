@@ -1,28 +1,40 @@
 
+DUB_PACKAGES = backtrace-d-master/source \
+               dyaml-0.5.0/source \
+               tinyendian-0.1.1/source
 
 
-JSWFILES = $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/string.js \
-           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/integer.js \
-           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/boolean.js \
-           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/enum.js \
-           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/datepicker.js \
-           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/dropdown_list.js \
-           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/autofill.js \
-           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/decimal.js \
-           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/calendar.js \
-           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/dialog_box.js \
-           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/selector.js \
-           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/form.js \
-           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/dynamic_widgets.js \
-           $(SPINNA_ROOT)/src/jquery/jquery-ui.js \
-           $(SPINNA_ROOT)/thirdparty/jquery/jquery.caret.js \
-           $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/form_fragment/std_layout.js \
+JSWFILES = src/jaypha/spinna/pagebuilder/widgets/string.js \
+           src/jaypha/spinna/pagebuilder/widgets/integer.js \
+           src/jaypha/spinna/pagebuilder/widgets/boolean.js \
+           src/jaypha/spinna/pagebuilder/widgets/enum.js \
+           src/jaypha/spinna/pagebuilder/widgets/datepicker.js \
+           src/jaypha/spinna/pagebuilder/widgets/dropdown_list.js \
+           src/jaypha/spinna/pagebuilder/widgets/autofill.js \
+           src/jaypha/spinna/pagebuilder/widgets/decimal.js \
+           src/jaypha/spinna/pagebuilder/widgets/calendar.js \
+           src/jaypha/spinna/pagebuilder/widgets/dialog_box.js \
+           src/jaypha/spinna/pagebuilder/widgets/selector.js \
+           src/jaypha/spinna/pagebuilder/widgets/form.js \
+           src/jaypha/spinna/pagebuilder/widgets/dynamic_widgets.js \
+           src/jaypha/spinna/pagebuilder/widgets/icon.js \
+           src/jaypha/spinna/pagebuilder/widgets/icon_button.js \
+           src/jaypha/spinna/pagebuilder/widgets/wide_button.js \
+           src/jaypha/spinna/pagebuilder/widgets/tabbed.js \
+           src/jquery/jquery-ui.js \
+           thirdparty/jquery/jquery.caret.js \
+           src/jaypha/spinna/pagebuilder/form_fragment/std_layout.js \
 
-JSFILES = $(SPINNA_ROOT)/src/jaypha/common.js \
-          $(SPINNA_ROOT)/thirdparty/js_date_format/js_date_format.js
+JSFILES = src/jaypha/common.js \
+          thirdparty/js_date_format/js_date_format.js
 
-SCSSWFILES = $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/widgets.scss \
-             $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/calendar.scss \
-             $(SPINNA_ROOT)/src/jaypha/spinna/pagebuilder/widgets/dialog_box.scss \
+SCSSWFILES = src/jaypha/spinna/pagebuilder/widgets/widgets.scss \
+             src/jaypha/spinna/pagebuilder/widgets/calendar.scss \
+             src/jaypha/spinna/pagebuilder/widgets/dialog_box.scss \
+             src/jaypha/spinna/pagebuilder/widgets/icon.scss \
+             src/jaypha/spinna/pagebuilder/widgets/icon_button.scss \
+             src/jaypha/spinna/pagebuilder/widgets/wide_button.scss \
+             src/jaypha/spinna/pagebuilder/widgets/toolbar_ex.scss \
+             src/jaypha/spinna/pagebuilder/widgets/tabbed.scss \
 
 SCSSFILES = 

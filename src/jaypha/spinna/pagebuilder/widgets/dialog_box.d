@@ -40,8 +40,10 @@ class DialogBox(string S) : HtmlElement
     super.add(tpl);
   }
 
-  override Composite put(const(char)[] t) { tpl.content.add(t); return this; }
-  override Composite put(Component o) { tpl.content.add(o); return this; }
+  override Composite put(string t) { tpl.content.put(t); return this; }
+  override Composite put(wstring t) { tpl.content.put(t); return this; }
+  override Composite put(dstring t) { tpl.content.put(t); return this; }
+  override Composite put(Component o) { tpl.content.put(o); return this; }
 
   override void copy(TextOutputStream output)
   {

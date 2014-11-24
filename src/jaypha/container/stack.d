@@ -28,7 +28,7 @@ struct Stack(T)
     }
 
     @property bool empty() { return q.empty; }
-    @property T front() { return q[$-1]; }
+    @property ref T front() { return q[$-1]; }
     void popFront() { q = q[0..$-1]; }
 }
 

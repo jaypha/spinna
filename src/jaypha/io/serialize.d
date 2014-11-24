@@ -110,7 +110,7 @@ string serialize(T:T[U],U)(T[U] value)
 
 //----------------------------------------------------------------------------
 
-string custom_serialize(alias F,T:T[])(T[] value)
+string customSerialize(alias F,T:T[])(T[] value)
 {
   auto x = appender!(string);
   formattedWrite(x,"a%d",value.length);
@@ -121,7 +121,7 @@ string custom_serialize(alias F,T:T[])(T[] value)
 
 //----------------------------------------------------------------------------
 
-string custom_serialize(alias F,T:T[U],U)(T[U] value)
+string customSerialize(alias F,T:T[U],U)(T[U] value)
 {
   auto x = appender!(string);
   formattedWrite(x,"o%d",value.length);
@@ -139,7 +139,7 @@ string custom_serialize(alias F,T:T[U],U)(T[U] value)
 // Used to parse the start of s, a and o types. Returns the extracted length.
 //----------------------------------------------------------------------------
 
-uint check_length_type_start(ref const(char)[] str, dchar type)
+uint checkLengthTypeStart(ref string str, dchar type)
 {
   if (str.length == 0 || str[0] != type)
     throw new Exception(format("Malformed serialize string. Expecting '%c', got %s",type,str));
@@ -169,7 +169,7 @@ enum php_z_int = ctRegex!(r"^-?\d+");
 enum php_z_uint = ctRegex!(r"^\d+");
 enum php_z_float = ctRegex!(r"^-?\d+(\.\d+)?((E|e)(\+|-)?\d+)?");
 
-T unserialize(T:bool)(ref const(char)[] str)
+T unserialize(T:bool)(ref string str)
 {
   scope(success) { str = str[2..$]; }
   if (str.length <2) throw new Exception(format("Malformed serialize string. Expecting \"b0\"/\"b1\", got \"%s\"",str));
@@ -180,7 +180,7 @@ T unserialize(T:bool)(ref const(char)[] str)
 
 //----------------------------------------------------------------------------
 
-T unserialize(T)(ref const(char)[] str) if (isIntegral!T)
+T unserialize(T)(ref string str) if (isIntegral!T)
 {
   if (str[0] != 'i')
     throw new Exception(format("Malformed serialize string. Expecting 'i', got %s",str));
@@ -197,7 +197,7 @@ T unserialize(T)(ref const(char)[] str) if (isIntegral!T)
 
 //----------------------------------------------------------------------------
 
-T unserialize(T)(ref const(char)[] str) if (isFloatingPoint!T)
+T unserialize(T)(ref string str) if (isFloatingPoint!T)
 {
   if (str[0] != 'f')
     throw new Exception(format("Malformed serialize string. Expecting 'f', got %s",str));
@@ -214,13 +214,13 @@ T unserialize(T)(ref const(char)[] str) if (isFloatingPoint!T)
 
 //----------------------------------------------------------------------------
 
-T[] unserialize(T:T[])(ref const(char)[] str)
+T[] unserialize(T:T[])(ref string str)
 {
   static if (isSomeChar!T)
   {
     // string values.
 
-    auto len = check_length_type_start(str, 's');
+    auto len = checkLengthTypeStart(str, 's');
 
     if (str[0] != ':')
       throw new Exception(format("Malformed serialize string. Expecting ':', got %s",str));
@@ -241,7 +241,7 @@ T[] unserialize(T:T[])(ref const(char)[] str)
   else
   {
     // ordinary arrays
-    auto len = check_length_type_start(str, 'a');
+    auto len = checkLengthTypeStart(str, 'a');
     
     T[] va;
     for (int i=0; i< len; ++i)
@@ -252,9 +252,9 @@ T[] unserialize(T:T[])(ref const(char)[] str)
 
 //----------------------------------------------------------------------------
 
-T[U] unserialize(T:T[U],U)(ref const(char)[] str)
+T[U] unserialize(T:T[U],U)(ref string str)
 {
-  auto len = check_length_type_start(str, 'o');
+  auto len = checkLengthTypeStart(str, 'o');
 
   T[U] va;
   for (int i=0; i< len; ++i)
@@ -268,9 +268,9 @@ T[U] unserialize(T:T[U],U)(ref const(char)[] str)
 //----------------------------------------------------------------------------
 // Allows custom unserialize functions to be used.
 .
-T[] custom_unserialize(T:T[])(ref const(char)[] str)
+T[] customUnserialize(T:T[])(ref string str)
 {
-  auto len = check_length_type_start(str, 'a');
+  auto len = checkLengthTypeStart(str, 'a');
   
   T[] va;
   for (int i=0; i< len; ++i)
@@ -281,9 +281,9 @@ T[] custom_unserialize(T:T[])(ref const(char)[] str)
 //----------------------------------------------------------------------------
 // Allows custom unserialize functions to be used.
 
-T[U] custom_unserialize(alias F,T:T[U],U)(ref const(char)[] str)
+T[U] customUnserialize(alias F,T:T[U],U)(ref string str)
 {
-  auto len = check_length_type_start(str, 'o');
+  auto len = checkLengthTypeStart(str, 'o');
 
   T[U] va;
   for (int i=0; i< len; ++i)
@@ -302,7 +302,7 @@ T[U] custom_unserialize(alias F,T:T[U],U)(ref const(char)[] str)
  * same type.
  */
 
-Variant unserialize(V:Variant)(ref const(char)[] str)
+Variant unserialize(V:Variant)(ref string str)
 {
   switch (str[0])
   {
@@ -315,7 +315,7 @@ Variant unserialize(V:Variant)(ref const(char)[] str)
     case 's':
       return Variant(unserialize!(string)(str));
     case 'a':
-      auto len = check_length_type_start(str, 'a');
+      auto len = checkLengthTypeStart(str, 'a');
 
       Variant[] va;
       foreach (i; 0..len)
@@ -324,7 +324,7 @@ Variant unserialize(V:Variant)(ref const(char)[] str)
       }
       return Variant(va);
     case 'o':
-      auto leno = check_length_type_start(str, 'o');
+      auto leno = checkLengthTypeStart(str, 'o');
       switch (str[0])
       {
         case 'b':
@@ -345,7 +345,7 @@ Variant unserialize(V:Variant)(ref const(char)[] str)
 
 //----------------------------------------------------------------------------
 
-Variant[T] unserializeV(T)(ref const(char)[] str, uint len)
+Variant[T] unserializeV(T)(ref string str, uint len)
 {
   Variant[T] vaa;
   foreach (j; 0..len)
@@ -388,20 +388,20 @@ unittest
   //assert(serialize!string(ss) == "s3:xyz");
 
   int[] x = [1,2,3];
-  cstring x_s = serialize!(int[])(x);
+  string x_s = serialize!(int[])(x);
   assert(x_s == "a3i1i2i3",x_s);
 
   int[cstring] y;
   y["a"] = 1;
   y["b"] = 2;
-  cstring y_s = serialize!(int[cstring])(y);
+  string y_s = serialize!(int[cstring])(y);
   assert(y_s == `o2s1:ai1s1:bi2`,y_s);
 
   mstring[cstring] z;
   z["a"] = "x1".dup;
   z["b"] = "y2".dup;
   z["c"] = "z3".dup;
-  cstring z_s = serialize!(mstring[cstring])(z);
+  string z_s = serialize!(mstring[cstring])(z);
   
   assert(z_s == `o3s1:as2:x1s1:bs2:y2s1:cs2:z3`,z_s);
 
@@ -409,18 +409,18 @@ unittest
   zc["a"] = "x1";
   zc["b"] = "y2";
   zc["c"] = "z3";
-  cstring zc_s = serialize!(cstring[cstring])(zc);
+  string zc_s = serialize!(cstring[cstring])(zc);
   assert(zc_s == `o3s1:as2:x1s1:bs2:y2s1:cs2:z3`,zc_s);
 
   cstring[cstring] zi;
   zi["a"] = "x1";
   zi["b"] = "y2";
   zi["c"] = "z3";
-  cstring zi_s = serialize!(cstring[cstring])(zi);
+  string zi_s = serialize!(cstring[cstring])(zi);
   assert(zi_s == `o3s1:as2:x1s1:bs2:y2s1:cs2:z3`, zi_s);
 
   int[][] td = [[1,2,3],[4,5,6,10],[7,8,9]];
-  cstring td_s = serialize!(int[][])(td);
+  string td_s = serialize!(int[][])(td);
   assert(td_s == "a3a3i1i2i3a4i4i5i6i10a3i7i8i9",td_s);
 
   int[cstring] tcd1;
@@ -437,18 +437,18 @@ unittest
 //  tcd ~= tcd1;
   //tcd ~= tcd2;
 
-  cstring tcd_s = serialize!(int[cstring][])(tcd);
+  string tcd_s = serialize!(int[cstring][])(tcd);
   // AA! assert(tcd_s == `a2o3s1:bi2s1:ai1s1:ci3o3s1:fi6s1:ei5s1:di4`,tcd_s);
 
-  cstring str = "b0b1xx";
+  string str = "b0b1xx";
   assert(unserialize!(bool)(str) == false);
   assert(unserialize!(bool)(str) == true);
   assert(str == "xx");
 
   str = "a23s241o13yy";
-  assert(check_length_type_start(str,'a') == 23);
-  assert(check_length_type_start(str,'s') == 241);
-  assert(check_length_type_start(str,'o') == 13);
+  assert(checkLengthTypeStart(str,'a') == 23);
+  assert(checkLengthTypeStart(str,'s') == 241);
+  assert(checkLengthTypeStart(str,'o') == 13);
   assert(str == "yy");
 
   str = "s5:abcdefg";
@@ -510,7 +510,7 @@ unittest
   assert(tcd2_uns["f"] == 6);
 
 
-  cstring tcd_ss = "a2o3s1:ai1s1:bi2s1:ci3o3s1:di4s1:ei5s1:fi6";
+  string tcd_ss = "a2o3s1:ai1s1:bi2s1:ci3o3s1:di4s1:ei5s1:fi6";
   auto tcd_v = unserialize!(Variant)(tcd_ss);
   assert(tcd_v.type() == typeid(Variant[]));
   assert(tcd_v.length == 2);

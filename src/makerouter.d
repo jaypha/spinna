@@ -1,5 +1,6 @@
+//Written in the D programming language
 /*
- * main program for constructing router code
+ * Main program for constructing router code
  *
  * Copyright 2014 Jaypha
  *
@@ -7,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D programming language.
  */
 
 module makerouter;
@@ -23,14 +22,20 @@ import std.getopt;
 import std.exception;
 import std.array;
 
-import dyaml.all;
+import jaypha.container.stack;
+import jaypha.container.queue;
+import jaypha.container.set;
+
+alias Stack = jaypha.container.stack.Stack;
+
+import yaml;
 
 import Backtrace = backtrace.backtrace;
 
 string preamble;
 string roletype;
 string authtype;
-string error_page = null;
+string errorPage = null;
 
 ulong[string] roles;
 
@@ -44,12 +49,20 @@ struct Context
 {
   string pattern;
   string service;
-  string node_path;  // Node path is also cumulative.
-  ulong roles;
+  string nodePath;  // Node path is also cumulative.
+  string[] roles;
   string method;
   string redirect;
   string mdule;
   string[string] format;
+
+  @property string rolesText()
+  {
+    string[] roleItems;
+    foreach (r;roles)
+      roleItems ~= "Role."~r;
+    return roleItems.join("|");
+  }
 }
 
 Stack!Context contexts;
@@ -84,23 +97,23 @@ struct Coder
 
 Coder code;
 
-set!string regexs;
+OrderedSet!string regexs;
 
-set!string modules;
+OrderedSet!string modules;
 
-bool include_functional = false;
-bool include_string = false;
+bool includeFunctional = false;
+bool includeString = false;
 
 //----------------------------------------------------------------------------
 
-void print_format(bool verbose = false)
+void printFormat(bool verbose = false)
 {
   writeln("Format: makerouter [-h] [-d<output_dir>] <input_file>");
 }
 
 //----------------------------------------------------------------------------
 
-Context context_default;
+Context contextDefault;
 
 static this()
 {
@@ -109,7 +122,7 @@ static this()
     "",
     null,
     "",
-    0,
+    null,
     "get",
     null,
     "",
@@ -122,17 +135,17 @@ static this()
 
 void main(string[] args)
 {
-  string output_dir = ".";
+  string outputDir = ".";
   bool help = false;
 
   getopt
   (
     args,
-    "d", &output_dir,
+    "d", &outputDir,
     "h", &help
   );
 
-  if (help) { print_format();  return; }
+  if (help) { printFormat();  return; }
 
   Backtrace.install(stderr);
 
@@ -144,7 +157,7 @@ void main(string[] args)
   auto chunker = stdin.byChunk(4096);
   chunker.copy(buffer);
 
-  Node root = Loader.fromString(cast(string)buffer.data).load();
+  Node root = Loader.fromString(cast(char[])buffer.data).load();
 
   //--------------------------------
 
@@ -154,92 +167,66 @@ void main(string[] args)
   if (root.containsKey("preamble"))
     preamble = root["preamble"].as!string;
 
-  if (root.containsKey("roles"))
-    defineRoles(root["roles"]);
-
-  if (root.containsKey("authtype"))
-    authtype = root["authtype"].as!string;
+  if (root.containsKey("roleModule"))
+    modules.put(root["roleModule"].as!string);
 
   if (root.containsKey("error"))
   {
-    error_page = root["error"].as!string;
-    modules.put(error_page.split(".")[0..$-1].join("."));
+    errorPage = root["error"].as!string;
+    modules.put(errorPage.split(".")[0..$-1].join("."));
   }
 
   code.put("auto find_route(string path, string method)\n{\n");
   ++code;
-  process_node(root["routes"],"root");
+  assert("routes" in root);
+  processNode(root["routes"],"root");
   code.put("return ActionInfo(null);\n");
   --code;
   code.put("}\n");
 
   //--------------------------------
 
-  //writeln(code.data);
-  
-  auto f1 = File(output_dir~"/gen/router.d", "w");
+  auto f1 = File(outputDir~"/gen/router.d", "w");
   scope(exit) { f1.close(); }
-  write_router(f1);
+  writeRouter(f1);
 
-  if (!roles.empty)
-  {
-    auto f2 = File(output_dir~"/gen/roles.d", "w");
-    scope(exit) { f2.close(); }
-    writeRoles(f2);
-  }
-
+  auto f2 = File(outputDir~"/gen/permissions.d", "w");
+  scope(exit) { f2.close(); }
+  writePermissions(f2);
 }
 
 //----------------------------------------------------------------------------
 
-void defineRoles(Node node)
-in
+void processNode(Node node, string name)
 {
-  assert(value.isSequence);
-}
-body
-{
-  ulong run = 1L;
-
-  foreach (Node f; node)
-  {
-    assert(f.isString);
-    roleName = f.as!string;
-    roles[roleName] = run;
-    run <<= run;
-  }
-}
-
-void process_node(Node node, string name)
-{
-  auto context = create_context(node, name, contexts.front);
+  auto context = createContext(node, name, contexts.front);
   if (context.service !is null)
   {
     // Having a service means we are defining a route.
-    create_service(context);
+    createService(context);
   }
   else
   {
-    create_sub_route(node, context);
+    createSubRoute(node, context);
   }
 }
 
 //----------------------------------------------------------------------------
 
-void create_service(ref Context context)
+void createService(ref Context context)
 {
   if (canFind(context.pattern,'$'))
-    create_regex_service(context);
+    createRegexService(context);
   else
-    create_static_service(context);
-  extract_permissions(context);
+    createStaticService(context);
+  extractPermissions(context);
 }
 
 //----------------------------------------------------------------------------
 
-void create_static_service(ref Context context)
+void createStaticService(ref Context context)
 {
-  include_functional = true;
+  includeFunctional = true;
 
   modules.put(context.mdule);
 
@@ -252,11 +239,11 @@ void create_static_service(ref Context context)
       "\", \"",
       context.method,
       "\", \"",
-      context.node_path,
+      context.nodePath,
       "\", \"",
       context.mdule,'.',context.service,
       "\", \"",
-      to!string(context.roles),
+      context.rolesText?context.rolesText:"0",
       "\", \"",
       context.redirect,
       "\"));\n"
@@ -266,7 +253,7 @@ void create_static_service(ref Context context)
 
 //----------------------------------------------------------------------------
 
-void create_sub_route(Node node, ref Context context)
+void createSubRoute(Node node, ref Context context)
 {
   if (node.containsKey("prefix"))
   {
@@ -274,7 +261,7 @@ void create_sub_route(Node node, ref Context context)
     code.put("{\n");
     ++code;
     code.put(text("path = path.chompPrefix(\"",node["prefix"].as!string,"\");\n")),
-    include_string = true;
+    includeString = true;
   }
 
   contexts.put(context);
@@ -282,7 +269,7 @@ void create_sub_route(Node node, ref Context context)
   foreach (string n, Node f; node)
   {
     if (f.isMapping)
-      process_node(f,n);
+      processNode(f,n);
     else
     {
       if (n == "get" || n == "put" || n == "delete" || n == "post")
@@ -290,10 +277,10 @@ void create_sub_route(Node node, ref Context context)
         Context cntxt = context;
         cntxt.method = n;
         cntxt.service = f.as!string;
-        if (cntxt.node_path.length)
-          cntxt.node_path ~= ".";
-        cntxt.node_path ~= n;
-        create_service(cntxt);
+        if (cntxt.nodePath.length)
+          cntxt.nodePath ~= ".";
+        cntxt.nodePath ~= n;
+        createService(cntxt);
       }
     }
   }
@@ -309,7 +296,7 @@ void create_sub_route(Node node, ref Context context)
 
 //----------------------------------------------------------------------------
 
-void create_regex_service(ref Context context)
+void createRegexService(ref Context context)
 {
   auto pattern = context.pattern;
   string[] params;
@@ -322,6 +309,7 @@ void create_regex_service(ref Context context)
     pattern = replace(pattern, r, "(?P<"~n~">"~v~")");
   }
   auto place = regexs.put(pattern);
+  regexs.put(pattern);
 
   code.put
   (
@@ -332,11 +320,11 @@ void create_regex_service(ref Context context)
       "\",\"",
       context.method,
       "\", \"",
-      context.node_path,
+      context.nodePath,
       "\", \"",
       context.mdule,'.',context.service,
       "\", \"",
-      to!string(context.roles),
+      context.rolesText?context.rolesText:"0",
       "\", \"",
       context.redirect,
       "\", \"",
@@ -348,13 +336,13 @@ void create_regex_service(ref Context context)
 
 //----------------------------------------------------------------------------
 
-Context create_context(Node node, string name, Context previous)
+Context createContext(Node node, string name, Context previous)
 {
   Context cntxt = previous;
 
-  if (cntxt.node_path.length)
-    cntxt.node_path ~= ".";
-  cntxt.node_path ~= name;
+  if (cntxt.nodePath.length)
+    cntxt.nodePath ~= ".";
+  cntxt.nodePath ~= name;
   if (node.containsKey("service"))
     cntxt.service = node["service"].as!string;
   if (node.containsKey("pattern"))
@@ -364,12 +352,12 @@ Context create_context(Node node, string name, Context previous)
   if (node.containsKey("roles"))
   {
     if (node["roles"].isScalar)
-      cntxt.roles = roles[node["roles"].as!string];
+      cntxt.roles = [ node["roles"].as!string ];
     else
     {
-      cntxt.roles = 0;
+      cntxt.roles = [];
       foreach (string v; node["roles"])
-        cntxt.roles |= roles[v];
+        cntxt.roles ~= v;
     }
   }
   if (node.containsKey("redirect"))
@@ -393,19 +381,19 @@ Context create_context(Node node, string name, Context previous)
 
 //----------------------------------------------------------------------------
 
-ulong[string] allowed_roles;
+string[string] allowedRoles;
 
-void extract_permissions(ref Context context)
+void extractPermissions(ref Context context)
 {
-  if (context.roles == 0)
+  if (context.roles.empty)
     return;
 
-  allowed_roles[context.node_path] = context.roles;
+  allowedRoles[context.nodePath] = context.rolesText;
 }
 
 //----------------------------------------------------------------------------
 
-void write_router(File writer)
+void writeRouter(File writer)
 {
   writer.writeln("/*\n * Detrmines which function to call based on the path\n *");
   if (preamble != "")
@@ -420,26 +408,26 @@ void write_router(File writer)
   writer.writeln("module gen.router;");
   writer.writeln();
   writer.writeln("public import jaypha.spinna.router_tools;");
-  if (include_functional)
+  if (includeFunctional)
     writer.writeln("import std.functional;");
-  if (include_string)
+  if (includeString)
     writer.writeln("import std.string;");
   writer.writeln("import std.exception;");
   
 
   writer.writeln();
-  foreach (m; modules.Range)
+  foreach (m; modules.range)
     writer.writeln("static import ",m,";");
 
-  if (error_page !is null)
-    writer.writeln("alias error_page ",error_page,";");
+  if (errorPage !is null)
+    writer.writeln("alias error_page ",errorPage,";");
 
   if (regexs.size() > 0)
   {
     int count = 0;
     writer.writeln();
     writer.writeln("import std.regex;");
-    foreach (r;regexs.Range)
+    foreach (r;regexs.range)
       writer.writeln("enum rx",count++," = ctRegex!(`^",r,"$`);");
   }
 
@@ -460,7 +448,7 @@ void write_router(File writer)
 
 //----------------------------------------------------------------------------
 
-void writeRoles(File writer)
+void writePermissions(File writer)
 {
 
   writer.writeln("/*\n * Info about authorisation for each action\n *");
@@ -473,9 +461,10 @@ void writeRoles(File writer)
   writer.writeln(" * Generated file. Do not edit");
   writer.writeln(" */");
   writer.writeln();
-  writer.writeln("module gen.roles;");
+  writer.writeln("module gen.permissions;");
   writer.writeln();
   writer.writeln("import std.exception;");
+/+
   string[] rdef;
   foreach (s,v; roles)
     rdef ~= "  "~s~" = "~to!string(v);
@@ -485,92 +474,19 @@ void writeRoles(File writer)
   writer.writeln("\n}");
   writer.writeln();
   writer.writeln("alias ulong RoleGroup;");
-  
++/
+
   writer.writeln("immutable ulong[string] permissions;");
-  if (allowed_roles.length)
+  if (allowedRoles.length)
   {
-    writeln("shared static this()\n{\n  ulong[string] p = [");
-    string[] permission_items;
-    foreach (n,p; allowed_roles)
-    {
-      permission_items ~= "  \""~n~"\": "~to!string(p)~"uL";
-    }
-    writer.writeln(permission_items.join(",\n"));
-    writer.writeln("];");
+    writer.writeln("shared static this()\n{\n  ulong[string] p = [");
+    string[] permissionItems;
+    foreach (n,p; allowedRoles)
+      permissionItems ~= "    \""~n~"\": "~p;
+    writer.writeln(permissionItems.join(",\n"));
+    writer.writeln("  ];");
     writer.writeln("  permissions = assumeUnique(p);\n}");
   }
 }
 
 //----------------------------------------------------------------------------
-
-struct Queue(T)
-{
-  alias Queue!T QT;
-
-  private:
-
-    T[] q;
-
-  public:
-
-    void put(T t)
-    {
-      q ~= t;
-    }
-
-    QT opOpAssign(string str)(T t) if (str == "~")
-    {
-      q ~= t;
-      return this;
-    }
-
-    bool empty() { return q.empty; }
-    T front() { return q.front(); }
-    void popFront() { q.popFront(); }
-}
-
-//----------------------------------------------------------------------------
-
-struct Stack(T)
-{
-  private:
-
-    T[] q;
-
-  public:
-
-    void put(T t)
-    {
-      q ~= t;
-    }
-
-    bool empty() { return q.empty; }
-    T front() { return q[$-1]; }
-    void popFront() { q = q[0..$-1]; }
-}
-
-//----------------------------------------------------------------------------
-
-struct set(T)
-{
-  private:
-
-    T[] the_set;
-
-  public:
-    ulong put(T t)
-    {
-      foreach (i,e; the_set)
-        if (t == e) return i;
-      
-      the_set ~= t;
-      return the_set.length-1;
-    }
-
-    ulong size() { return the_set.length; }
-
-    auto Range()
-    {
-      return the_set;
-    }
-}

@@ -2,15 +2,20 @@ RDMD = rdmd
 
 SPINNA_ROOT = .
 
-DYAML_PROJ = /home/jason/projects/dyaml_0.4/source
+
 include makefile.include
 
 BININSTALL = /usr/local/bin
 LIBINSTALL = /usr/local/lib
 
-LIBDIR = /usr/lib64/mysql .
+DUB_ROOT = /home/jason/.dub/packages
+DUB_DIRS = $(addprefix $(DUB_ROOT)/,$(DUB_PACKAGES))
+
+LIBDIR = /usr/lib64/mysql $(DUB_ROOT)/dyaml-0.5.0 .
 LIBS = fcgi dyaml mysqlclient
-IMPDIR =  $(SPINNA_ROOT)/src $(DYAML_PROJ)
+
+
+IMPDIR =  $(SPINNA_ROOT)/src $(DUB_DIRS)
 
 LIBFLAGS= $(addprefix -L-l,$(LIBS)) $(addprefix -L-L,$(LIBDIR))
 

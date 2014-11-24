@@ -16,7 +16,7 @@ module jaypha.spinna.router_controller;
 import gen.router;
 public import jaypha.spinna.authorisation;
 
-struct SpinnaRouter(alias fr, alias aa)
+struct RouterController(alias fr, alias aa)
 {
   static ActionInfo info;
 

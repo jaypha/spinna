@@ -20,24 +20,24 @@ struct Queue(T)
 
   private:
 
-    T[] q;
+    T[] theQueue;
 
   public:
 
     void put(T t)
     {
-      q ~= t;
+      theQueue ~= t;
     }
 
     Q opOpAssign(string str)(T t) if (str == "~")
     {
-      q ~= t;
+      theQueue ~= t;
       return this;
     }
 
-    @property bool empty() { return q.empty; }
-    @property T front() { return q.front(); }
-    void popFront() { q.popFront(); }
+    @property bool empty() { return theQueue.empty; }
+    @property ref T front() { return theQueue.front(); }
+    void popFront() { theQueue.popFront(); }
 }
 
 unittest

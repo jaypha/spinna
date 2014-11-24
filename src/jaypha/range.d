@@ -59,30 +59,6 @@ ByChunk!R byChunk(R)(R r, ulong n) { return ByChunk!R(r,n); }
 
 
 //----------------------------------------------------------------------------
-// Comsumes the front of the range as long as it matches the given prefix
-// Returns whether or not the entire prefix got matches. If all_or_nothing is
-// true, then an exception occurs if prefix is nto matched in its entirely.
-// Designed to work with ranges that cannot be rewound.
-
-deprecated bool skip_over_anyway(R)(ref R r, string prefix, bool all_or_nothing = false)
- if (isInputRange!R)
-{
-  if (r.empty || r.front != prefix[0])
-    return false;
-
-  uint i = 0;
-  do
-  {
-    r.popFront();
-    ++i;
-  } while (i < prefix.length && !r.empty && r.front == prefix[i]);
-
-  if (i == prefix.length) return true;
-  enforce(!all_or_nothing);
-  return false;
-}
-
-//----------------------------------------------------------------------------
 
 unittest
 {
@@ -104,12 +80,4 @@ unittest
   buff.clear();
 
   //txt = cast(ubyte[]) "acabacbxyz".dup;
-  r1 = inputRangeObject(txt);
-
-  assert(skip_over_anyway(r1, "aca"));
-  assert(!skip_over_anyway(r1, "baa"));
-  assert(!skip_over_anyway(r1, "xyz"));
-  //skip_over_anyway(r1,"cbz",true); // <- should fail
-  r1.copy(buff);
-  assert(cast(char[])(buff.data) == "cbxyz");
 }

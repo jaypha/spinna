@@ -43,14 +43,12 @@ class LinkButton : HtmlElement
     add(label);
     attributes["type"] = "button";
     attributes["onclick"] =  "document.location='"~link~"'";
-    //attributes["href"] = link;
   }
 
   @property warning(string w)
   {
     auto x = attributes["onclick"];
     attributes["onclick"] = "var i = confirm('"~w~"'); if (i)  { "~x~"; }";
-    //attributes["onclick"] = "return confirm('"~w~"')";
   }
 }
 
@@ -75,7 +73,6 @@ class OpenButton : HtmlElement
   {
     auto x = attributes["onclick"];
     attributes["onclick"] = "var i = confirm('"~w~"'); if (i)  { "~x~"; }";
-    //attributes["onclick"] = "return confirm('"~w~"')";
   }
 }
 

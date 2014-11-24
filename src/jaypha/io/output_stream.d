@@ -18,6 +18,8 @@ import std.conv;
 import std.format;
 import std.utf;
 
+//----------------------------------------------------------------------------
+
 interface OutputStream
 {
   void put(dchar c);
@@ -26,6 +28,8 @@ interface OutputStream
   void put(const(wchar)[] s);
   void put(const(dchar)[] s);
 }
+
+//----------------------------------------------------------------------------
 
 class OutputRangeStream(R) : OutputStream
   if (isOutputRange!(R,dchar))
@@ -67,10 +71,14 @@ class OutputRangeStream(R) : OutputStream
   }
 }
 
+//----------------------------------------------------------------------------
+
 OutputRangeStream!R outputRangeStream(R)(ref R r)
 {
   return new OutputRangeStream!R(r);
 }
+
+//----------------------------------------------------------------------------
 
 class TextOutputStream : OutputStream
 {
@@ -109,17 +117,17 @@ class TextOutputStream : OutputStream
       {
         stream.put(arg);
       }
-      else static if (__traits(compiles,arg.copy(stream)))
+      else static if (__traits(compiles,arg.copy(this)))
       {
-        arg.copy(stream);
+        arg.copy(this);
       }
-      else static if (__traits(comiles,to!string(arg))
+      else static if (__traits(compiles,to!string(arg)))
       {
         stream.put(to!string(arg));
       }
       else
       {
-        static assert(false); // TODO need to find away to simply fail to allow other functions to try.
+        formattedWrite(stream, "%s", arg);
       }
     }
     return this;
@@ -150,10 +158,14 @@ class TextOutputStream : OutputStream
   }
 }
 
+//----------------------------------------------------------------------------
+
 TextOutputStream textOutputStream(R)(ref R r)
 {
   return new TextOutputStream(new OutputRangeStream!R(r));
 }
+
+//----------------------------------------------------------------------------
 
 deprecated class TextBuffer(S = string) : TextOutputStream if (isSomeString!S)
 {
@@ -161,9 +173,10 @@ deprecated class TextBuffer(S = string) : TextOutputStream if (isSomeString!S)
 
   this() { buffer = appender!S(); super(outputRangeStream(buffer)); }
 
-
   @property S data() { return buffer.data; }
 }
+
+//----------------------------------------------------------------------------
 
 unittest
 {

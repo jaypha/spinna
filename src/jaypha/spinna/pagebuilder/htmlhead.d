@@ -39,7 +39,7 @@ class HtmlHead : Composite
       output.print("<meta content='",content,"'");
       if (name.length)
         output.print(" name='",name,"'");
-      if (http_equiv.length)
+      if (httpEquiv.length)
         output.print(" http-equiv='",httpEquiv,"'");
       if (scheme.length)
         output.print(" scheme='",scheme,"'");
@@ -126,23 +126,19 @@ class HtmlHead : Composite
     foreach (mt; metaTags)
       mt.copy(output);
 
-    foreach (f;css_files)
-      output.println("<link rel='stylesheet' type='text/css' href='",f,"'/>");
     foreach (f;cssFiles)
       output.println("<link rel='stylesheet' type='text/css' href='",f,"'/>");
 
-    if (css_text.length)
+    if (cssText.length)
     {
       output.println("<style type='text/css'>\n<!--");
-      foreach (f; css_text)
+      foreach (f; cssText)
         output.println(f);
       output.println("-->\n</style>");
     }
 
     if (useJquery || namedOnloadScripts.length || ordinaryOnloadScripts.length)
-      output.println("<script type='text/javascript' src='",jquery_src,"'></script>");
-    foreach (f;script_files)
-      output.println("<script type='text/javascript' src='",f,"'></script>");
+      output.println("<script type='text/javascript' src='",jquerySrc,"'></script>");
     foreach (f;scriptFiles)
       output.println("<script type='text/javascript' src='",f,"'></script>");
 

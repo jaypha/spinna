@@ -44,7 +44,7 @@ class AutofillWidget : Widget
     super(_form, _name, _label, _required, "input");
     attributes["type"] = "text";
     options = _options;
-    add_class("dropselect-widget");
+    addClass("dropselect-widget");
   }
 
   override void copy(TextOutputStream output)

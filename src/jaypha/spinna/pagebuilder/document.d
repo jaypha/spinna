@@ -23,6 +23,7 @@ public import jaypha.spinna.global;
 
 import std.array;
 import std.conv;
+import std.range;
 
 //-----------------------------------------------------------------------------
 
@@ -40,26 +41,34 @@ class Document
   HtmlHead docHead;
   HtmlElement docBody;
 
-  alias docHead page_head;
-  alias docBody page_body;
-  alias currentForm current_form;
-
   bool printXmlDecl = false;
 
-  this(string pageIid = null, string[] classes = null)
+  this(string pageId = null, string[] classes = null)
   {
     docHead = new HtmlHead();
     docBody = new HtmlElement("body");
     if (!pageId.empty)
-      pageBody.id = pageId;
+      docBody.id = pageId;
     if (!classes.empty)
-      pageBody.cssClasses = classes;
+      docBody.cssClasses = classes;
+  }
+
+  void copy(S = string)(ref HttpResponse response, bool noCache = true)
+  {
+    auto b = appender!S();
+    copy!(S,typeof(b))(b);
+
+    if (noCache)
+      response.noCache();
+    response.contentType("text/html; charset="~utfEnc!S);
+    response.header("Content-Length", to!S(b.data.length));
+    response.entity = cast(ByteArray)b.data;
   }
 
   void copy(S,R)(R output) if (isSomeString!S && isOutputRange!(R,S))
   {
-    auto bodyBuffer = Appender!S();
-    auto headBuffer = Appender!S();
+    auto bodyBuffer = appender!S();
+    auto headBuffer = appender!S();
     
     auto stream = textOutputStream(bodyBuffer);
     docBody.copy(stream);
@@ -78,15 +87,8 @@ class Document
   }
 }
 
-
+// Deprecated.
 void transfer(S = string)(Document doc, ref HttpResponse response, bool noCache = true)
 {
-  auto b = appender!S();
-  doc.copy!(S,typeof(b))(b);
-
-  if (no_cache)
-    response.noCache();
-  response.content_type("text/html; charset="~utfEnc!S);
-  response.header("Content-Length", to!S(b.data.length));
-  response.entity = cast(ByteArray)b.data;
+  doc.copy(response, noCache);
 }

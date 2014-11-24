@@ -1,4 +1,14 @@
-
+//Written in the D programming language
+/*
+ * Fixed point values.
+ *
+ * Copyright 2013 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
 
 module jaypha.decimal;
 
@@ -262,7 +272,7 @@ unittest
   amount = "30";
   assert(amount.value == 3000);
 
-  amount = to_decimal!(2,string)("6");
+  amount = toDecimal!(2,string)("6");
   assert(amount.value == 600);
 
   amount = 295;

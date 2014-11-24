@@ -34,13 +34,13 @@ string imfFold(string content, ulong additional, out ulong lastLineLength)
   auto a = appender!string();
 /*
 
-  auto i = lastIndexOfAny(content[0..(MaxLineLength-additional)],ImfWsp);
+  auto i = lastIndexOfAny(content[0..(ImfMaxLineLength-additional)],ImfWsp);
   enforce(i != 0);
 
   app.put(content[0..i]);
   app.put(ImfEoln);
   content = content[i..$];
-  while (content.length > MaxLineLength)
+  while (content.length > ImfMaxLineLength)
   {
     i = lastIndexOfAny(content[0..MaxLineLength],ImfWsp);
     enforce(i != 0);
@@ -53,12 +53,12 @@ string imfFold(string content, ulong additional, out ulong lastLineLength)
 */
   while (content.length+additional > ImfMaxLineLength)
   {
-    //auto i = lastIndexOfAny(content[0..MaxLineLength-additional],ImfWsp);
-    auto i = lastIndexOf(content[0..MaxLineLength-additional],' ');
+    //auto i = lastIndexOfAny(content[0..ImfMaxLineLength-additional],ImfWsp);
+    auto i = lastIndexOf(content[0..ImfMaxLineLength-additional],' ');
     assert(i != 0);
 
     a.put(content[0..i]);
-    a.put(ImfEoln);
+    a.put(MimeEoln);
     content = content[i..$];
     additional = 0;
   }
@@ -102,11 +102,11 @@ MimeHeader addressHeader(string name, Mailbox[] addresses)
     if (runningLength + n.length > ImfMaxLineLength)
     {
       runningLength = -2;
-      n = ImfEoln ~ n;
+      n = MimeEoln ~ n;
     }
     list ~= n;
     runningLength += n.length+1;
   }
-  header.field_body = list.join(",");
+  header.fieldBody = list.join(",");
   return header;
 }

@@ -47,6 +47,10 @@ class TextComponent(S = string) : Component if (isSomeString!S)
 
 class Composite : Component
 {
+  // Composite put(S)(S text) if (isSomeString!S) { content.put(new TextComponent!S(text); return this; }
+  // Composite put(T : Component)(T o) { content.put(o); return this; }
+  // Composite put(T)(T x) { content.put(new TextComponent!(string)(to!string(x)); return this; }
+
   Composite put(string t) { content.put(new TextComponent!string(t)); return this; }
   Composite put(wstring t) { content.put(new TextComponent!wstring(t)); return this; }
   Composite put(dstring t) { content.put(new TextComponent!dstring(t)); return this; }
@@ -159,14 +163,14 @@ class FileComponent(S = string) : Component
 
 unittest
 {
-  import std.stdio;
+  //import std.stdio;
   void pp(TextOutputStream o) { o.print("--phbf--"); }
 
   auto buf = appender!string();
   auto bos = textOutputStream(buf);
 
   auto target = new Composite();
-  target.add("abc").add("xyz").add(new TextComponent("123"));
+  target.add("abc").add("xyz").add(new TextComponent!()("123"));
 
   target.add(new DelegateComponent(&pp));
   target.copy(bos);
@@ -179,7 +183,7 @@ unittest
   wrapper.add("start!").wrap(target).add("!end");
   target.copy(bos);
   //bos.print(target);
-  writeln(buf.data);
+
   assert(buf.data == "start!abcxyz123--phbf--!end");
   
 

@@ -24,6 +24,8 @@
   validateOptionalDate
   validateRequiredDate
   validateDate
+
+  All functions return whether the validation succeded.
 */
 
 module jaypha.spinna.validate;
@@ -54,7 +56,7 @@ bool validateId
   if (name !in source || source[name].length == 0)
   {
     if (required) return false;
-    value = null;
+    value = string.init;
   }
   else
   {
@@ -69,11 +71,10 @@ bool validateId
 //---------------------------------------------------------
 // Shortcut mixins.
 
-enum IdGet(bool requried = false) = "string id; if (!validate_id(id, request.gets, \"id\", "~(requried?"true":"false")~")) { response.status(400); return; }";
-enum IdPost(bool requried = false) = "string id; if (!validate_id(id, request.posts, \"id\", "~(requried?"true":"false")~")) { response.status(400); return; }";
+enum IdGet(bool requried = false) = "string id; if (!validateId(id, request.gets, \"id\", "~(requried?"true":"false")~")) { response.status(400); return; }";
+enum IdPost(bool requried = false) = "string id; if (!validateId(id, request.posts, \"id\", "~(requried?"true":"false")~")) { response.status(400); return; }";
 
 //----------------------------------------------------------------------------
-// Returns - whether the validation succeded.
 
 bool validateString
 (
@@ -89,7 +90,7 @@ bool validateString
   if (name !in source || source[name].length == 0)
   {
     if (required) return false;
-    else value = "";
+    else value = string.init;
   }
   else
   {
@@ -100,6 +101,8 @@ bool validateString
   }
   return true;
 }
+
+//-----------------------------------------------
 
 bool validateString
 (
@@ -118,6 +121,7 @@ bool validateString
   return x;
 }
 
+//-----------------------------------------------
 
 unittest
 {
@@ -477,6 +481,23 @@ bool validateSingleEnumerated
     return ((options is null) || canFind(options, value));
   }
   return true;
+}
+
+//-----------------------------------------------
+
+bool validateSingleEnumerated
+(
+  ref strstr value,
+  StrHash source,
+  string name,
+  bool required,
+  string[] options
+)
+{
+  string v;
+  bool x = validateSingleEnumerated(v, source, name, required, options);
+  if (x) value[name] = v;
+  return x;
 }
 
 //----------------------------------------------------------------------------

@@ -18,20 +18,23 @@ module jaypha.spinna.pagebuilder.lists.simple_list;
 
 import jaypha.types;
 public import jaypha.spinna.pagebuilder.lists.list;
+
+import std.traits;
+import std.range;
+import jaypha.types;
+import jaypha.algorithm;
 import jaypha.datasource;
 
 
 class SimpleList(DS,string tpl) : ListComponent if(isDataSource!(DS))
 {
-  alias ReturnType!(DS.apply) R;
-  alias ElementType!R E;
-  alias rtMap!(R, string[string]) L;
+  alias DataSourceElementType!DS E;
 
   DS source;
   string[string] delegate(E) mapper;
 
   @property void start(ulong s) { _start = s; }
-  @property void limit(ulong l) { _limit = s; }
+  @property void limit(ulong l) { _limit = l; }
   @property ulong length() { return source.length; }
 
   this
@@ -48,15 +51,19 @@ class SimpleList(DS,string tpl) : ListComponent if(isDataSource!(DS))
   {
     ulong count = 0;
 
-    auto list = L(source[_start.._start+_limit], mapper);
+    auto r = (_limit == 0)?source[_start..$]:source[_start..(_start+_limit)];
+    auto list = rtMap!(typeof(r),strstr)(r,mapper);
 
     foreach (item; list)
     {
-      mixin(TemplateOutput!tpl);
+      with (output)
+      {
+        mixin(TemplateOutput!tpl);
+      }
       ++count;
     }
   }
 
   private:
-    ulong _start, _limit; 
+    ulong _start = 0, _limit = 0;
 }

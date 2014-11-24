@@ -14,8 +14,9 @@
 module jaypha.spinna.router_controller_no_auth;
 
 import gen.router;
+import std.range;
 
-struct RouterController(alias fr, alias aa)
+struct RouterController
 {
   static ActionInfo info;
 

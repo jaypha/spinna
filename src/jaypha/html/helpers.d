@@ -40,9 +40,9 @@ string nl2br(string text)
 
 //-----------------------------------------------------------------------------
 
-string htmlLink(string link, string label = null)
+string htmlLink(string link, string label = null, bool newPage = false)
 {
-  return "<a href='"~link~"'>"~((label !is null)?label:link)~"</a>";
+  return "<a href='"~encodeSpecial(link)~"'"~(newPage?" target='_blank'":"")~">"~((label !is null)?label:link)~"</a>";
 }
 
 enum HtmlLink(string link, string label) = htmlLink(link,label);

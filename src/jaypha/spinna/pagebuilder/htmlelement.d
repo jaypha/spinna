@@ -50,7 +50,7 @@ class HtmlElement : Composite
 
   HtmlElement addClass(string className)
   {
-    if (canFind(cssClasses,className))
+    if (!canFind(cssClasses,className))
       cssClasses ~= className;
     return this;
   }
@@ -60,7 +60,7 @@ class HtmlElement : Composite
   HtmlElement removeClass(string className)
   {
     uint i;
-    for (; i<css_classes.length; ++i)
+    for (; i<cssClasses.length; ++i)
       if (cssClasses[i] == className)
       {
         cssClasses = remove(cssClasses,i);
@@ -111,7 +111,7 @@ class HtmlElement : Composite
   
   @property bool emptyTag()
   {
-    return (length == 0 && !canFind(emptyTags,tagName));
+    return (length == 0 && canFind(emptyTags,tagName));
   }
 
   //---------------------------------------------------------------------------
@@ -122,31 +122,37 @@ class HtmlElement : Composite
 
 unittest
 {
-  import std.stdio;
+  //import std.stdio;
   import std.range;
 
-  auto buf = appender!(char[])();
+  auto buf = appender!string();
   auto bos = textOutputStream(buf);
 
   auto page = new HtmlElement("br");
   page.copy(bos);
   assert(buf.data == "<br/>");
-  buf.clear();
+
+  buf = appender!string();
+  bos = textOutputStream(buf);
   
   page = new HtmlElement();
   page.copy(bos);
   assert(buf.data == "<div></div>");
-  buf.clear();
 
-  page.tag_name = "img";
+  buf = appender!string();
+  bos = textOutputStream(buf);
+
+  page.tagName = "img";
   page.attributes["src"] = "pig.gif";
   page.copy(bos);
   assert(buf.data == "<img src='pig.gif'/>");
-  buf.clear();
-  page.add_class("top");
-  page.add_class("bottom");
-  page.css_styles["position"] = "rela&tive";
-  page.css_styles["padding"] = "5px";
+
+  buf = appender!string();
+  bos = textOutputStream(buf);
+  page.addClass("top");
+  page.addClass("bottom");
+  page.cssStyles["position"] = "rela&tive";
+  page.cssStyles["padding"] = "5px";
   page.add("hello");
   page.copy(bos);
   assert
@@ -158,7 +164,8 @@ unittest
   auto inner = new HtmlElement("p");
   inner.add("hello");
 
-  buf.clear();
+  buf = appender!string();
+  bos = textOutputStream(buf);
   page = new HtmlElement();
   page.add("abc");
   page.add("def");

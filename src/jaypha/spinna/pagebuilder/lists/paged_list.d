@@ -16,11 +16,7 @@ import jaypha.spinna.pagebuilder.component;
 
 import jaypha.spinna.pagebuilder.lists.list;
 
-class PagedList
-(
-  string tpl = "jaypha/spinna/pagebuilder/lists/paged_default.tpl",
-  string ptpl = "jaypha/spinna/pagebuilder/lists/paginator_default.tpl"
-) : Component
+class PagedList(string tpl, string ptpl) : Component
 {
   Paginator!ptpl paginator;
     
@@ -28,9 +24,9 @@ class PagedList
 
   ListComponent content;
 
-  this(string _name, string b, StrHash r)
+  this(string n, string b, StrHash r)
   {
-    name = _name;
+    name = n;
     paginator = new Paginator!ptpl(name, b, r);
   }
 
@@ -49,6 +45,16 @@ class PagedList
 
     paginator.numPages = (content.length + paginator.pageSize - 1)/paginator.pageSize;
 
-    mixin(TemplateOutput!tpl);
+    mixin(TemplateOutput!(tpl,"output.print"));
   }
+}
+
+auto defaultPagedList(string n, string b, StrHash r)
+{
+  return new PagedList!
+  (
+    "jaypha/spinna/pagebuilder/lists/paged_default.tpl",
+    "jaypha/spinna/pagebuilder/lists/paginator_default.tpl"
+  )
+  (n, b, r);
 }

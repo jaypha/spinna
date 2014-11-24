@@ -23,10 +23,7 @@ function makeWidgetFromMeta(idPrefix, metadata)
         switch (metadata.subtype)
         {
           case "textarea":
-            jq = $("<textarea class='widget text-widget' name='"+name+" id='"+idPrefix+metadata.name+"'></textarea>");
-            new StringWidget(jq,metadata);
-            if ("default" in metadata)
-              jq.text(metadata.default);
+            jq = makeTextAreaWidget(idPrefix+metadata.name, metadata.name, metadata, metadata.default);
             break;
 
           case "password":

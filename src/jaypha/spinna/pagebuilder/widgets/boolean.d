@@ -52,7 +52,7 @@ class BooleanWidget : Widget
   )
   {
     super(_form, _name, _label, _required);
-    add_class("boolean-widget");
+    addClass("boolean-widget");
 
     add(new DelegateComponent(&display));
   }

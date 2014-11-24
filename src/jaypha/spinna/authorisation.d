@@ -24,7 +24,7 @@ public import gen.roles;
 
 // Account Role is an enumeration of ulong values that are bitwise mutually exclusive.
 
-private pure nothrow @safe /* @nogc */ bool is_valid_role_type(E)(E type) if (is(E == enum) && isImplicitylyConvertible!(E,ulong))
+private pure nothrow @safe /* @nogc */ bool is_valid_role_type(E)() if (is(E == enum) && isImplicitlyConvertible!(E,ulong))
 {
   ulong run = 0;
   foreach (x;EnumMembers!E)
@@ -35,11 +35,11 @@ private pure nothrow @safe /* @nogc */ bool is_valid_role_type(E)(E type) if (is
   return true;
 }
 
-enum isValidRoleType(E) = is_valid_role_type!E
+enum isValidRoleType(E) = is_valid_role_type!E();
 
 // Check for existance of Role and RoleGroup
-static assert(isValidRoleType(Role));
-static assert(isImplicitylyConvertible!(RoleGroup,ulong));
+static assert(isValidRoleType!Role);
+static assert(isImplicitlyConvertible!(RoleGroup,ulong));
 
 
 //----------------------------------------------------------------------------
@@ -66,10 +66,10 @@ bool hasRole(RoleGroup r2)
 
 Role extractRole(RoleGroup roles)
 {
-  foreach (j; EnumMembers!AccountRole)
+  foreach (j; EnumMembers!Role)
     if (roles & j)
       return j;
-  return 0;
+  return Role.__nil__;
 }
 
 //----------------------------------------------------------------------------
@@ -78,7 +78,7 @@ Role extractRole(RoleGroup roles)
 Role extractRole()
 {
   assert(isLoggedIn);
-  return extractRole!AccountRole(session["login"].get!ulong("roles"));
+  return extractRole(session["login"].get!ulong("roles"));
 }
 
 //----------------------------------------------------------------------------
@@ -95,7 +95,7 @@ bool actionAuthorised(string action)
 bool actionAuthorised(string action, RoleGroup roles)
 {
   // Admin always has authorisation.
-  if (hasRole(roles, AccountRole.Admin))
+  if (hasRole(roles, Role.Admin))
     return true;
 
   // If no permissions are defined then access is universal.
@@ -103,7 +103,7 @@ bool actionAuthorised(string action, RoleGroup roles)
     return true;
 
   // Check against permission.
-  return roles & permissions[action];
+  return (roles & permissions[action]) != 0L;
 }
 
 //----------------------------------------------------------------------------
@@ -120,7 +120,8 @@ void login(string userId, ulong roles)
 
 void logout()
 {
-  session.clear();
+  session.clobber();
+  // TODO remove cookie.
 }
 
 //----------------------------------------------------------------------------

@@ -54,4 +54,6 @@ template utfEnc(S) if (isSomeString!S || isSomeChar!S)
 enum utfEnc(C:char) = "UTF-8";
 enum utfEnc(C:wchar) = "UTF-16";
 enum utfEnc(C:dchar) = "UTF-32";
-enum utfEnc(S) if (isSomeString!S) = utfEnc!(ElementEncodingType!S);
+enum utfEnc(S:string) = "UTF-8";
+enum utfEnc(S:wstring) = "UTF-16";
+enum utfEnc(S:dstring) = "UTF-32";

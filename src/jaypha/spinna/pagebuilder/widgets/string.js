@@ -14,12 +14,22 @@
 
 function makeStringWidget(id, name, def, value)
 {
-  var jq = $("<input type='text' class='widget string-widget' name='"+name+" id='"+id+"'/>");
+  var jq = $("<input type='text' class='widget string-widget' name='"+name+"' id='"+id+"'/>");
   new StringWidget(jq,def);
   if (typeof value != 'undefined')
     jq.val(value);
   return jq;
 }
+
+function makeTextAreaWidget(id, name, def, value)
+{
+  var jq = $("<textarea class='widget text-widget' name='"+name+"' id='"+id+"'></textarea>");
+  new StringWidget(jq,def);
+  if (typeof value != 'undefined')
+    jq.text(value);
+  return jq;
+}
+
 
 //----------------------------------------------------------------------------
 

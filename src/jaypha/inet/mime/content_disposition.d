@@ -17,6 +17,7 @@
 module jaypha.inet.mime.content_disposition;
 
 import jaypha.inet.mime.reading;
+import jaypha.inet.imf.writing;
 
 import std.array;
 

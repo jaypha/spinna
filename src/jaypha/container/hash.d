@@ -38,7 +38,7 @@ struct Hash(T)
 
   //--------------------------------------------------------------------------
 
-  @property T[string] to_array()
+  @property T[string] toArray()
   {
     T[string] ret;
     foreach (s,x;a)
@@ -135,24 +135,3 @@ unittest
 
 //----------------------------------------------------------------------------
 
-debug
-{
-  import std.range;
-
-  public void dump(O,T)(Hash!(T) hash, O output) if (isOutputRange!(O,string))
-  {
-    string i;
-    T[] v;
-    foreach (i,v;hash.a)
-    {
-      output.put(i);
-      output.put(": ");
-      foreach(j;v)
-      {
-        output.put(j);
-        output.put(",");
-      }
-      output.put("\n");
-    }
-  }
-}

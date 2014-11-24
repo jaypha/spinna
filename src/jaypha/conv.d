@@ -31,8 +31,9 @@ string bin2hex(uint i)
 // Extract the bits from a number and puts them into an aray.
 // eg. 01101b => [ 1000b, 100b, 1b ].
 
-T[] bitsToList(T)(T v) if(__traits(isUnsigned,T))
+T[] bitsToList(T)(T v) if(__traits(isIntegral,T))
 {
+  assert(v >= 0);
   T c = 1;
   T[] r;
 
@@ -50,12 +51,15 @@ T[] bitsToList(T)(T v) if(__traits(isUnsigned,T))
 // Reduces an array to a single value by or-ing them together.
 // TODO explore using std.algorithm.reduce.
 
-T listToBits(T)(T[] list) if(__traits(isUnsigned,T))
+T listToBits(T)(T[] list) if(__traits(isIntegral,T))
 {
   T bits;
 
   foreach (l;list)
+  {
+    assert(l >= 0);
     bits |= l;
+  }
   return bits;
 }
 
@@ -112,6 +116,6 @@ unittest
   assert(bin2hex(0xB4C58A6E) == "B4C58A6E");
   assert(bin2hex(0x8765432)  == "08765432");
   assert(bin2hex(0x4B8DA00C) == "4B8DA00C");
-  assert(bitsToList(0x7A) == [ 64, 32, 16,  8, 2 ]);
+  assert(bitsToList(0x7A) == [ 2, 8, 16, 32, 64 ]);
   assert(listToBits([ 64, 32, 16,  8, 2 ]) == 0x7A);
 }

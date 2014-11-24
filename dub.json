@@ -5,7 +5,7 @@
 	"authors": ["Jason den Dulk"],
 	"license": "BSL-1.0",
 	"dependencies": {
-    "fcgi-loop" : "",
+    "fcgi-loop" : ""
   },
   "configurations":
   [
@@ -14,7 +14,7 @@
       "libs-posix": [ "dyaml" ],
       "targetType": "executable",
       "dependencies": { "dyaml" : "", "backtrace": "" },
-      "mainSourceFile": "makerouter.d"
+      "mainSourceFile": "makerouter.d",
       "postBuildCommands":
       [
         "strip makerouter",

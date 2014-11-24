@@ -1,0 +1,49 @@
+
+.icon-btn
+{
+  font-size: 9px;
+  display: inline-block;
+  text-align:center;
+}
+
+.icon-btn .icon
+{
+  display:block;
+  margin: auto;
+}
+
+.icon-btn .inner, .icon-btn a.inner
+{
+  color: black;
+}
+
+.icon-btn.disabled .inner, .icon-btn.disabled a.inner
+{
+  color: $disabled-text;
+}
+
+.icon-btn.icon16 { width: 20px; }
+.icon-btn.icon32 { width: 50px; }
+.icon-btn.icon48 { width: 70px; }
+
+.icon-btn .inner
+{
+  display: inline-block;
+}
+
+.icon-btn .hotable { cursor: pointer; }
+.icon-btn.disabled { cursor: default; }
+
+.icon-btn
+{
+	padding:3px 1px;
+	border: 1px solid transparent;
+	border-radius: 5px;
+}
+
+.icon-btn.highlight
+{
+  border: 1px solid $highlight-border;
+  background-color: $highlight-background;
+  box-shadow: inset 0 0 2px $highlight-border;
+}

@@ -16,6 +16,7 @@ public import jaypha.spinna.pagebuilder.widgets.widget;
 public import jaypha.spinna.pagebuilder.widgets.enumerated;
 
 import jaypha.html.entity;
+import jaypha.html.helpers;
 import jaypha.container.hash;
 
 import std.algorithm;
@@ -50,7 +51,7 @@ class SortWidget : Widget
       add("<li id='"~id~"-"~item.value~"'>"~encodeSpecial(item.label)~"</li>");
 
     super.copy(output);
-    ouput.print(startUpJavascript("$('#"~id~"').sortable({update: function(e,u){ sortUpdate('"~id~"','"~name~"','"~form.id~"')}});"));
+    output.print(startUpJavascript("$('#"~id~"').sortable({update: function(e,u){ sortUpdate('"~id~"','"~name~"','"~form.id~"')}});"));
   }
 
   private:

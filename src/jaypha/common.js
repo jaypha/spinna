@@ -1,13 +1,28 @@
+// Written in javascript
+/*
+ * Common JS code
+ *
+ * Copyright (C) 2014 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
 
+//----------------------------------------------------------------------------
+// Is needle in haystack?
 
-
-function in_array(needle, haystack)
+function inArray(needle, haystack)
 {
   for (i in haystack)
     if (needle == haystack[i])
       return true;
   return false;
 }
+
+//----------------------------------------------------------------------------
+// Equialises the height/width of an element to the largest one.
 
 (function($){$.fn.equalise = function(dim)
 {
@@ -20,3 +35,12 @@ function in_array(needle, haystack)
       max = $(this)[dim]();
   })[dim](max);
 };})(jQuery);
+
+
+//----------------------------------------------------------------------------
+// Sets the focus to the first form element on the page.
+
+$(function()
+{
+  $('form:first *:input[type!=hidden]:first').focus();
+});

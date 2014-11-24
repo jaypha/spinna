@@ -20,16 +20,30 @@ import jaypha.spinna.response;
 import std.json;
 import std.conv;
 
+JSONValue fromStrStr(strstr value)
+{
+  JSONValue[string] a;
+  foreach (i,v; value)
+    a[i] = JSONValue(v);
+  return JSONValue(a);
+}
+
 //--------------------------------------------------------------------------
 // Transfers the contents of a JSON structure into an HTTP response.
 
-void transfer(ref JSONValue doc, ref HttpResponse response, bool noCache = true)
+void copy(ref JSONValue doc, ref HttpResponse response, bool noCache = true)
 {
   auto s = toJSON(&doc);
 
   if (noCache)
     response.noCache();
-  response.content_type("application/json; charset=utf-8");
+  response.contentType("application/json; charset=utf-8");
   response.header("Content-Length", to!string(s.length));
   response.entity = cast(ByteArray)s;
+}
+
+// Deprecated
+void transfer(ref JSONValue doc, ref HttpResponse response, bool noCache = true)
+{
+  copy(doc,response,noCache);
 }

@@ -102,7 +102,7 @@ function AutofillWidget(jqo, options)
   // Calls searchCallback and loads result into the list.
   jqo.bind('keyup', function()
   {
-    obj.loadlist(obj.optn.searchCallback($(this).val()));
+    obj.loadList(obj.optn.searchCallback($(this).val()));
   });
 
   //----------------------------------------
@@ -184,7 +184,7 @@ AutofillWidget.prototype.getLabel = function(val)
 
 AutofillWidget.prototype.loadList = function(subList)
 {
-  //alert("loadlist "+subList.length);
+  //alert("loadList "+subList.length);
   var obj = this;
   // Creates HTML for subList and inserts into the list element.
   this.listw.html("");
