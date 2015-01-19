@@ -36,4 +36,6 @@ struct ReadIn
     auto r = file.rawRead(buffer);
     empty = (r.length == 0);
   }
+
+  this(File f) { file = f; popFront(); }
 }

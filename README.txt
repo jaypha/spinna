@@ -11,7 +11,6 @@ Spinna is a web server framework for the D language.
 - Server independance*
 - Compile time generated router.
 - Sessions
-- MySQL database support (other databases possible, but not yet implemented).
 - Pagebuilder classes to construct HTML.
 - Templates - Embed D code inside text.
 
@@ -29,10 +28,7 @@ Linux only. Tested under Fedora, should work with other distros.
 == Requirements ==
 
 - FCGI
-- MySQL (or MariaDB)
 - Sass
-- Flex
-- Bison
 
 == Installation ==
 

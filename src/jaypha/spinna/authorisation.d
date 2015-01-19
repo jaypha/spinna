@@ -19,12 +19,12 @@ import std.exception;
 import jaypha.types;
 import jaypha.spinna.global;
 
-public import gen.roles;
+public import gen.permissions;
 
 
 // Account Role is an enumeration of ulong values that are bitwise mutually exclusive.
 
-private pure nothrow @safe /* @nogc */ bool is_valid_role_type(E)() if (is(E == enum) && isImplicitlyConvertible!(E,ulong))
+private pure nothrow @safe @nogc bool is_valid_role_type(E)() if (is(E == enum) && isImplicitlyConvertible!(E,ulong))
 {
   ulong run = 0;
   foreach (x;EnumMembers!E)
@@ -69,7 +69,7 @@ Role extractRole(RoleGroup roles)
   foreach (j; EnumMembers!Role)
     if (roles & j)
       return j;
-  return Role.__nil__;
+  return Role.None;
 }
 
 //----------------------------------------------------------------------------

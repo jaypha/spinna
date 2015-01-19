@@ -190,9 +190,14 @@ StrHash extractPosts(string s)
 
 void extractParam(string pair, ref StrHash p)
 {
+  // TODO should split only once.
   auto r = split(pair,'=');
   auto x = decodeComponent(replace(r[0],"+"," ").idup);
-  auto y = decodeComponent(replace(r[1],"+"," ").idup);
+  string y;
+  if (r.length > 1)
+    y = decodeComponent(replace(r[1],"+"," ").idup);
+  else
+    y = null;
   p.add(x,y);
 }
 

@@ -15,9 +15,9 @@ module jaypha.spinna.json;
 
 import jaypha.types;
 
-import jaypha.spinna.response;
+import jaypha.spinna.global;
 
-import std.json;
+public import std.json;
 import std.conv;
 
 JSONValue fromStrStr(strstr value)
@@ -46,4 +46,22 @@ void copy(ref JSONValue doc, ref HttpResponse response, bool noCache = true)
 void transfer(ref JSONValue doc, ref HttpResponse response, bool noCache = true)
 {
   copy(doc,response,noCache);
+}
+
+//--------------------------------------------------------------------------
+// A commonly used rejection mechanism.
+
+void reject(ulong status, string message = null)
+{
+  response.status(status);
+
+  JSONValue ret = JSONValue
+  (
+    [
+      "success" : JSONValue(false),
+      "reason" : JSONValue(message),
+    ]
+  );
+
+  ret.copy(response);
 }

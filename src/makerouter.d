@@ -36,6 +36,7 @@ string preamble;
 string roletype;
 string authtype;
 string errorPage = null;
+string roleModule = null;
 
 ulong[string] roles;
 
@@ -168,7 +169,7 @@ void main(string[] args)
     preamble = root["preamble"].as!string;
 
   if (root.containsKey("roleModule"))
-    modules.put(root["roleModule"].as!string);
+    roleModule = root["roleModule"].as!string;
 
   if (root.containsKey("error"))
   {
@@ -413,6 +414,8 @@ void writeRouter(File writer)
   if (includeString)
     writer.writeln("import std.string;");
   writer.writeln("import std.exception;");
+  if (roleModule !is null)
+    writer.writeln("import "~roleModule~";");
   
 
   writer.writeln();
@@ -464,6 +467,9 @@ void writePermissions(File writer)
   writer.writeln("module gen.permissions;");
   writer.writeln();
   writer.writeln("import std.exception;");
+  if (roleModule !is null)
+    writer.writeln("public import "~roleModule~";");
+  writer.writeln();
 /+
   string[] rdef;
   foreach (s,v; roles)
@@ -479,6 +485,7 @@ void writePermissions(File writer)
   writer.writeln("immutable ulong[string] permissions;");
   if (allowedRoles.length)
   {
+    writer.writeln();
     writer.writeln("shared static this()\n{\n  ulong[string] p = [");
     string[] permissionItems;
     foreach (n,p; allowedRoles)

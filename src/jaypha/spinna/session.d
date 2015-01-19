@@ -197,6 +197,16 @@ void load(ref Session sess)
       //}
     }
   }
+  else
+  {
+    while (true)
+    {
+      sess.sessionId = rndGen().take(4).map!(bin2hex).join();
+      if (!exists(sessionDir~sess.sessionId))
+        break;
+    }
+    write(sessionDir~sess.sessionId,null);
+  }
 }
 
 

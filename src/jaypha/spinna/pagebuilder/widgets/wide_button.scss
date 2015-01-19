@@ -1,0 +1,62 @@
+
+.wide-button
+{
+  position: relative;
+}
+
+.wide-button .inner
+{
+	display: block;
+}
+
+.wb-left
+{
+	float: left;
+	margin-right: 5px;
+}
+
+.wb-right
+{
+	float: right;
+	margin-left: 5px;
+}
+
+.wide-button-content
+{
+	display: table-cell;
+	vertical-align:middle;
+}
+
+.wide-button .overlay
+{
+  position: absolute; top:0; left:0; right: 0; bottom: 0;
+}
+
+.wide-button.washout .overlay
+{
+  background-color: white; opacity: 0.6;
+}
+
+.wide-button.disabled
+{
+  background-color: $disabled-background;
+}
+
+.wide-button.disabled .inner, .wide-button.disabled a.inner
+{ color: $disabled-text }
+
+.wide-button .hotable { cursor: pointer; }
+
+.wide-button.disabled { cursor: default; }
+
+.wide-button.disabled.boxed
+{
+	border-color: $disabled-border
+}
+
+.wide-button.highlight
+{
+  border: 1px solid $highlight-border;
+  background-color: $highlight-background;
+  box-shadow: inset 0 0 2px $highlight-border;
+}
