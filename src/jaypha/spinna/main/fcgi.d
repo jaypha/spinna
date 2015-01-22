@@ -10,14 +10,22 @@
  * Authors: Jason den Dulk
  */
 
+//---------------------------------------------------------------------------
+// fcgiSpinnaRequestProcessor
+//---------------------------------------------------------------------------
+// This module defines a RequestProcessor instance that uses the Spinna
+// Router and interfaces with FCGI.
+//---------------------------------------------------------------------------
+
 module jaypha.spinna.main.fcgi;
 
 public import jaypha.fcgi.loop;
-public import jaypha.spinna.processNew;
+public import jaypha.spinna.process;
 
-import jaypha.spinna.router_controller_no_auth;
+import jaypha.spinna.router_controller;
 
-alias RP!(FcgiInStream,FcgiOutStream,RouterController) requestProcessor;
+alias RequestProcessor!(FcgiInStream,FcgiOutStream,RouterController)
+  fcgiSpinnaRequestProcessor;
 
 void main()
 {
@@ -29,7 +37,7 @@ void main()
 
 void processFcgi(ref FcgiRequest r)
 {
-  requestProcessor.run
+  fcgiSpinnaRequestProcessor.run
   (
     r.env,
     r.fcgiIn,

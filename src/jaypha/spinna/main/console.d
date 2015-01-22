@@ -10,26 +10,32 @@
  * Authors: Jason den Dulk
  */
 
+//---------------------------------------------------------------------------
+// consoleSpinnaRequestProcessor
+//---------------------------------------------------------------------------
+// This module defines a RequestProcessor instance that uses the Spinna
+// Router and interfaces with the console.
+//---------------------------------------------------------------------------
+
 module jaypha.spinna.main.console;
 
 import jaypha.types;
 public import jaypha.io.dirtyio;
-import jaypha.spinna.processNew;
-import jaypha.spinna.router_controller_no_auth;
+import jaypha.spinna.process;
+import jaypha.spinna.router_controller;
 
 import std.stdio;
 import std.range;
 import std.array;
 import std.string;
 
-import config.properties;
-
 debug
 {
   import Backtrace = backtrace.backtrace;
 }
 
-alias RP!(ReadIn,WriteOut,RouterController) requestProcessor;
+alias RequestProcessor!(ReadIn,WriteOut,RouterController)
+  consoleSpinnaRequestProcessor;
 
 void main(string[] args)
 {
@@ -58,7 +64,7 @@ void main(string[] args)
 
   auto content = extractEnv(env, reader);
 
-  requestProcessor.run
+  consoleSpinnaRequestProcessor.run
   (
     env,
     content,

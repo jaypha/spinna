@@ -191,9 +191,11 @@ void main(string[] args)
   scope(exit) { f1.close(); }
   writeRouter(f1);
 
+  /+
   auto f2 = File(outputDir~"/gen/permissions.d", "w");
   scope(exit) { f2.close(); }
   writePermissions(f2);
+  +/
 }
 
 //----------------------------------------------------------------------------

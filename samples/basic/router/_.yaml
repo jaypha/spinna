@@ -1,0 +1,22 @@
+preamble: "Copyright (C) 2014 Jaypha."
+
+routes:
+
+  module: pages
+
+  home:
+    pattern: /
+    get: getHome
+
+  html:
+    pattern: /html
+    get: getHtml
+
+  json:
+    pattern: /json
+    get: getJson
+
+  readback:
+    pattern: /readback
+    module: "jaypha.spinna.readback"
+    get: getReadback

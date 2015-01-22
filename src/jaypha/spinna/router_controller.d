@@ -1,6 +1,6 @@
 //Written in the D programming language
 /*
- * Router Controller with authorisation
+ * Router Controller for using Spinna's builtin router.
  *
  * Copyright (C) 2014 Jaypha
  *
@@ -10,12 +10,19 @@
  * Authors: Jason den Dulk
  */
 
+/* This is the interface to Spinna's compile time generated
+ * router. It rests on the assumption that the router code is
+ * contiained in 'gen.router';
+ */
 
 module jaypha.spinna.router_controller;
 
-import gen.router;
-public import jaypha.spinna.authorisation;
+import jaypha.spinna.global;
 
+import gen.router;
+
+/+
+public import jaypha.spinna.authorisation;
 struct RouterController(alias fr, alias aa)
 {
   static ActionInfo info;
@@ -44,4 +51,20 @@ struct RouterController(alias fr, alias aa)
   }
 
   static void service() { info.service(); }
+}
++/
+
+
+struct RouterController
+{
+  static ActionInfo info;
+
+  static bool hasRoute(string path, string method)
+  {
+    info = find_route(path,method);
+    request.environment["CURRENT_ACTION"] = info.action;
+    return info.action !is null;
+  }
+
+  static void doService() { info.service(); }
 }
