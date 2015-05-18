@@ -18,7 +18,9 @@ function formValidate(formId, invalidCallback)
 {
   var invalidWidgets = [];
 
-  $(".widget", "#"+form_id).each(function()
+  // Call the validate method of the object attached to each widget.
+
+  $(".widget", "#"+formId).each(function()
   {
     var wgt = $(this).data("widget");
 

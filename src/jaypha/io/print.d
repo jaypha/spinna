@@ -84,7 +84,7 @@ unittest
 {
   import std.array;
 
-  auto napp = appender!(const(char)[]);
+  auto napp = appender!(const(char)[])();
 
   auto d = "for".dup;
 

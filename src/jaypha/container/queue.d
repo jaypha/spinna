@@ -14,7 +14,9 @@ module jaypha.container.queue;
 
 import std.array;
 
+//----------------------------------------------------------------------------
 struct Queue(T)
+//----------------------------------------------------------------------------
 {
   alias Queue!T Q;
 
@@ -39,6 +41,8 @@ struct Queue(T)
     @property ref T front() { return theQueue.front(); }
     void popFront() { theQueue.popFront(); }
 }
+
+//----------------------------------------------------------------------------
 
 unittest
 {
@@ -79,3 +83,5 @@ unittest
 
   assert(queue.empty);
 }
+
+//----------------------------------------------------------------------------

@@ -12,9 +12,6 @@
 
 module jaypha.properties;
 
-//import std.algorithm;
-//import std.array;
-
 /*
  * Properties are one per line in the format "property : value".
  * '#' indicates comment.

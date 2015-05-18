@@ -1,6 +1,6 @@
 //Written in the D programming language
 /*
- * A session persistant storage of values.
+ * Persistant storage of values.
  *
  * Copyright 2013 Jaypha
  *
@@ -15,6 +15,7 @@ module jaypha.spinna.session;
 import jaypha.types;
 import jaypha.io.serialize;
 import jaypha.conv;
+import jaypha.rnd;
 
 import std.random;
 import std.array;
@@ -33,7 +34,9 @@ import config.general;
  */
 
 
+//----------------------------------------------------------------------------
 struct Session
+//----------------------------------------------------------------------------
 {
   @property bool expired() { if (!active) load(this); return _expired; }
   string sessionId;
@@ -101,7 +104,9 @@ struct Session
     long timestamp;
 }
 
+//----------------------------------------------------------------------------
 class Activity
+//----------------------------------------------------------------------------
 {
   final void set(T)(string name, T value) { values[name] = serialize!(T)(value); }
   final void unset(string name) { values.remove(name); }
@@ -140,6 +145,8 @@ class Activity
     string[string] values;
 }
 
+//----------------------------------------------------------------------------
+
 string save(ref Session sess)
 {
   auto app = appender!string();
@@ -162,15 +169,17 @@ string save(ref Session sess)
   {
     while (true)
     {
-      sess.sessionId = rndGen().take(4).map!(bin2hex).join();
+      sess.sessionId = rnd.take(4).map!(bin2hex).join();
       if (!exists(sessionDir~sess.sessionId))
         break;
     }
   }
 
-  write(sessionDir~sess.sessionId,app.data);
+  std.file.write(sessionDir~sess.sessionId,app.data);
   return sess.sessionId;
 }
+
+//----------------------------------------------------------------------------
 
 void load(ref Session sess)
 {
@@ -180,41 +189,28 @@ void load(ref Session sess)
     char[] filename = sessionDir.dup ~ sess.sessionId;
 
     if (!exists(filename))
+    {
       sess._expired = true;
+    }
     else
     {
       string contents = readText!string(filename);
       sess.timestamp = unserialize!(long)(contents);
-      if (Clock.currStdTime() - sess.timestamp > sessionTimeLimit)
+      if ((Clock.currStdTime() - sess.timestamp) > sessionTimeLimit)
         sess._expired = true;
       sess.activities = customUnserialize!(unserializeActivity,Activity[string])(contents);
-      //auto len = checkLengthTypeStart(contents, 'o');
-      //foreach (i;0..len)
-      //{
-      //  auto s = unserialize!(string)(contents);
-      //  sess.activities[s] = new Activity();
-      //  sess.activities[s].values = unserialize!(cstring[string])(contents);
-      //}
     }
-  }
-  else
-  {
-    while (true)
-    {
-      sess.sessionId = rndGen().take(4).map!(bin2hex).join();
-      if (!exists(sessionDir~sess.sessionId))
-        break;
-    }
-    write(sessionDir~sess.sessionId,null);
   }
 }
 
+//----------------------------------------------------------------------------
 
 string serializeActivity(Activity a)
 {
   return serialize!(string[string])(a.values);
 }
 
+//----------------------------------------------------------------------------
 
 Activity unserializeActivity(ref string str)
 {
@@ -222,14 +218,14 @@ Activity unserializeActivity(ref string str)
   a.values = unserialize!(string[string])(str);
   return a;
 }
-/+
+
+//----------------------------------------------------------------------------
+
 unittest
 {
-  import std.stdio;
+  auto session = Session();
 
-  Session s = Session();
-
-  auto a = s.get("staff/members/list");
+  auto a = session.get("staff/members/list");
 
   assert(a.values.length == 0);
 
@@ -237,24 +233,24 @@ unittest
   assert(a.get!(char[])("abc") == "");
 
   a.set!(int)("abc", 42);
-  a.set!(int)("def", 63);
+  a.setInt("def", 63);
 
-  assert(a.get!(int)("abc") == 42);
+  assert(a.getInt("abc") == 42);
   assert(a.get!(int)("def") == 63);
 
   a.set!(char[])("abc", "xyz".dup);
   assert(a.get!(char[])("abc") == "xyz");
 
-  auto b = s.get("staff/members");
+  auto b = session.get("staff/members");
 
   assert(b.get!(int)("abc") == 0);
   assert(b.get!(char[])("abc") == "");
 
   b.set!(int)("abc", 89);
-  assert(b.get!(int)("abc") == 89);
-  assert(a.get!(char[])("abc") == "xyz");
+  assert(b.getInt("abc") == 89);
+  assert(a.getStr("abc") == "xyz");
 
-  auto c = s.get("staff/members/list");
+  auto c = session["staff/members/list"];
 
   assert(c.get!(char[])("abc") == "xyz");
   assert(c.get!(int)("def") == 63);
@@ -262,17 +258,4 @@ unittest
   c.set!(long)("long", 200);
   assert(c.get!(long)("long") == 200);
   assert(a.get!(long)("long") == 200);
-
-  auto sessid = save(s);
-
-  Session w = Session(sessid);
-  assert(!w.expired());
-  assert(w.active);
-
-  auto wa = s.get("staff/members/list");
-  assert(wa.values.length == 3);
-  assert(wa.get!(char[])("abc") == "xyz");
-  assert(wa.get!(int)("def") == 63);
-  assert(wa.get!(long)("long") == 200);
 }
-+/

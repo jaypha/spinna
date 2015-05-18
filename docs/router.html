@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<!--
+  Documentation for Jaypha Spinna.
+  Copyright 2015 Jaypha.
+  Distributed under the Boost Licence.
+  Written by Jason den Dulk.
+-->
+<head>
+ <title>Spinna - Router</title>
+ <link rel='stylesheet' type='text/css' href='style.css'>
+</head>
+<body>
+<div class='body'>
+<h1>The Router</h1>
+
+<p>The router is the part of the system that determines what action is being
+requested based on the URL path and HTTP method given.</p>
+
+<p>In Spinna, the programmer specifies the router via a YAML definition
+file.</p>
+
+<p>The router definition effectively defines the website. It is interpereted
+by the "makerouter" program and D code is created which is compiled into the
+website program.</p>
+
+<p><a href='reference/jaypha.spinna.process.html#RequestProcess'>
+<span class='code'>RequestProcessor</span></a> calls the generated router code
+to identify the service requested and the function that performs it.</p>
+
+<p>The use of Spinna's router is actually optional. You can use an alternative router by
+setting RequestProcess.findRoute to your own router.</p>
+
+<h2>Spinna Router Definition and Usage</h2>
+
+<p>A website application is made up of a number of actions. Each
+action is identified by the path section of the URL. In Spinna, these
+actions are defined in a router definition file.</p>
+
+<p>This file is in YAML format.</p>
+
+<p>The definition contains two top-level definitions.</p>
+
+<ul>
+ <li>"preamble" -  Text to be included in the generated source code as a comment. This
+     is optional.</li>
+ <li>"routes" - The action definitions</li>
+</ul>
+
+<p>The definition of a specific action is a follows</p>
+
+<pre class='code p'>
+&lt;name>:
+  pattern: &lt;url path fragment>
+  module: &lt;module name where functions are defined>
+  get: &lt;function name for get requests>
+  post: &lt;function name for post requests>
+  delete: &lt;function name for delete requests>
+  put: &lt;function name for put requests>
+  service: &lt;function name for misc requests (default)>
+  docroot: &lt;file path>
+  serveFiles: &lt;regexp>
+  format: &lt;object>
+</pre>
+
+<p>The router tries to match each pattern in order of definition. If it matches, the
+CURRENT_ACTION environment variable is set to the action name. The framework calls
+the function identified by definition for the request method.</p>
+
+<p>If no patterns match the routing fails.</p>
+
+<h3>Recursive definitions.</h3>
+
+<p>A definition can contain sub-routes, by providing a "prefix" field. This forms a path
+heirarchy. The router will attempt match the URL path with the pattern prepended with
+all the prefixes defined in the heirarchy. The current action is the object names
+joined with ".".</p>
+
+<p>Example:</p>
+
+<pre class='code p'>
+admin:
+  prefix: /admin
+
+  home:
+    pattern: /home
+    module: mysite.home
+    get: getHome
+    post: postHome
+
+  search:
+    pattern: /search
+    module: mysite.search
+    service: doSearch
+</pre>
+
+<p>This defines several actions. "admin.home.get" will match against "/admin/home"
+for GET requests and result in mysite.home.getHome being called. "admin.home.post"
+will match against "/admin/home" for POST requests, and mysite.home.postHome
+will be called. The action "admin.search" matches against "/admin/search" for all
+methods and will result in mysite.search.doSearch being called.</p>
+
+<p>Prefixes are concatentated when performing matches. For example</p>
+
+<pre class='code'>
+account:
+  prefix: /account
+
+  staff:
+    prefix: /staff
+
+    edit:
+      pattern: /edit
+      module: mysite.edit
+      get: doEdit
+</pre>
+
+<p>This matches the URL path of "/account/staff/edit" to mysite.edit.doEdit for GET
+requests. The current action is account.staff.edit.get.</p>
+
+<h3>Inheritance</h3>
+
+<p>If a field is ommitted it inherits it's parent. Any provided field will
+override any parent filed of the same name except for "prefix".</p>
+
+<p>Example</p>
+
+<pre class='code p'>
+admin:
+  prefix: /admin
+  module: mysite.home
+
+  home:
+    pattern: /home
+    get: getHome
+    post: postHome
+
+  search:
+    pattern: /search
+    module: mysite.search
+    service: doSearch
+</pre>
+
+<p>admin.home uses module mysite.home, and admin.search uses mysite.search.</p>
+
+
+<h3>Regular expression patterns</h3>
+
+<p>Patterns can have regular expression components. The content of the regular
+expression is extracted and passed to the service in an associative array using the
+component names as indexes.</p>
+
+<p>Example</p>
+
+<pre class='code p'>
+  product:
+    pattern: "/$name-$number"
+    service: getProduct
+    format: 
+      name: "[a-zA-Z]+"
+      number: "[0-9]+"
+</pre>
+
+<p>The '$' indicates a regular expression (unless preceeded by a '\'). The format object
+define the regular expressions. The above mentiond pattern will match "/john-12" and
+"/ball-3" etc. getProduct will be called with an associative array with "name" and "number"
+set to the extracted contents.</p>
+
+<p>For example, with the above definition, "/john-12" will result in calling</p>
+
+<p class='code'>getProduct(["name" : "john", "number" : "12" ])</p>
+
+
+<h3>File Streaming</h3>
+
+<p>The router can be directed to stream files that match the regular expression given.</p>
+
+<p>Example</p>
+
+<pre class='code p'>
+prefix: /images
+
+  files:
+    docroot: /path-to-dir
+    serveFiles: "/.*\.gif"
+</pre>
+
+<p>For path "/images/bottle.gif", The file /path-to-dir/bottle.gif will be streamed. If
+the path does not match or the file does not exist, then the router will move on to the
+next path.</p>
+
+<h3>Synopsis for called functions</h3>
+
+<p>The synopsis is "void function()" for oridinary services and "void function(string[string])"
+for services with regular expression components.</p>
+
+<h2>Compiling and Integrating</h2>
+
+<p>Spinna comes with a utility called makerouter, which must be compiled and installed when
+installing Spinna. Makerouter is called:</p>
+
+<p class='code'>makerouter [-h] [-m&lt;module_name>] &lt;input_file></p>
+
+<p>-h - print help<br/>
+-m - name of the module of the generated code. Defaults to "gen.router".
+</p>
+
+<p>The generated module is written to the standard output.</p>
+
+<p>You would normally use the Spinna router by importing the module created by
+makerouter assigning the findRoute member of
+RequestProcessor with the findRoute function defined within.</p>
+
+<h2>Spinna Router Modules</h2>
+
+<p>makerouter - The source for the makerouter utility<br/>
+jaypha.spinna.router.actioninfo - Defines the ActionInfo structure.<br/>
+jaypha.spinna.router.builder - Builds the code.<br/>
+jaypha.spinna.router.tools - Code components used by the router module.<br/>
+</p>
+
+<p class='footer'>
+Copyright 2015 Jaypha
+</p>
+</div>
+</body>
+</html>

@@ -23,7 +23,9 @@ import std.algorithm;
 
 import config.general;
 
+//-----------------------------------------------------------------------------
 class HtmlHead : Composite
+//-----------------------------------------------------------------------------
 {
   struct MetaTag
   {
@@ -51,6 +53,8 @@ class HtmlHead : Composite
     }
   }
 
+  //---------------------------------------------
+
   bool useJquery = false;
 
   MetaTag[] metaTags;
@@ -59,11 +63,14 @@ class HtmlHead : Composite
   string description;   // Short description of the web page.
   string[] keywords;
 
+  deprecated("Use Document.comment instead")
   string comment;       // Primary comment.
 
   string[] scriptFiles; // Scripts that are stored in external files.
   string[] cssFiles;    // Stylesheet files.
   string[] cssText;    // Styles to be printed in the page
+
+  //---------------------------------------------
 
   void addScriptFile(string file)
   {
@@ -89,6 +96,7 @@ class HtmlHead : Composite
     else ordinaryScripts ~= text;
   }
 
+  deprecated("addSeo doesn't really belong here and will be removed in a future release")
   void addSeo(strstr data)
   {
     if ("meta_keywords" in data)
@@ -102,6 +110,8 @@ class HtmlHead : Composite
     if ("meta_description" in data)
       description = data["meta_description"];
   }
+
+  //---------------------------------------------
 
   override void copy(TextOutputStream output)
   {
@@ -168,6 +178,8 @@ class HtmlHead : Composite
     super.copy(output);
     output.println("</head>");
   }
+
+  //---------------------------------------------
 
   private:
     strstr namedScripts;

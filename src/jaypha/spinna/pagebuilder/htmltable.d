@@ -24,14 +24,14 @@ class HtmlTableRow : HtmlElement
   {
     auto c = new HtmlElement(cellType);
     
-    super.add(c);
+    super.put(c);
     return c;
   }
 
-  override Composite put(string t) { auto c = cell(); cell.add(new TextComponent!string(t)); return this; }
-  override Composite put(wstring t) { auto c = cell(); cell.put(new TextComponent!wstring(t)); return this; }
-  override Composite put(dstring t) { auto c = cell(); cell.add(new TextComponent!dstring(t)); return this; }
-  override Composite put(Component o) { auto c = cell(); cell.add(o); return this; }
+  override Composite put(string t) { auto c = cell(); c.add(new TextComponent!string(t)); return this; }
+  override Composite put(wstring t) { auto c = cell(); c.put(new TextComponent!wstring(t)); return this; }
+  override Composite put(dstring t) { auto c = cell(); c.add(new TextComponent!dstring(t)); return this; }
+  override Composite put(Component o) { auto c = cell(); c.add(o); return this; }
 
   private:
     CellType cellType;
@@ -55,7 +55,7 @@ class HtmlTable : HtmlElement
   HtmlTableRow bodyRow()
   {
     auto c = new HtmlTableRow(HtmlTableRow.CellType.td);
-    tBody.add(c);
+    tBody.put(c);
     return c;
   }
 
@@ -63,28 +63,28 @@ class HtmlTable : HtmlElement
   {
     if (!tFoot) tFoot = new Composite();
     auto c = new HtmlTableRow(HtmlTableRow.CellType.td);
-    tFoot.add(c);
+    tFoot.put(c);
     return c;
   }
 
   override void copy(TextOutputStream output)
   {
     foreach (c; columnClasses)
-      add("<col class='"~c~"'/>");
+      put("<col class='"~c~"'/>");
     if (tHead)
     {
-      add("<thead>");
-      add(tHead);
-      add("</thead>");
+      put("<thead>");
+      put(tHead);
+      put("</thead>");
     }
-    add("<tbody>");
-    add(tBody);
-    add("</tbody>");
+    put("<tbody>");
+    put(tBody);
+    put("</tbody>");
     if (tFoot)
     {
-      add("<tfoot>");
-      add(tFoot);
-      add("</tfoot>");
+      put("<tfoot>");
+      put(tFoot);
+      put("</tfoot>");
     }
     super.copy(output);
   }

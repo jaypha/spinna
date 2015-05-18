@@ -1,6 +1,6 @@
 //Written in the D programming language
 /*
- * Encodes HTML entities.
+ * Functions for encoding HTML entities.
  *
  * Copyright (C) 2014 Jaypha
  *
@@ -51,7 +51,7 @@ S encodeSpecial(S)(S s) if (isSomeString!S)
 {
   alias ElementEncodingType!S C;
 
-  auto buf = appender!S;
+  auto buf = appender!S();
   foreach (C c; s) // Do not decode
   {
     // Passing code units is OK as special chars are all ASCII.
@@ -87,5 +87,5 @@ unittest
   assert(encodeSpecial("to \u4f3e quote \"abc\" is > quoting 'a','b','c' & < not quoting.") == "to \u4f3e quote &quot;abc&quot; is &gt; quoting &#39;a&#39;,&#39;b&#39;,&#39;c&#39; &amp; &lt; not quoting.");
 
   // range style.
-  assert(`a"&>b`.map!(encodeSpecial).join() == "a&quot;&amp;&gt;b");
+  assert(`a"&>b`.map!(encodeSpecial)().join() == "a&quot;&amp;&gt;b");
 }

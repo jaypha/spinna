@@ -13,7 +13,7 @@
  * Written in the D programming language.
  */
 
-
+depracated("Use itemList instead");
 module jaypha.spinna.pagebuilder.lists.simple_list;
 
 import jaypha.types;
@@ -65,5 +65,5 @@ class SimpleList(DS,string tpl) : ListComponent if(isDataSource!(DS))
   }
 
   private:
-    ulong _start = 0, _limit = 0;
+    ulong _start, _limit;
 }

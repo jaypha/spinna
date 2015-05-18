@@ -20,25 +20,36 @@ import std.datetime;
 import std.string;
 
 import jaypha.types;
+import jaypha.spinna.global;
 
 import jaypha.inet.mime.header;
 
+//-----------------------------------------------------------------------------
 struct HttpResponse
+//-----------------------------------------------------------------------------
 {
-  //---------------------------------------------------------------------------
+  //-------------------------------------------------------
   // entity is the main content.
-  //---------------------------------------------------------------------------
 
   ByteArray entity;
 
-  void copy(R)(R range) if (isOutputRange!(R,ByteArray))
-  {
-    // Headers
-    range.put(cast(ByteArray)"Content-Type: ");
-    range.put(cast(ByteArray)mimeType);
-    range.put(cast(ByteArray)MimeEoln);
+  InputRange!ByteArray stream;
 
-    range.put(cast(ByteArray)"Status: ");
+  //-------------------------------------------------------
+
+  void copy(R)(ref R range) if (isOutputRange!(R,ByteArray))
+  {
+    // Status Line
+
+    if (!isFCGI)
+    {
+      range.put(cast(ByteArray)request.environment["SERVER_PROTOCOL"]);
+      range.put(cast(ByteArray)" ");
+    }
+    else
+    {
+      range.put(cast(ByteArray)"Status: ");
+    }
     range.put(cast(ByteArray)to!string(httpStatus));
     if (httpStatusMsg !is null)
     {
@@ -47,17 +58,24 @@ struct HttpResponse
     }
     range.put(cast(ByteArray)MimeEoln);
 
+    // Headers
+    range.put(cast(ByteArray)"Content-Type: ");
+    range.put(cast(ByteArray)mimeType);
+    range.put(cast(ByteArray)MimeEoln);
+
     range.put(cast(ByteArray)headers.data);
     range.put(cast(ByteArray)MimeEoln);
 
     // Body
   
-    range.put(entity);
+    if (stream !is null)
+      foreach (buffer; stream) range.put(buffer);
+    else
+      range.put(entity);
   }
 
-  //---------------------------------------------------------------------------
+  //-------------------------------------------------------
   // Functions for response headers.
-  //---------------------------------------------------------------------------
 
   void status(ulong status, string msg = null)
   {
@@ -65,7 +83,7 @@ struct HttpResponse
     httpStatusMsg = msg;
   }
 
-  //------------------------------------
+  //-------------------------------------------------------
 
   void setSessionCookie(string name, string value, string path = "/", string domain = null)
   {
@@ -134,7 +152,10 @@ struct HttpResponse
     httpStatusMsg = "OK";
     headers = appender!string();
     entity = entity.init;
+    stream = null;
   }
+
+  //-------------------------------------------------------
 
   private:
     string mimeType = "text/plain";
@@ -143,12 +164,14 @@ struct HttpResponse
     private Appender!string headers;
 }
 
+//----------------------------------------------------------------------------
+
 unittest
 {
   import std.range;
   import std.stdio;
 
-  auto napp = appender!ByteArray;
+  auto napp = appender!ByteArray();
   HttpResponse response;
 
   response.entity = cast(ByteArray)("Hello Goodbye\n");

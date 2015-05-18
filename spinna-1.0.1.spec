@@ -19,7 +19,6 @@ make DESTDIR=%{buildroot} rpminstall
 
 %files
 %defattr(-,root,root)
-%{_libdir}/libfig.a
 %{_bindir}/makerouter
 %{_bindir}/makefixdb
 %{_includedir}/spinna

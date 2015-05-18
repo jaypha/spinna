@@ -16,8 +16,8 @@ public import jaypha.spinna.pagebuilder.component;
 
 interface ListComponent : Component
 {
-  @property void start(ulong);
-  @property void limit(ulong);
+  @property void start(size_t);
+  @property void limit(size_t);
   @property ulong length();
 }
 

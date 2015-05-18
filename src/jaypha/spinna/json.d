@@ -1,5 +1,6 @@
+// Written in the D programming language.
 /*
- * Support function for JSON based requests/resposnes.
+ * Support functions for JSON based requests/resposnes.
  *
  * Copyright 2014 Jaypha
  *
@@ -8,7 +9,6 @@
  *
  * Authors: Jason den Dulk
  *
- * Written in the D programming language.
  */
 
 module jaypha.spinna.json;
@@ -19,6 +19,8 @@ import jaypha.spinna.global;
 
 public import std.json;
 import std.conv;
+
+//--------------------------------------------------------------------------
 
 JSONValue fromStrStr(strstr value)
 {
@@ -42,7 +44,7 @@ void copy(ref JSONValue doc, ref HttpResponse response, bool noCache = true)
   response.entity = cast(ByteArray)s;
 }
 
-// Deprecated
+deprecated("Use jaypha.spinna.json.copy instead")
 void transfer(ref JSONValue doc, ref HttpResponse response, bool noCache = true)
 {
   copy(doc,response,noCache);

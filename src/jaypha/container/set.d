@@ -12,9 +12,11 @@
 
 module jaypha.container.set;
 
+//----------------------------------------------------------------------------
 // Simple collection where each element is unique.
-
+//----------------------------------------------------------------------------
 struct Set(T)
+//----------------------------------------------------------------------------
 {
   void put(T t)
   {
@@ -24,9 +26,9 @@ struct Set(T)
     theSet ~= t;
   }
 
-  ulong size() { return theSet.length; }
+  @property size_t size() { return theSet.length; }
 
-  auto range()
+  @property auto range()
   {
     return theSet;
   }
@@ -38,10 +40,11 @@ struct Set(T)
 
 //----------------------------------------------------------------------------
 // Like Set, but the elements are ordered, and the set is indexable.
-
+//----------------------------------------------------------------------------
 struct OrderedSet(T)
+//----------------------------------------------------------------------------
 {
-  ulong put(T t)
+  size_t put(T t)
   {
     foreach (i,e; theSet)
       if (t == e) return i;
@@ -50,11 +53,11 @@ struct OrderedSet(T)
     return theSet.length-1;
   }
 
-  ulong size() { return theSet.length; }
+  @property size_t size() { return theSet.length; }
 
-  T opIndex(ulong i) { return theSet[i]; }
+  T opIndex(size_t i) { return theSet[i]; }
 
-  auto range()
+  @property auto range()
   {
     return theSet;
   }
@@ -62,4 +65,37 @@ struct OrderedSet(T)
   private:
 
     T[] theSet;
+}
+
+//----------------------------------------------------------------------------
+
+unittest
+{
+  Set!long set;
+
+  assert(set.size == 0);
+
+  set.put(5);
+  assert(set.size == 1);
+  set.put(7);
+  assert(set.size == 2);
+  set.put(5);
+  assert(set.size == 2);
+
+  assert(set.range == [5,7]);
+
+  OrderedSet!long oSet;
+
+  assert(oSet.size == 0);
+
+  oSet.put(5);
+  assert(oSet.size == 1);
+  oSet.put(7);
+  assert(oSet.size == 2);
+  oSet.put(5);
+  assert(oSet.size == 2);
+
+  assert(oSet.range == [5,7]);
+  assert(oSet[0] == 5);
+  assert(oSet[1] == 7);
 }

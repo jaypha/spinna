@@ -1,6 +1,6 @@
 //Written in the D programming language
 /*
- * Fixed point values.
+ * Fixed point type.
  *
  * Copyright 2013 Jaypha
  *

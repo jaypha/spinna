@@ -1,0 +1,2 @@
+The files in this directory are used to test stuff that is not readily tested
+with unittest. Things that involves reading/writing from/to a file, for example.

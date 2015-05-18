@@ -19,6 +19,7 @@ public import jaypha.spinna.pagebuilder.widgets.integer;
 public import jaypha.spinna.pagebuilder.widgets.checkgroup;
 public import jaypha.spinna.pagebuilder.widgets.radiogroup;
 public import jaypha.spinna.pagebuilder.widgets.datepicker;
+public import jaypha.spinna.pagebuilder.widgets.time;
 public import jaypha.spinna.pagebuilder.widgets.buttons;
 public import jaypha.spinna.pagebuilder.widgets.decimal;
 public import jaypha.spinna.pagebuilder.widgets.dropdown_list;

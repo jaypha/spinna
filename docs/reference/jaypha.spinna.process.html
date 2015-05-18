@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<!--
+  Documentation for Jaypha Spinna.
+  Copyright 2015 Jaypha.
+  Distributed under the Boost Licence.
+  Written by Jason den Dulk.
+-->
+<head>
+ <title>Spinna - jaypha.spinna.process</title>
+ <link rel='stylesheet' type='text/css' href='../style.css'>
+</head>
+<body>
+<div class='body'>
+<h1>Module Reference - jaypha.spinna.process</h1>
+
+<p>This module defines the RequestProcessor struct.</p>
+
+<dt class="d_decl">struct <a name="RequestProcessor"></a><span class="funcName">RequestProcessor(I,O)</span>   if (isOutputRange!(O,immutable(ubyte)[]))</dt>
+<dd>
+<p>
+I - Input range type that is used to communicate with the external environment. The
+HTTP request will be read from an input range of this type.<br/>
+O - Output range type that is used to communicate with the external environment. The HTTP
+response will be written to an output range of this type.</p>
+
+<p><b>Properties:</b></p>
+<table class='parms'>
+<tr><td class='code'><a href='#errorHandler'>errorHandler</a></td>
+<td>Callback to create an error respsonse.</td></tr>
+<tr><td class='code'><a href='#preServiceHandler'>preServiceHandler</a></td>
+<td>Callback to function called prior to designated function.</td></tr>
+<tr><td class='code'><a href='#postServiceHandler'>postServiceHandler</a></td>
+<td>Callback to function called after designated function.</td></tr>
+<tr><td class='code'><a href='#findRoute'>findRoute</a></td>
+<td>Callback for router. Called to identify the function to handle the given URL and method.</td></tr>
+</table>
+
+<p><b>Methods</b></p>
+<table class='parms'>
+<tr><td class='code'><a href='#run'>run</a></td>
+<td>Processes the request.</td></tr>
+</table>
+</dd>
+
+<div class='aggregate-content'>
+
+<a name='errorHandler'></a>
+<dt class="d_decl">shared static void function (ulong code, string message, O errStream) <span class='funcName'>errorHandler</span></dt>
+<dd>
+<p>If an error occurs, this handler will be called. The handler will typically create an
+error HTTP response and write it.</p>
+<p><b>Callback Parameters</b></p>
+<table class='parms'>
+<tr><td class='code'>ulong <i>code</i></td><td>HTTP error code.</td></tr>
+<tr><td class='code'>string <i>message</i></td><td>HTTP error message.</td></tr>
+<tr><td class='code'>O <i>errStream</i></td><td>Error output stream (same as error stream passed to run()).</td></tr>
+</table>
+</dd>
+
+<a name='preServiceHandler'></a>
+<dt class="d_decl">shared static bool function () <span class='funcName'>preServiceHandler</span></dt>
+<dd>
+<p>Called prior to the function identified by the router. This allows for any custom
+universal setup work. Also serves as the authentication function. The return value
+determines whether the indicated service will be performed.</p>
+<p><b>Returns</b>: If returns <span class='code'>true</span>, then service
+identified by the router will be called. if <span class='code'>false</span>,
+the service will not be called.</p>
+</dd>
+
+<a name='postServiceHandler'></a>
+<dt class="d_decl">shared static bool function () <span class='funcName'>postServiceHandler</span></dt>
+<dd>
+<p>Called after the function identified by the router, but before the sending of the response
+or saving of any session data.</p>
+</dd>
+
+<a name='findRoute'></a>
+<dt class="d_decl">shared static ActionInfo function (string path, string method) <span class='funcName'>findRoute</span></dt>
+<dd>
+<p>The router function. Determines the service to be called from the
+URL path and HTTP method.
+</p>
+<p><b>Callback Parameters</b></p>
+<table class='parms'>
+<tr><td class='code'>string <i>path</i></td><td>The URL path.</td></tr>
+<tr><td class='code'>string <i>method</i></td><td>The HTTP method.</td></tr>
+</table>
+<p><b>Returns</b>: An ActionInfo instance containing the action name and a
+callback delegate pointer.</p>
+</dd>
+
+
+<a name='run'></a>
+<dt class="d_decl">static void <span class='funcName'>run</span>(string[string] env, I inputStream, O outputStream, O errorStream)</dt>
+<dd>
+<p>Performs the processing of the request.</p>
+<p><b>Parameters</b></p>
+<table class='parms'>
+<tr><td class='code'>string[string] <i>env</i></td><td>Environment variables.</td></tr>
+<tr><td class='code'>I <i>inputStream</i></td><td>The input.</td></tr>
+<tr><td class='code'>O <i>outputStream</i></td><td>The output.</td></tr>
+<tr><td class='code'>O <i>errorStream</i></td><td>The output for errors.</td></tr>
+</table>
+</dd>
+
+</div> <!-- RequestProcess -->
+
+<a name='extractEnv'></a>
+<dt class="d_decl">auto <span class='funcName'>extractEnv</span>(R)(ref string[string] env, ref R reader)</dt>
+<dd>
+<p>Extracts environment variables from the main headers of a MIME document.</p>
+
+<p>As a concession to FCGI, RequestProcessor requires the main HTTP
+ headers to be extracted and placed in an environment array.
+ When not reading from an FCGI source, this function is called
+ first to manually perform the extraction.</p>
+
+<p><b>Parameters</b></p>
+<table class='parms'>
+<tr><td class='code'>ref string[string] <i>env</i></td><td>Environment variables.</td></tr>
+<tr><td class='code'>ref R <i>reader</i></td><td>MIME Entity input.</td></tr>
+</table>
+<p><b>Returns</b>: The content of the MIME document as a type compatible with R.</p>
+</dd>
+
+
+
+
+<p class='footer'>
+Copyright 2015 Jaypha
+</p>
+</div>
+</body>
+</html>

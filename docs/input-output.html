@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<!--
+  Documentation for Jaypha Spinna.
+  Copyright 2015 Jaypha.
+  Distributed under the Boost Licence.
+  Written by Jason den Dulk.
+-->
+<head>
+ <title>Spinna - Introduction</title>
+ <link rel='stylesheet' type='text/css' href='style.css'>
+</head>
+<body>
+<div class='body'>
+<h1>Input and Output</h1>
+
+<p>Web servers take input in the form of a HTTP request and supplies output in the form of an
+HTTP response. Spinna works with the request and response directly.</p>
+
+<p>The <span class='code'>jaypha.spinna.global</span> module declares two
+variables, <span class='code'>request</span> and <span class='code'>response</span>,
+of types <span class='code'>HttpRequest</span> and <span class='code'>HttpResponse</span> respectively.</p>
+
+<p><span class='code'>HttpRequest</span> is defined in <span class='code'>jaypha.spinna.request</span>.<br/>
+<span class='code'>HttpResponse</span> is defined in <span class='code'>jaypha.spinna.response</span>.</p>
+
+<p><span class='code'>HttpRequest</span> contains the URL (or GET) parameters, the environment
+variables and cookies. If the content type is x-www-url-encoded or multipart/formdata, then the
+contents are extracted and available as POST parameters and files. Otherwise the content is
+avaiable in raw form for the program to access.</p>
+
+<p><span class='code'>HttpResponse</span> contains methods to set the response headers and a property <span class='code'>entity</span> of type
+<span class='code'>ByteArray</span> for the output body. Your code would "write" its output to <span class='code'>HttpResponse.entity</span>.
+You then call <span class='code'>HttpResponse.copy()</span> to send the response to an output range.</p>
+
+<p>Alternatively, if you want to stream your output (ie. lazy output), you could set the
+<span class='code'>stream</span> member.
+
+<p>Two common ways to generate the output content is to use Pagebuilder to create a HTML
+Document and use <span class='code'>jaypha.spinna.pagebuilder.document.copy()</span>, and to create a JSON
+structure and use <span class='code'>jaypha.spinna.json.copy()</span>.</p>
+
+<h2>I/O streams</h2>
+
+<p>In HTTP, the input and output streams are defined as "octet-streams". So, in Spinna,
+I/O is done through input ranges of <span class='code'>immutable(ubyte)</span> and output ranges of
+<span class='code'>immutable(ubyte)[]</span>.</p>
+
+<p>An alias exists - <span class='code'>alias ByteArray immutable(ubyte)[]</span>.</p>
+
+<p>The types that define the I/O ranges are supplied as parameters to
+<span class='code'>RequestProcessor</span>, and
+the streams that provide the input, output and error output are supplied as parameters to
+<span class='code'>RequestProcessor.run()</span>.</p>
+
+<p>FCGI preextracts the headers of the MIME document and places these in an enviroment
+array. For other types of web server, <span class='code'>RequestProcessor</span> calls 
+<span class='code'>jaypha.spinna.process.extractEnv()</span>, which performs this task.</p>
+
+<p class='footer'>
+Copyright 2015 Jaypha
+</p>
+</div>
+</body>
+</html>

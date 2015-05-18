@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<!--
+  Documentation for Jaypha Spinna.
+  Copyright 2015 Jaypha.
+  Distributed under the Boost Licence.
+  Written by Jason den Dulk.
+-->
+<head>
+ <title>Spinna - Introduction</title>
+ <link rel='stylesheet' type='text/css' href='style.css'>
+</head>
+<body>
+<div class='body'>
+<h1>Introduction</h1>
+
+<h3>Features</h3>
+<h4>The Usual Nuts &amp; Bolts</h4>
+
+<p>Spinna comes with many of the features you would expect from an independant
+  framework. Support for reading HTTP requests and writing HTTP responses,
+  sessions, templates, validation etc.
+  There are two things however, that are absent: databases and
+  authorisation.</p>
+<p>There are no database features because no aspect of Spinna
+  requires one. You use your own favorite database code. I have written a
+  <a href='https://github.com/jaypha/dbsql'>set of database classes</a>
+  and you are welcome to use them, but it is by no means
+  obligatory.</p>
+<p>Authorisation can be done in many different ways, and I have not yet come
+   across a satisfactory universal solution. So I provide a
+   means by which you can supply your own authorisation mechanism, and if I
+   come across something that can be used, I will consider including it in a
+   future release.</p>
+   
+<h4>Server Independance</h4>
+
+<p>Spinna is desigend to not tie you down to any particular type of web
+   server. By creating an appropriate adaptor, you can use Spinna with any web
+   server "front end". Spinna comes with three adaptors. One to allow
+   execution from the console, another to interface with FCGI, and one to
+   interface with Vibe-d.</p>
+
+<h4>Compile Time Router</h4>
+
+<p>Spinna's makerouter utitlity is used to generate D code that is compiled into the
+   project to perform the routing tasks. Thus the router is direct binary which would
+   be faster than run time created objects.</p>
+
+<h4>Pagebuilder</h4>
+
+<p>Pagebuilder is a set of classes to help you to construct HTML pages. While
+   not trying to hide HTML from you, it does seek to take
+   much of the boilerplate burden away from you.</p>
+
+<p>Pagebuilder makes use of the fact that HTML is heirarchical in nature. So by
+   using classes that derive from the <span class='code'>Component</span>
+   interface, you can construct a heirarchy of objects, and then have them
+   generate the HTML to be sent to output.</p>
+
+<p>Thus you can create classes as reusable components, to encapsulate boilerplate,
+   or simply to breakdown a complex page into smaller chunks.</p>
+
+<p>Pagebuilder supplies classes for common components such as paginated
+   lists, forms and widgets.</p>
+
+<h4>Templates</h4>
+<p>The ability to embed code inside plain text is popular with website
+   programming, and Spinna provides its own template engine to do this. Similar
+   in functionality to <a href='http://code.dlang.org/packages/embd'>EmbD</a> and <a href='http://code.dlang.org/packages/temple'>Temple</a>,
+   Spinna's template engine is more specialised to work with Pagebuilder.</p>
+<p class='footer'>
+Copyright 2015 Jaypha
+</p>
+</div>
+</body>
+</html>

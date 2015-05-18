@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<!--
+  Documentation for Jaypha Spinna.
+  Copyright 2015 Jaypha.
+  Distributed under the Boost Licence.
+  Written by Jason den Dulk.
+-->
+<head>
+ <title>Spinna - Main Process</title>
+ <link rel='stylesheet' type='text/css' href='style.css'>
+</head>
+<body>
+<div class='body'>
+<h1>Main Process Routine</h1>
+<p>In Spinna the primary rountine for processing requests is 
+<a href='reference/jaypha.spinna.process.html#RequestProcessor'><span class='code'>RequestProcessor</span></a>. It performs the following steps<p>
+
+<ol class='p'>
+ <li>Interperet the HTTP request and put info into easy to use data structures.</li>
+ <li>Run the router to determine which service to call. Failure results in a 404 response.</li>
+ <li>Call pre-process routine, if any. Pre-process routine may perform authorisation
+    or other validation.</li>
+ <li>Run the service, if OK'd by pre-process.</li>
+ <li>Run post-process routine, if any.</li>
+ <li>Save the session.</li>
+ <li>Catch any exceptions to generate an error page.</li>
+ <li>Output the HTTP response.</li>
+</ol>
+
+<p><span class='code'>RequestProcessor</span> is in the
+<span class='code'>jaypha.spinna.process</span> module.
+
+<p>To use <span class='code'>RequestProcessor</span> you will need to
+instantaite it with input/output range types.</p>
+
+<p>Spinna has <a href='web-server.html'>three built in</a>
+   <span class='code'>RequestProcessor</span> type definitions.</p>
+
+<p>For an FCGI based service (using fcgi-loop), use the struct
+<span class='code'>fcgiRequestProcessor</span> defined in
+<span class='code'>jaypha.spinna.main.fcgi</span>.</p>
+
+<p>For a console based service, use the struct
+<span class='code'>consoleRequestProcessor</span> defined in
+<span class='code'>jaypha.spinna.main.console</span>.</p>
+
+<p>For a Vibe-d based service, use the struct
+<span class='code'>vibeRequestProcessor</span> defined in
+<span class='code'>jaypha.spinna.main.vibe</span>.</p>
+
+
+<p>RequestProcessor has 4 callback handlers and one method.</p>
+
+<p><b>errorHandler</b> Callback for generating an error response.</p>
+<p><b>findRoute</b> Router function.</p>
+<p><b>preServiceHandler</b> Called after the route has been determined, but before the
+actual service is called.</p>
+<p><b>postServiceHandler</b> Called after the service is called.</p>
+<p><b>run</b> Call this when you are ready to process the request.</p>
+
+<h3>See Also</h3>
+<a href='reference/jaypha.spinna.process.html'>RequestProcessor reference</a>
+
+<p class='footer'>
+Copyright 2015 Jaypha
+</p>
+</div>
+</body>
+</html>

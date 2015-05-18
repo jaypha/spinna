@@ -2,14 +2,15 @@
 
 == Authorisation ==
 
-Spinna uses role based authorisation. Accounts are given one or more roles. Each service
-may have a number of roles which are allowed to perform it. With each request, the framework
-matches the allowed roles for the service with the roles of the user.
+Spinna does not specifically define authorisation itself. This allows the developer
+the freedom to use their preferred authorisation method.
 
-A service may have no roles identified, in which it is considered publicly accessible. If
-roles are defined, then the user must be logged in and have at least one of the defined
-roles assigned to their account. If the user is authorised, the service is performed
-normally. If the user is not authorised, then either a redirection to a login page occurs,
-or the request is rejected with a 403 response.
+The main request processor allows for the declaring of a preServieHandler
+function that returns a bool. This is where authorisation checks should take
+place. If "false" is returned, the the service will not be performed.
 
-Authorisation for services are defined in the router definition resource.
+The preServiceHandler is expected to generate the appropriate output if authentication
+fails.
+
+The router provided by Spinna adds a CURRENT_ACTION value to the request environment that
+can be used by authorisation.

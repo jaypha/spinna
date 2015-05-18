@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<!--
+  Documentation for Jaypha Spinna.
+  Copyright 2015 Jaypha.
+  Distributed under the Boost Licence.
+  Written by Jason den Dulk.
+-->
+<head>
+ <title>Spinna - Introduction</title>
+ <link rel='stylesheet' type='text/css' href='style.css'>
+</head>
+<body>
+<div class='body'>
+<h1>Installation</h1>
+<p>As much as I would like to make Spinna a turnkey project, some extra
+   installation steps are required.</p>
+
+<h3>Requirements</h3>
+<p>In addition to itself, Spinna requires the following.</p>
+<ul>
+<li>rDMD or other D compiler</li>
+<li><a href='http://sass-lang.com/'>Sass</a></li>
+<li>Dub packages jaypha-base,
+    jaypha-inet, dyaml and their dependencies.</li>
+</ul>
+
+<p>For FCGI based websites:</p>
+<ul>
+<li>FCGI system library</li>
+<li>Dub package fcgi-loop</li>
+</ul>
+
+<p>For Vibe-d base websites:</p>
+<ul>
+<li>Dub package vibe-d</li>
+</ul>
+
+<p>For console executables:</p>
+<ul>
+<li>Dub package backtrace</li>
+</ul>
+
+<h3>MakeRouter</h3>
+
+<p>To make use of Spinna's router, you will need to compile the makerouter utility
+and install it.</p>
+<p>The main source file is in <span class='code'>src/makerouter.d</span></p>
+<p>A makefile exists for Linux. To use it run <span class='code'>make bin</span>
+and then, <span class='code'>sudo make install</span>.</p>
+
+<p class='footer'>
+Copyright 2015 Jaypha
+</p>
+</div>
+</body>
+</html>

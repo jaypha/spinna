@@ -1,6 +1,6 @@
 //Written in the D programming language
 /*
- * Main processing routine for HTTP requests.
+ * Main processing code for HTTP requests.
  *
  * Copyright 2014 Jaypha
  *
@@ -17,8 +17,8 @@ import std.range;
 import std.algorithm;
 
 import jaypha.spinna.global;
+import jaypha.spinna.router.actioninfo;
 import std.uni;
-import gen.router;
 import std.traits;
 import std.conv;
 
@@ -35,48 +35,53 @@ import std.conv;
  * 7. Output the HTTP response.
  */
 
-// TODO must test for service of type void Delegate()
-
-enum bool isRouterController(R) = is(typeof(
-  (inout int = 0)
-  {
-    if (R.hasRoute("","")) {}
-    R.doService();
-  }
-));
-
 //---------------------------------------------------------------------------------------
-// This would be defined as an alias in an appropriate main file.
-
-struct RequestProcessor(I,O,RC)
-  if (isOutputRange!(O,immutable(ubyte)[]) && isRouterController!RC)
+// This would be defined as an alias in an appropriate adaptor file.
+//---------------------------------------------------------------------------------------
+struct RequestProcessor(I,O)
+  if (isOutputRange!(O,immutable(ubyte)[]))
+//---------------------------------------------------------------------------------------
 {
-  shared static void function (ulong, string, O) errorHandler;
+  alias O OutputRange;
+  shared static void function (ulong, string, ref O) errorHandler;
   shared static bool function () preServiceHandler;
   shared static void function () postServiceHandler;
+  shared static ActionInfo function (string,string) findRoute;
 
-  static void run(strstr env, I inputStream, O outputStream, O errorStream)
+  static void run(strstr env, ref I inputStream, ref O outputStream, ref O errorStream)
   {
+    assert(errorHandler);
+    assert(findRoute);
     scope(exit) { session.clear(); request.clear(); response.clear(); }
     try
     {
-      request.prepare(env, inputStream);
+      if (!isFCGI)
+      {
+        auto r = extractEnv(env, inputStream);
+        request.prepare(env, r);
+      }
+      else
+        request.prepare(env, inputStream);
 
       if ("SPINNA_SESSION" in request.cookies)
         session.sessionId = request.cookies["SPINNA_SESSION"].value;
 
-      if (!RC.hasRoute(request.path,toLower(request.method)))
+      auto info = findRoute(request.path,toLower(request.method));
+
+      if (info.action is null)
       {
         // Could not match.
-        errorHandler(404, "Page not found: "~request.path, outputStream);
+        errorHandler(404, "Page not found: "~request.path, errorStream);
       }
       else
       {
+        request.environment["CURRENT_ACTION"] = info.action;
+
         bool doService = true;
         if (preServiceHandler)
           doService = preServiceHandler();
         if (doService)
-          RC.doService();
+          info.service();
         if (postServiceHandler)
           postServiceHandler();
       }
@@ -88,38 +93,56 @@ struct RequestProcessor(I,O,RC)
     }
     catch (HttpException e)
     {
-      // A malformed HTTP request
-      // Give 4xx response
-      errorHandler(e.code,e.msg, outputStream);
+      errorHandler(e.code,e.msg, errorStream);
     }
     catch (Exception e)
     {
-      // General problem
-      errorHandler(500,e.msg, outputStream);
+      // General problem result in a 500 response.
+      errorHandler(500,e.msg, errorStream);
     }
 
     response.copy(outputStream);
   }
 }
 
+
+//----------------------------------------------------------------------------
+// Extracts environment variables from the main headers of a MIME document.
+//
+// As a concession to FCGI, RequestProcessor requires the main HTTP
+// headers to be extracted and placed in an environment array.
+// When not reading from an FCGI source, this function is called
+// first to manually perform the extraction.
+
 import std.string;
 import jaypha.inet.mime.reading;
 
-//----------------------------------------------------------------------------
-// Extracts environment variables from the main headers of a mime document.
-//
-// As a concession to FCGI, RequestProcessor assumes that the main HTTP
-// headers have already been read an processed. If you are reading from a
-// source that doesn't do this, then use extractEnv to extract information
-// from the HTTP headers and put it into enviroment variables.
-
-auto extractEnv(R)(ref strstr env, R reader)
+auto extractEnv(R)(ref strstr env, ref R reader)
 {
+  auto firstLine = appender!ByteArray();
+  auto stuff = jaypha.inet.mime.reading.readUntil(reader, "\r\n");
+  stuff.copy(firstLine);
+
+  auto firstLineWords = split(cast(string)firstLine.data);
+
+  env["REQUEST_METHOD"] = firstLineWords[0];
+  env["REQUEST_URI"] = firstLineWords[1];
+  env["SERVER_PROTOCOL"] = firstLineWords[2];
+
+  auto s = split(firstLineWords[1],"?");
+  env["SCRIPT_NAME"] = s[0];
+  env["SCRIPT_URL"] = s[0];
+  env["QUERY_STRING"] = s.length>1?s[1]:null;
+
   auto entity = mimeEntityReader(reader);
   foreach (h; entity.headers)
   {
     switch (h.name)
     {
+      case "Host":
+        env["HTTP_HOST"] = strip(h.fieldBody);
+        env["SERVER_NAME"] = strip(h.fieldBody);
+        break;
       case "Content-Type":
         env["CONTENT_TYPE"] = strip(h.fieldBody);
         break;
@@ -136,5 +159,6 @@ auto extractEnv(R)(ref strstr env, R reader)
         ;
     }
   }
+
   return entity.content;
 }

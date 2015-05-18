@@ -1,6 +1,6 @@
 //Written in the D programming language
 /*
- * Server side HTTP request context
+ * Server side HTTP request.
  *
  * Copyright 2013 Jaypha.
  *
@@ -36,6 +36,7 @@ import std.stdio;
 import std.string;
 import std.traits;
 import std.range;
+import std.conv;
 
 // In D2, Files in structures in associative arrays, causes a crash.
 
@@ -49,12 +50,8 @@ class HttpFileUpload
 }
 
 //-----------------------------------------------------------------------------
-//
-// HttpRequest
-//
-//-----------------------------------------------------------------------------
-
 struct HttpRequest
+//-----------------------------------------------------------------------------
 {
   strstr environment;
 
@@ -106,11 +103,7 @@ struct HttpRequest
 
 
 //-----------------------------------------------------------------------------
-//
 // Parsing and extracting routines.
-//
-//-----------------------------------------------------------------------------
-
 
 void prepare(IRange)(ref HttpRequest request, strstr env, IRange input)
   if (isByteRange!IRange)
@@ -131,16 +124,21 @@ void prepare(IRange)(ref HttpRequest request, strstr env, IRange input)
         throw new HttpException("Missing Content-Type");
         
       auto contentType = extractMimeContentType(env["CONTENT_TYPE"]);
+
+      // Not all inputs terminate after the content has ended, so we 
+      // artificially end it.
+      auto t = take(input, to!(size_t)(env["CONTENT_LENGTH"]));
+
       if (contentType.type == "multipart/form-data")
       {
         if (!("boundary" in contentType.parameters))
           throw new HttpException("malformed Content-Type");
-        parseForm!IRange(request, input, contentType.parameters["boundary"]);
+        parseForm(request, t, contentType.parameters["boundary"]);
       }
       else
       {
         auto a = appender!(immutable(ubyte)[])();
-        input.copy(a);
+        t.copy(a);
         
         if (contentType.type == "application/x-www-form-urlencoded")
         {
@@ -184,7 +182,6 @@ StrHash extractPosts(string s)
 }
 
 //-----------------------------------------------------------------------------
-
 // Extract a parameter from a url encoded string.
 
 void extractParam(string pair, ref StrHash p)
@@ -218,9 +215,9 @@ void parseForm(IRange)(ref HttpRequest request, IRange input, string boundary)
     MimeContentType ct;
     MimeContentDisposition disp;
 
-    auto partReader = reader.front; // part_reader is a MimeEntityReader
+    auto partReader = reader.front; // partReader is a MimeEntityReader
 
-    /* Look for content-type and disposition in the header */
+    /* Look for content type and disposition in the header */
     foreach (header; partReader.headers)
     {
       switch (header.name)
@@ -264,73 +261,3 @@ void parseForm(IRange)(ref HttpRequest request, IRange input, string boundary)
 }
 
 //---------------------------------------------------------------------------
-
-debug(http_request)
-{
-  import std.stdio;
-  import std.range;
-  import std.conv;
-  
-
-  import jaypha.io.dirtyio;
-
-  void main(string[] args)
-  {
-    writeln("begin");
-    string[string] env;
-    HttpRequest request;
-
-    if (args.length > 1)
-    {
-      env["REQUEST_METHOD"] = args[1];
-      env["QUERY_STRING"] = args[2];
-      
-      auto win = ReadIn(stdin);
-      auto entity = mimeEntityReader(win);
-
-      foreach (h; entity.headers)
-      {
-        switch (h.name)
-        {
-          case "Content-Type":
-            env["CONTENT_TYPE"] = strip(h.fieldBody);
-            break;
-          case "Cookie":
-            env["HTTP_COOKIE"] = strip(h.fieldBody);
-            break;
-          case "Referer":
-            env["HTTP_REFERER"] = strip(h.fieldBody);
-            break;
-          case "Content-Length":
-            env["CONTENT_LENGTH"] = strip(h.fieldBody);
-            break;
-          default:
-            ;
-        }
-      }
-
-      request.prepare(env,entity.content);
-    }
-    else
-    {
-      string txt = "r=5&q=10&t=3+12&n=8";
-
-      env["QUERY_STRING"] = "a=5&b=10;j=3+12&a=8";
-      env["REQUEST_METHOD"] = "POST";
-      env["CONTENT_LENGTH"] = to!string(txt.length);
-      env["CONTENT_TYPE"] = "application/x-www-form-urlencoded";
-      ubyte[] bytes = cast(ubyte[])txt.dup;
-      auto r1 = inputRangeObject(bytes);
-      request.prepare(env,r1);
-    }
-
-    auto wout = WriteOut(stdout);
-    writeln(request.method());
-
-    writeln("--gets--");
-    request.gets.dump(wout);
-    writeln("--posts--");
-    request.posts.dump(wout);
-    writeln("finish");
-  }
-}

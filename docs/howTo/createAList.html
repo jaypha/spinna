@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<!--
+  Documentation for Jaypha Spinna.
+  Copyright 2015 Jaypha.
+  Distributed under the Boost Licence.
+  Written by Jason den Dulk.
+-->
+<head>
+ <title>Spinna - Introduction</title>
+ <link rel='stylesheet' type='text/css' href='../style.css'>
+</head>
+<body>
+<div class='body'>
+<h1>How To Create A List in Pagebuilder</h1>
+
+
+<h4>Imported Modules</h4>
+
+<p>
+ jaypha.spinna.pagebuilder.lists.table_list<br/>
+ jaypha.spinna.pagebuilder.lists.paged_list (if using pagination)
+</p>
+
+<h4>Do the following</h4>
+
+<ol>
+<li><p>Define a data source.</p>
+
+<p>A datasource is an input range that defines <span class='code'>[]</span>,
+<span class='code'>[a..b]</span> and <span class='code'>$</span>. Unlike
+<span class='code'>hasSlice</span>, data sources do not need to be forward ranges.</p>
+</li>
+<li><p>Define a mapper function</p>
+
+<p>This function creates a row of display data from a row of input data.</p>
+
+<p><span class='code'>string[] mapper(E source)</span> - E is the element type of the datasource.</p>
+</li>
+
+<li>Define a <span class='code'>string[] of headers</span></li>
+<li>Implement <span class='code'>TableListComponent</span></li>
+<li>Insert the component into a paginated list component (optional)</li>
+<li>Insert into your document</li>
+</ol>
+<h3>Example</h3>
+
+<pre class='code'>
+string[string][] sourceData = getDataFromSomewhere();
+
+string[] mapper(string[string] sourceRow)
+{
+  // The order of the returning array is the order it will be displayed in the
+  // list table.
+
+  return
+  [
+    someSuitableFormat(sourceRow["time"]),
+    sourceRow["name"],
+    "&lt;b>"~sourceRow["something-important"]~"&lt;/b>"
+  ];
+}
+
+string[] headers = [ "Time", "Name", "Something&lt;br/>Important" ];
+
+ListComponent list = new TableListComponent!(string[string][])("list-name", sourceData, headers, &mapper);
+
+Component paged = new PagedList!("paged_template_file","paginator_template_file")("css-id", request.path, request.gets);
+
+// Alternatively   Component paged = defaultPagedList("css-id", request.path, request.gets);
+
+paged.content = list;
+</pre>
+
+<p class='footer'>
+Copyright 2015 Jaypha
+</p>
+</div>
+</body>
+</html>

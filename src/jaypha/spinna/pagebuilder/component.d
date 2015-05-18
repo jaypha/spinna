@@ -13,8 +13,8 @@
 module jaypha.spinna.pagebuilder.component;
 
 public import jaypha.types;
-public import jaypha.io.output_stream;
-import jaypha.embed;
+public import jaypha.io.outputstream;
+import jaypha.spinna.embed;
 
 public import jaypha.html.entity;
 import std.algorithm;

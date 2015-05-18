@@ -25,7 +25,7 @@ enum pageSizeDefault = 50;
 // Session configs.
 
 enum sessionDir = "/tmp/";
-enum sessionTimeLimit = 20*600000000; // 20 minutes;
+enum sessionTimeLimit = 20*600000000L; // 20 minutes;
 
 // jQuery
 

@@ -5,7 +5,9 @@
 	"authors": ["Jason den Dulk"],
 	"license": "BSL-1.0",
 	"dependencies": {
-    "fcgi-loop" : ""
+    "fcgi-loop" : "",
+    "jaypha-base" : "",
+    "jaypha-inet" : ""
   },
   "configurations":
   [

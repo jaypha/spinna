@@ -22,7 +22,7 @@ struct MenuItem
   MenuItem[] sub_menu;
 }
 
-class MenuComponent(string S = "jaypha/spinna/pagebuilder/widgets/menu-default.tpl") : Component
+class MenuComponent(string S = "jaypha/spinna/pagebuilder/widgets/menudefault.tpl") : Component
 {
   MenuItem[] menu;
 

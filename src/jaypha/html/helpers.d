@@ -35,7 +35,7 @@ string truncatedText(string text, uint length)
 
 string nl2br(string text)
 {
-  return replace(text, "\n", "<br>");
+  return replace(text, "\n", "<br/>");
 }
 
 //-----------------------------------------------------------------------------
@@ -81,6 +81,11 @@ string htmlImg(string src, string alt, string cssClass = null, string id = null)
 
 enum HtmlImg(string src, string alt, string cssClass = null, string id = null)
   = htmlImg(src,alt,cssClass,id);
+
+string htmlComment(string content, bool inline = true)
+{
+  return "<!-- "~(inline?"":"\n")~content~(inline?"":"\n")~" -->";
+}
 
 /+
 

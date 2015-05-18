@@ -1,4 +1,14 @@
 // Written in the D programming language.
+/*
+ * Defines code for various pages for a sample website.
+ *
+ * Copyright 2014 Jaypha
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Authors: Jason den Dulk
+ */
 
 module pages;
 
@@ -8,11 +18,8 @@ import jaypha.spinna.global;
 import jaypha.spinna.json;
 import std.array;
 
-//import jaypha.spinna.pagebuilder.widgets.icon;
-//import jaypha.spinna.pagebuilder.widgets.icon_button;
-//import jaypha.spinna.pagebuilder.widgets.wide_button;
-//import jaypha.spinna.pagebuilder.widgets.toolbar_ex;
-import jaypha.spinna.pagebuilder.widgets.tabbed;
+//---------------------------------------------------------------------------
+// Construct a response directly
 
 void getHome()
 {
@@ -20,11 +27,19 @@ void getHome()
   response.entity ~= cast(ByteArray)"Hello World!\n";
 }
 
+//---------------------------------------------------------------------------
+// Construct a response using the HTML document builder.
+
 void getHtml()
 {
   auto doc = new Document("home-page");
-  doc.docBody.addClass("special");
+  doc.comment = "Main Comment";
 
+  doc.docHead.title = "Page Title";
+
+  doc.docHead.addCssFile("style.css");
+
+  doc.docBody.addClass("special");
   doc.docBody.put("<h1>This page constructed using the HTML Document Builder.</h1>");
 
   auto hw = new HtmlElement("p");
@@ -34,6 +49,9 @@ void getHtml()
 
   doc.copy(response);
 }
+
+//---------------------------------------------------------------------------
+// Construct a response using the JSON document builder.
 
 void getJson()
 {
@@ -49,133 +67,50 @@ void getJson()
   ret.copy(response);
 }
 
-/*
-void get_icon()
-{
-  auto doc = new Document("home-page", ["icons"]);
-  doc.docHead.addScriptFile("/src/jaypha/spinna/pagebuilder/widgets/icon.js");
-  doc.docHead.addCssFile("/src/jaypha/spinna/pagebuilder/widgets/icon.scss");
+//---------------------------------------------------------------------------
+// Construct a response using a template and TextOutputStream.
 
-  doc.docBody.put(new Icon("Dial",32));
-  transfer(doc, response, false);
+void getTemplate()
+{
+  auto buffer = appender!string();
+
+  uint num = 1;
+
+  auto stream = textOutputStream(buffer);
+  stream.println("This page constructed ","with templates and TextOutputStream");
+  stream.printfln("num = %d!",num);
+
+  // These two are accessed from within the template
+  string title = "Template Output";
+  string message  = "Hello World";
+
+  with (stream)
+  {
+    mixin(TemplateOutput!("template.tpl"));
+  }
+
+  response.entity ~= cast(ByteArray)buffer.data;
 }
 
-void get_icon_btn()
+//---------------------------------------------------------------------------
+// Construct a response using a template and PageBuilder
+
+void getTemplate2()
 {
-  auto doc = new Document("home-page", ["icon-btns"]);
-  doc.docHead.useJquery = true;
-  doc.docHead.addScriptFile("/src/jaypha/spinna/pagebuilder/widgets/icon.js");
-  doc.docHead.addCssFile("/src/jaypha/spinna/pagebuilder/widgets/icon.scss");
+  auto doc = new Document("template-page");
 
-  doc.docHead.addScriptFile("/src/jaypha/spinna/pagebuilder/widgets/icon_button.js");
-  doc.docHead.addCssFile("/src/jaypha/spinna/pagebuilder/widgets/icon_button.scss");
+  doc.docBody.put("<h1>This page constructed using the HTML Document Builder and templates.</h1>");
 
-  auto btn = new IconButton();
-  btn.icon = new Icon("Navigation",32);
-  btn.label = "Nav";
-  //btn.script = "alert('pressed')";
-  
-  doc.docBody.put(btn);
-  transfer(doc, response, false);
+  // These two are accessed from within the template
+  string title = "Page Builder Template";
+  string message  = "Hello Universe";
+
+  auto pre = new HtmlElement("pre");
+
+  mixin TemplateComponent!("template.tpl") CreatePage;
+
+  doc.docBody.put(pre);
+  pre.put(new CreatePage.TC());
+
+  doc.copy(response);
 }
-
-
-void get_toolbar()
-{
-  auto doc = new Document("home-page", ["icon-btn-row"]);
-  doc.docHead.use_jquery = true;
-  doc.docHead.addScriptFile("/src/jaypha/spinna/pagebuilder/widgets/icon.js");
-  doc.docHead.addCssFile("/src/jaypha/spinna/pagebuilder/widgets/icon.scss");
-
-  doc.docHead.addScriptFile("/src/jaypha/spinna/pagebuilder/widgets/icon_button.js");
-  doc.docHead.addCssFile("/src/jaypha/spinna/pagebuilder/widgets/icon_button.scss");
-
-  doc.docHead.addCssFile("/src/jaypha/spinna/pagebuilder/widgets/toolbar.scss");
-
-  doc.docHead.add_script("$('.toolbar .inner').equalise();", true);
-  auto toolbar = new Toolbar();
-  toolbar.groups.length = 1;
-
-  auto btn = new IconButton("nav");
-  btn.icon = new Icon("Navigation",32);
-  btn.label = "Navigate Website";
-  btn.script = "alert('pressed')";
-  toolbar.groups[0].components ~= btn;
-
-  btn = new IconButton("phone");
-  btn.icon = new Icon("Dial",32);
-  btn.label = "Phone";
-  btn.link = "/";
-  toolbar.groups[0].components ~= btn;
-
-  btn = new IconButton("mail");
-  btn.icon = new Icon("Mail",32);
-  btn.label = "Mail";
-  btn.link = "/";
-  toolbar.groups[0].components ~= btn;
-  
-  doc.docBody.put(toolbar);
-  transfer(doc, response, false);
-}
-
-void get_widebutton()
-{
-  auto doc = new Document("home-page", ["icon-btn-row"]);
-  doc.docHead.use_jquery = true;
-  doc.docHead.addScriptFile("/src/jaypha/spinna/pagebuilder/widgets/icon.js");
-  doc.docHead.addCssFile("/src/jaypha/spinna/pagebuilder/widgets/icon.scss");
-
-  doc.docHead.addScriptFile("/src/jaypha/spinna/pagebuilder/widgets/icon_button.js");
-  doc.docHead.addCssFile("/src/jaypha/spinna/pagebuilder/widgets/icon_button.scss");
-
-  doc.docHead.addScriptFile("/src/jaypha/spinna/pagebuilder/widgets/wide_button.js");
-  doc.docHead.addCssFile("/src/jaypha/spinna/pagebuilder/widgets/wide_button.css");
-
-  auto btn = new WideButton("x");
-  btn.left = new Icon("Navigation",32);
-  btn.link = "/";
-  btn.put("Press This");
-  btn.css_styles["width"] = "500px";
-  doc.docBody.put(btn);
-
-  btn = new WideButton();
-  btn.left = new Icon("Dial",32);
-  btn.put("Not available");
-  btn.css_styles["text-align"] = "center";
-  btn.css_styles["width"] = "500px";
-  doc.docBody.put(btn);
-
-  btn = new WideButton();
-  btn.addClass("washout");
-  btn.right = new Icon("Dial",32);
-  btn.put("Click");
-  btn.css_styles["text-align"] = "center";
-  btn.css_styles["width"] = "500px";
-  btn.script = "alert('pressed');";
-  doc.docBody.put(btn);
-
-  transfer(doc, response, false);
-}
-
-
-void get_tabbed()
-{
-  auto doc = new Document("home-page", ["tabbed"]);
-  doc.docHead.useJquery = true;
-  doc.docHead.addScriptFile("/scripts/tabbed.js");
-
-  doc.docHead.addCssFile("/css/tabbed.css");
-
-  auto tabbed = new Tabbed("tabby");
-  auto p = tabbed.addPanel("Page 1");
-  p.add("Page 1 content");
-  p = tabbed.addPanel("Page 2");
-  p.add("Page 2 content");
-  p = tabbed.addPanel("Page 3");
-  p.add("Page 3 content");
-  doc.docBody.put(tabbed);
-  transfer(doc, response, false);
-
-}
-
-*/

@@ -1,6 +1,6 @@
 //Written in the D programming language
 /*
- * Report current state
+ * Generates info about current state.
  *
  * Copyright (C) 2014 Jaypha.
  *
@@ -8,8 +8,6 @@
  * (See http://www.boost.org/LICENSE_1_0.txt)
  *
  * Authors: Jason den Dulk
- *
- * Written in the D programming language.
  */
 
 module jaypha.spinna.readback;
@@ -17,14 +15,12 @@ module jaypha.spinna.readback;
 import jaypha.types;
 
 import jaypha.spinna.global;
-import jaypha.spinna.pagebuilder.document;
 
 import std.array;
 
-void getReadback()
-{
-  response.entity = cast(ByteArray)readbackInfo();
-}
+//---------------------------------------------------------------------------
+// readbackInfo creates a string containing information about the request.
+// This is useful for debugging.
 
 string readbackInfo()
 {
@@ -80,4 +76,12 @@ string readbackInfo()
   s.put(cast(string)request.rawInput);
 
   return s.data;
+}
+
+//---------------------------------------------------------------------------
+// A request processing function to return readback info.
+
+void getReadback()
+{
+  response.entity = cast(ByteArray)readbackInfo();
 }

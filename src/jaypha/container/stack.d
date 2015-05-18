@@ -30,6 +30,8 @@ struct Stack(T)
     @property bool empty() { return q.empty; }
     @property ref T front() { return q[$-1]; }
     void popFront() { q = q[0..$-1]; }
+
+    void clear() { q.length = 0; }
 }
 
 unittest
@@ -65,5 +67,14 @@ unittest
   
   stack.popFront();
 
+  assert(stack.empty);
+
+  stack.put(3);
+  stack.put(12);
+
+  assert(!stack.empty);
+  assert(stack.front == 12);
+
+  stack.clear();
   assert(stack.empty);
 }

@@ -1,6 +1,6 @@
 //Written in the D programming language
 /*
- * 'Main' file for interfacing with FCGI servers.
+ * Server adapter for FCGI.
  *
  * Copyright 2014 Jaypha
  *
@@ -11,10 +11,9 @@
  */
 
 //---------------------------------------------------------------------------
-// fcgiSpinnaRequestProcessor
+// fcgiRequestProcessor
 //---------------------------------------------------------------------------
-// This module defines a RequestProcessor instance that uses the Spinna
-// Router and interfaces with FCGI.
+// This module defines a RequestProcessor instance that interfaces with FCGI.
 //---------------------------------------------------------------------------
 
 module jaypha.spinna.main.fcgi;
@@ -22,22 +21,28 @@ module jaypha.spinna.main.fcgi;
 public import jaypha.fcgi.loop;
 public import jaypha.spinna.process;
 
-import jaypha.spinna.router_controller;
+import jaypha.spinna.global;
 
-alias RequestProcessor!(FcgiInStream,FcgiOutStream,RouterController)
-  fcgiSpinnaRequestProcessor;
+//---------------------------------------------------------------------------
+
+alias RequestProcessor!(FcgiInStream,FcgiOutStream)
+  fcgiRequestProcessor;
+
+//---------------------------------------------------------------------------
 
 void main()
 {
   fcgiLoop(&processFcgi);
 }
 
-
-// Process serves as an adapter between FCGI_loop and process_request
+//---------------------------------------------------------------------------
+// Process serves as an adapter between fcgiLoop and RequestProcessor
 
 void processFcgi(ref FcgiRequest r)
 {
-  fcgiSpinnaRequestProcessor.run
+  isFCGI = true;
+
+  fcgiRequestProcessor.run
   (
     r.env,
     r.fcgiIn,

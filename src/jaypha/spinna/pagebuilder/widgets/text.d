@@ -55,9 +55,14 @@ class TextWidget : Widget
   override void copy(TextOutputStream output)
   {
     if (maxLength != 0) attributes["maxlength"] = to!string(maxLength);
-    put(_value);
+    put(new DelegateComponent(&copyValue));
     super.copy(output);
     output.print(javascript("new StringWidget($('#"~id~"'), { label: '"~label~"', minLength: "~to!string(minLength)~", maxLength: "~to!string(maxLength)~", required: "~to!string(required)~" });"));
+  }
+
+  void copyValue(TextOutputStream output)
+  {
+    output.print(_value);
   }
 
   ulong minLength = 0;

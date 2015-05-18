@@ -426,6 +426,14 @@ bool validateBoolean(out bool value, StrHash source, string name, bool required)
   return value || !required;
 }
 
+bool validateBoolean(ref strstr value, StrHash source, string name, bool required)
+{
+  bool v;
+  bool x = validateBoolean(v, source, name, required);
+  if (x) value[name] = v?"1":"0";
+  return x;
+}
+
 unittest
 {
   StrHash source;
@@ -654,7 +662,7 @@ bool validateDate
   }
   return true;
 }
-  
+
 //----------------------------------------------------------------------------
 
 unittest
@@ -712,4 +720,33 @@ unittest
   assert(d1.get().toISOExtString() == "2022-07-13");
   assert(!validateOptionalDate(d1,source,"strat"));
 
+}
+
+//----------------------------------------------------------------------------
+// Validates and records into a string[string].
+
+bool validateTime
+(
+  ref strstr value,
+  StrHash source,
+  string name,
+  bool required
+)
+{
+  if (name !in source || source[name].empty)
+  {
+    if (required)
+      return false;
+    value[name] = null;
+  }
+  else try
+  {
+    TimeOfDay.fromISOExtString(source[name]);
+    value[name] = source[name];
+  }
+  catch (DateTimeException e)
+  {
+    return false;
+  }
+  return true;
 }

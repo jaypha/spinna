@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<!--
+  Documentation for Jaypha Spinna.
+  Copyright 2015 Jaypha.
+  Distributed under the Boost Licence.
+  Written by Jason den Dulk.
+-->
+<head>
+ <title>Spinna - Web Server</title>
+ <link rel='stylesheet' type='text/css' href='style.css'>
+</head>
+<body>
+<div class='body'>
+<h1>Interfacing With the Web Server</h1>
+
+<p>Spinna is deisgned with the intention of being usable with any web server
+   or other front end.</p>
+
+<p>You can interface between Spinna and your web server by creating an adapter
+   that declares an instance of
+   <a href='main-process.html'>RequestProcessor</a>.</p>
+
+<p>Spinna provides three created adapters: FCGI, console and Vibe-d.</p>
+
+<h3>FCGI</h3>
+<p>Spinna interfaces with FCGI via the
+   <a href='http://code.dlang.org/packages/fcgi-loop'>fcgi-loop</a> module.
+   The adaptor is defined in <span class='code'>jaypha.spinna.main.fcgi</span>.
+</p>
+
+<p>You set up an FCGI project by importing the jaypha.spinna.main.fcgi module
+into your project. This module defines a <span class='code'>main</span> routine.
+</p>
+
+<p>You would need to define an error handling function, optional pre and post
+processing functions and set the findRouter callback within a shared static
+module constructor.</p>
+
+<p>See also the sample in samples/basic/src/fcgi.d</p>
+
+<h3>Console</h3>
+
+<p>The adaptor defined in <span class='code'>jaypha.spinna.main.console</span>
+   defines a way to call the website application from the console.</p>
+
+<p>The existence of this is for the purpose of debugging. You can run the program
+   through your favorite debugger program.</p>
+
+<p>The console adapter incorporates the
+   <a href='http://code.dlang.org/packages/backtrace-d'>backtrace-d</a> module
+   to provide pretty printed exception traces</p>.
+
+<p>You set up a console project by importing the <span class='code'>jaypha.spinna.main.console</span> module
+into your project. This module defines a <span class='code'>main</span> routine.
+</p>
+
+<p>You would need to define an error handling function, optional pre and post
+processing functions and set the findRouter callback within a shared static
+module constructor.</p>
+
+<p>You use the console executable by providing a full HTTP request via the
+   standard input. An HTTP response is printed to the standard output with error
+   messages printed to standard error.</p>
+
+<p>See also the sample in samples/basic/src/console.d</p>
+
+<h3>Vibe-d</h3>
+
+<p>The <span class='code'>jaypha.spinna.main.vibe</span> adapter provides an
+   interface to a Vibe-d server.</p>
+
+<p>Spinna is a independant framework and thus defines its own request and response
+   stuctures and uses them rather than the ones provided by Vibe-d.</p>
+
+<p>The vibe-d adapter makes use of Vibe-d's default main routine, so the version
+flags of <span class='code'>VibeLibeventDriver</code> and
+<span class='code'>VibeDefaultMain</code> must be set when compiling.</p>
+
+<p>You use the vibe-d adapter similarly to the console and FCGI, except that in
+addition to the other steps, you will need to call <span class='code'>startVibeD</span>.
+This in turn calls <span class='code'>listenTCP_s</span>.</p>
+
+<p>See also the sample in samples/vibed/src/app.d</p>
+
+<h3>See Also</h3>
+<a href='main-process.html'>Main Processing Routine</a>
+
+<p class='footer'>
+Copyright 2015 Jaypha
+</p>
+</div>
+</body>
+</html>

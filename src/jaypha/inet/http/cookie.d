@@ -16,8 +16,6 @@
 
 module jaypha.inet.http.cookie;
 
-import jaypha.string;
-
 import std.array;
 import std.string;
 

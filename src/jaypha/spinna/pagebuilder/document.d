@@ -24,6 +24,7 @@ public import jaypha.spinna.global;
 import std.array;
 import std.conv;
 import std.range;
+import std.traits;
 
 //-----------------------------------------------------------------------------
 
@@ -42,6 +43,8 @@ class Document
   HtmlElement docBody;
 
   bool printXmlDecl = false;
+
+  string comment;       // Primary comment.
 
   this(string pageId = null, string[] classes = null)
   {
@@ -81,13 +84,19 @@ class Document
       output.put("<?xml version='1.0' encoding='"~utfEnc!S~"'?>");
     output.put(`<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">`);
     output.put("\r\n<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>\r\n");
+    if (comment)
+    {
+      output.put("<!--\r\n");
+      output.put(comment);
+      output.put("\r\n-->\r\n");
+    }
     output.put(headBuffer.data);
     output.put(bodyBuffer.data);
     output.put("\r\n</html>");
   }
 }
 
-// Deprecated.
+deprecated("Use Document.copy instead")
 void transfer(S = string)(Document doc, ref HttpResponse response, bool noCache = true)
 {
   doc.copy(response, noCache);

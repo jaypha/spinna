@@ -1,7 +1,15 @@
+# Support makefile include.
+# Declares javascript and scss files, and dub packages used by Spinna.
+# Designed for Fedora. Should be compatible with RPM systems
+#
+# Copyright 2014-15 Jaypha.
+# Distributed under the Boost V1.0 license.
 
 DUB_PACKAGES = backtrace-d-master/source \
                dyaml-0.5.0/source \
-               tinyendian-0.1.1/source
+               tinyendian-0.1.1/source \
+               jaypha-base-1.0.0/src \
+               jaypha-inet-0.9.1/src \
 
 
 JSWFILES = src/jaypha/spinna/pagebuilder/widgets/string.js \
@@ -9,32 +17,42 @@ JSWFILES = src/jaypha/spinna/pagebuilder/widgets/string.js \
            src/jaypha/spinna/pagebuilder/widgets/boolean.js \
            src/jaypha/spinna/pagebuilder/widgets/enum.js \
            src/jaypha/spinna/pagebuilder/widgets/datepicker.js \
-           src/jaypha/spinna/pagebuilder/widgets/dropdown_list.js \
+           src/jaypha/spinna/pagebuilder/widgets/timepicker.js \
+           src/jaypha/spinna/pagebuilder/widgets/dropdownlist.js \
            src/jaypha/spinna/pagebuilder/widgets/autofill.js \
            src/jaypha/spinna/pagebuilder/widgets/decimal.js \
            src/jaypha/spinna/pagebuilder/widgets/calendar.js \
-           src/jaypha/spinna/pagebuilder/widgets/dialog_box.js \
+           src/jaypha/spinna/pagebuilder/widgets/dialogbox.js \
            src/jaypha/spinna/pagebuilder/widgets/selector.js \
            src/jaypha/spinna/pagebuilder/widgets/form.js \
-           src/jaypha/spinna/pagebuilder/widgets/dynamic_widgets.js \
+           src/jaypha/spinna/pagebuilder/widgets/dynamicwidgets.js \
            src/jaypha/spinna/pagebuilder/widgets/icon.js \
-           src/jaypha/spinna/pagebuilder/widgets/icon_button.js \
-           src/jaypha/spinna/pagebuilder/widgets/wide_button.js \
+           src/jaypha/spinna/pagebuilder/widgets/iconbutton.js \
+           src/jaypha/spinna/pagebuilder/widgets/widebutton.js \
            src/jaypha/spinna/pagebuilder/widgets/tabbed.js \
-           src/jquery/jquery-ui.js \
+           src/jaypha/spinna/pagebuilder/formfragment/stdlayout.js \
+           thirdparty/jquery/jquery-ui.js \
            thirdparty/jquery/jquery.caret.js \
-           src/jaypha/spinna/pagebuilder/form_fragment/std_layout.js \
 
 JSFILES = src/jaypha/common.js \
           thirdparty/js_date_format/js_date_format.js
 
 SCSSWFILES = src/jaypha/spinna/pagebuilder/widgets/widgets.scss \
              src/jaypha/spinna/pagebuilder/widgets/calendar.scss \
-             src/jaypha/spinna/pagebuilder/widgets/dialog_box.scss \
+             src/jaypha/spinna/pagebuilder/widgets/dialogbox.scss \
              src/jaypha/spinna/pagebuilder/widgets/icon.scss \
-             src/jaypha/spinna/pagebuilder/widgets/icon_button.scss \
-             src/jaypha/spinna/pagebuilder/widgets/wide_button.scss \
-             src/jaypha/spinna/pagebuilder/widgets/toolbar_ex.scss \
+             src/jaypha/spinna/pagebuilder/widgets/iconbutton.scss \
+             src/jaypha/spinna/pagebuilder/widgets/widebutton.scss \
+             src/jaypha/spinna/pagebuilder/widgets/toolbarex.scss \
              src/jaypha/spinna/pagebuilder/widgets/tabbed.scss \
 
 SCSSFILES = 
+
+
+TESTFILES = testdialog \
+            testrequest \
+            testrouter \
+            testsession \
+            testembed \
+
+

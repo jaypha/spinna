@@ -1,18 +1,24 @@
+# Makefile for compiling makerouter, collecting javascript and scss files,
+# and for creating RPM modules
+# Designed for Fedora. Should be compatible with RPM systems
+#
+# Copyright 2014-15 Jaypha.
+# Distributed under the Boost V1.0 license.
+
 RDMD = rdmd
 
 SPINNA_ROOT = .
-
-
-include makefile.include
-
+DUB_ROOT = $(HOME)/.dub/packages
 BININSTALL = /usr/local/bin
 LIBINSTALL = /usr/local/lib
 
-DUB_ROOT = /home/jason/.dub/packages
+include makefile.include
+
+
 DUB_DIRS = $(addprefix $(DUB_ROOT)/,$(DUB_PACKAGES))
 
-LIBDIR = /usr/lib64/mysql $(DUB_ROOT)/dyaml-0.5.0 .
-LIBS = fcgi dyaml mysqlclient
+LIBDIR = $(DUB_ROOT)/dyaml-0.5.0 .
+LIBS = fcgi dyaml
 
 
 IMPDIR =  $(SPINNA_ROOT)/src $(DUB_DIRS)
@@ -29,7 +35,11 @@ DDFLAGS = $(DFLAGS) -g -debug
 
 LFLAGS = $(LIBFLAGS)
 
-build: bin lib js css
+TESTSRC = $(addprefix $(SPINNA_ROOT)/srctest/,$(TESTFILES))
+
+build: bin res
+
+res: css js
 
 css: res/_spinna.scss res/_spinna_no_widgets.scss
 
@@ -48,8 +58,6 @@ makerouter: src/makerouter.d
 	$(RDMD) $(DDFLAGS) $(LFLAGS) -ofmakerouter --build-only src/makerouter.d
 
 # --------------------------
-
-# --------------------------
 # This is for installing support programs, not finished software.
 
 install:
@@ -64,29 +72,34 @@ clean:
 	rm -f lib/*
 	rm -f res/*
 
+#----------------------------------------------------
+# Javascript and css resources
+
 res/spinna.js: $(JSFILES) $(JSWFILES)
 	js -C $(addprefix -f ,$(JSFILES)) $(addprefix -f ,$(JSWFILES))
 	cat $(JSFILES) $(JSWFILES) > res/spinna.js
 
 res/spinna_no_widgets.js: $(JSFILES)
 	js -C $(addprefix -f ,$(JSFILES))
-	cat $(JSFILES) > res/spinna_no_widgets.js
+	cat $(JSFILES) > res/spinnanowidgets.js
 
 res/_spinna.scss: $(SCSSFILES) $(SCSSWFILES)
 	cat $(SCSSFILES) $(SCSSWFILES) > res/_spinna.scss
 
 res/_spinna_no_widgets.scss: $(SCSSFILES)
-	#cat $(SCSSFILES) > res/_spinna_no_widgets.scss
-	touch res/_spinna_no_widgets.scss
-
-test:
-	$(RDMD) $(DDFLAGS) $(LFLAGS) -J./src_test -unittest src_test/test_main.d
+	#cat $(SCSSFILES) > res/_spinnanowidgets.scss
+	touch res/_spinnanowidgets.scss
 
 #----------------------------------------------------
-# debug builds
+# Test programs for code that cannot be tested with unittest.
 
-http_request:
-	$(RDMD) $(DDFLAGS) $(LFLAGS) --build-only -debug=http_request -unittest -ofrequest src/jaypha/spinna/request.d
+test:
+	for i in $(TESTFILES); do \
+		echo $$i; \
+	$(RDMD) -I./srctest $(DDFLAGS) $(LFLAGS) -of./bin/$$i -J./srctest -unittest ./srctest/$$i.d ; \
+	done
+	echo finished testing
+
 
 #----------------------------------------------------
 # Install for rpm
@@ -107,4 +120,3 @@ rpminstall: build
 	cp -R thirdparty $(DESTDIR)/usr/include/spinna
 	cp -R licenses $(DESTDIR)/usr/include/spinna
 	cp -R res $(DESTDIR)/usr/include/spinna
-	cp lib/libfig.a $(DESTDIR)/usr/lib64

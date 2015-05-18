@@ -92,7 +92,7 @@ class Paginator(string tpl) : Component
 
 //----------------------------------------------------------------------------
 
-auto paginator(string tpl = "jaypha/spinna/pagebuilder/lists/paginator_default.tpl")(string n, string b, ref StrHash r)
+auto paginator(string tpl = "jaypha/spinna/pagebuilder/lists/paginatordefault.tpl")(string n, string b, ref StrHash r)
 {
   return new Paginator!tpl(n,b,r);
 }

@@ -1,6 +1,6 @@
 //Written in the D programming language
 /*
- * This module has functions to read/write data to a serialize string.
+ * Serializes data to and from strings.
  *
  * It does not support the ability to read/write objects, but does
  * support arrays and associative arrays.
@@ -98,7 +98,7 @@ string serialize(T:T[])(T[] value)
 
 string serialize(T:T[U],U)(T[U] value)
 {
-  auto x = appender!(string);
+  auto x = appender!string();
   formattedWrite(x,"o%d",value.length);
   foreach (idx,val; value)
   {

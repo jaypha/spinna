@@ -1,0 +1,54 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<!--
+  Documentation for Jaypha Spinna.
+  Copyright 2015 Jaypha.
+  Distributed under the Boost Licence.
+  Written by Jason den Dulk.
+-->
+<head>
+ <title>Spinna - Introduction</title>
+ <link rel='stylesheet' type='text/css' href='../style.css'>
+</head>
+<body>
+<div class='body'>
+<h1>How To Create a Basic FCGI Website</h1>
+
+<p>It is assumed that you already know how to:</p>
+<ul>
+  <li>Construct a project in your chosen environment.</li>
+  <li>Setup your web server for use with FCGI.</li>
+</ul>
+<p>Do the following</p>
+<ul>
+  <li>Install Spinna and fcgi-loop</li>
+  <li>Create a project.</li>
+  <li>Copy config/general.d into your project.</li>
+  <li>Create a module source file.</li>
+  <li>Import <span class='code'>jaypha.spinna.main.fcgi</span></li>
+  <li>Create functions for error handling, pre processing and post processing (if desired)</li>
+  <li>Inside a shared static this(), assign function handlers to fcgiRequestProcessor.</li>
+  <li>Create modules and functions to process the requests.</li>
+  <li>You will need to create a YAML router definition file. (see Router Definition and Usage)</li>
+  <li>Compile the project.</li>
+  <li>Put the generated program into your website.</li>
+</ul>
+
+<p>A Sample exists in samples/basic to serve as a guide.</p>
+
+<h4>Note</h4>
+
+<p>The fcgi loop interface works by creating a number of threads and reusing those threads
+for new requests. Any global variables set during a process will carry on to the next
+request. Therefore it is important to ensure that any global variables used are reset
+between requests. Any global variables used by the framework are automatically reset
+by the framework.</p>
+
+<p class='footer'>
+Copyright 2015 Jaypha
+</p>
+</div>
+</body>
+</html>
