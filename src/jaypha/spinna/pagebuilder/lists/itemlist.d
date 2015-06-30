@@ -26,7 +26,7 @@ import jaypha.algorithm;
 import jaypha.datasource;
 
 
-class ItemList(DS) : ListComponent if(isDataSource!(DS))
+class ItemListComponent(DS) : ListComponent if(isDataSource!(DS))
 {
   alias DataSourceElementType!DS E;
 
@@ -49,7 +49,7 @@ class ItemList(DS) : ListComponent if(isDataSource!(DS))
     mapper = _mapper;
   }
 
-  void copy(TextOutputStream output)
+  override void copy(TextOutputStream output)
   {
     assert(listItem !is null);
 
@@ -67,9 +67,11 @@ class ItemList(DS) : ListComponent if(isDataSource!(DS))
     size_t _start, _limit;
 }
 
+alias ItemListComponent ItemList;
+
 interface ListItem : Component
 {
-  @property void set(strstr);
+  void set(strstr);
 }
 
 class TemplateListItem(string tpl) : ListItem
@@ -77,9 +79,9 @@ class TemplateListItem(string tpl) : ListItem
   size_t count = 0;
 
   private strstr item;
-  @property void set(strstr data) { item = data; }
+  override void set(strstr data) { item = data; }
   
-  void copy(TextOutputStream output)
+  override void copy(TextOutputStream output)
   {
     with (output)
     {
@@ -87,4 +89,6 @@ class TemplateListItem(string tpl) : ListItem
     }
     ++count;
   }
+
+  @property string opDispatch(string s)() { assert(s in item,s~" not in item"); return item[s]; }
 }

@@ -24,6 +24,15 @@ h1 { font-size: 22px; color: red; }
 h2 { font-size: 18px; color: red; }
 h3 { font-size: 15px; color: red; }
 
+.header
+{
+  padding: 10px 0;
+  border-bottom: 1px solid grey;
+  margin-bottom: 0.7em;
+  line-height:24px;
+  text-align:center;
+}
+
 table
 {
   border-collapse: collapse;
@@ -52,6 +61,7 @@ td, th
 {
   text-align: center;
   border-top: 1px solid grey;
+  padding-top: 5px;
 }
 .body
 {

@@ -68,5 +68,5 @@ enum matchFilePattern(string root, string rx, string method, string action)
 =
 "{auto m = match(path, "~rx~");"
 "if (m && method == \"get\") { auto fileName = \""~root~"\"~path;"
-"if (exists(fileName) && isFile(fileName)) return ActionInfo(\""~action~"\", () { jaypha.spinna.fileStreamer.streamFile(fileName); });"
+"if (exists(fileName) && isFile(fileName)) return ActionInfo(\""~action~"\", () { jaypha.spinna.filestreamer.streamFile(fileName); });"
 "}}";

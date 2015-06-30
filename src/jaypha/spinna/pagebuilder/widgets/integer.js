@@ -1,3 +1,4 @@
+// Written in Javascript
 /*
  * JS for integer widgets.
  *
@@ -9,10 +10,12 @@
  * Authors: Jason den Dulk
  */
 
-function make_integer_widget(name, options)
+function makeIntegerWidget(id, name, def, value)
 {
-  var jq = $("<input type='text' class='widget integer-widget' name='"+name+" id='"+name+"'/>");
-  new StringWidget(jq,options);
+  var jq = $("<input type='text' class='widget integer-widget' name='"+name+" id='"+id+"'/>");
+  new IntegerWidget(jq,def);
+  if (typeof value != 'undefined')
+    jq.val(value);
   return jq;
 }
 

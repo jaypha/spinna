@@ -17,6 +17,7 @@ import jaypha.types;
 import jaypha.spinna.global;
 
 import std.array;
+import std.string;
 
 //---------------------------------------------------------------------------
 // readbackInfo creates a string containing information about the request.
@@ -69,6 +70,18 @@ string readbackInfo()
     s.put(i~": ");
     foreach (j,cs;ac)
       s.put(j~"="~cs~", ");
+    s.put("\n");
+  }
+
+  s.put("** File Uploads **\n");
+
+  foreach (i,files;request.files.all)
+  {
+    s.put(i~": ");
+    foreach(f;files)
+    {
+      s.put(format("name=%s size=%d mime=%s,",f.fileName,f.size,f.type.mimeType));
+    }
     s.put("\n");
   }
 

@@ -70,7 +70,8 @@ clean:
 	rm -f makerouter
 	rm -f bin/*
 	rm -f lib/*
-	rm -f res/*
+	rm -f res/*.scss
+	rm -f res/*.js
 
 #----------------------------------------------------
 # Javascript and css resources

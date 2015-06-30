@@ -1,11 +1,20 @@
 .simple-toolbar * { margin-right: 5px; }
 
-input.widget, .selector-search, .boolean-widget, .sort-widget, .selector-box, .text-widget, .dropselect-widget
+//----------------------------------------------------------------------------
+// Generic input box style
+
+.input-box
 {
   border: $widget-border;
   border-radius: $widget-corner;
   padding: $widget-padding;
   background-color: white;
+}
+
+input.widget, .selector-search, .sort-widget, .selector-box,
+.text-widget, .dropselect-widget
+{
+  @extend .input-box;
 }
 
 /* String -----------------------------------------------------------------*/
@@ -16,6 +25,7 @@ input.widget, .selector-search, .boolean-widget, .sort-widget, .selector-box, .t
 
 .boolean-widget
 {
+  @extend .input-box;
   border-radius:4px;
   padding: 2px;
   font-family: arial;
@@ -24,7 +34,6 @@ input.widget, .selector-search, .boolean-widget, .sort-widget, .selector-box, .t
   width: 30px;
   height:12px;
   text-align:center;
-  background-color: white;
 }
 
 /* Selector ---------------------------------------------------------------------*/

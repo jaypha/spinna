@@ -6,8 +6,8 @@ DUB_ROOT = $(HOME)/.dub/packages
 
 DUB_PACKAGES = backtrace-d-master/source \
                fcgi-loop-1.2.0/src \
-               jaypha-base-1.0.0/src \
-               jaypha-inet-0.9.1/src \
+               jaypha-base-1.0.1/src \
+               jaypha-inet-0.9.5/src \
 
 
 SPINNA_ROOT = ../..

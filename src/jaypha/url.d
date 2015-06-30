@@ -45,4 +45,9 @@ unittest
   x = addQueryParm(x, "a", "b");
   x = addQueryParm(x, "df", "y=&4");
   assert(x == "abc.com?a=b&df="~encodeComponent("y=&4"));
+
+  strstr stuff = [ "m" : "12", "n" : "@ word", "q#" : "io" ];
+  x = addQueryParms("xyz.com", stuff);
+  import std.stdio;
+  writeln(x);
 }

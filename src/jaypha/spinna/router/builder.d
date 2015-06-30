@@ -218,7 +218,7 @@ struct RouterBuilder
 
   void processServeFiles(ref Context context, string pattern)
   {
-    modules.put("jaypha.spinna.fileStreamer");
+    modules.put("jaypha.spinna.filestreamer");
     stdModules.put("std.file");
 
     auto place = regexs.put(pattern);

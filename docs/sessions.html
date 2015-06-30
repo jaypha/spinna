@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<!--
+  Documentation for Jaypha Spinna.
+  Copyright 2015 Jaypha.
+  Distributed under the Boost Licence.
+  Written by Jason den Dulk.
+-->
+<head>
+ <title>Spinna - Introduction</title>
+ <link rel='stylesheet' type='text/css' href='style.css'>
+</head>
+<body>
+<div class='body'>
+<div class='header'>
+ <img style='float:right' src='jaypha-94x24.gif'/>
+ <a href='_docs.html'><img style='float:left' src='spinna-70x24.png'/></a>
+ <div style='clear:both' ></div>
+</div>
+<h1>Sessions</h1>
+
+<p>Spinna sessions are handled by the Session struct in module jaypha.spinna.session.</p>
+
+<p>A session is made up of a number of Activity instances which, in turn, is made up
+of a number of values. You access a value using the index operator and get/set methods</p>
+
+<p><b>Example</b>
+
+<pre class='code p'>
+session["activity"].set!string("name", "value");
+string value = session["activity"].get!string("name");
+</pre>
+
+<p>Spinna sessions can store values of base types as well as arrays. It cannot store
+class or struct objects.</p>
+
+<p>jaypha.spinna.global defines a session variable which is used.</p>
+
+<p>Loading and saving of jaypha.spinna.global.session is handled by the framework.
+When you access the seesion fro the first time, it will create/load the session.
+If the session has been activated, it will save at the end of the execution.</p>
+
+<p>Sessions are stored in files in the directory specified in config.general.sessionDir.
+Session values are serialised using jaypha.io.serialize</p>
+
+<h3>Session ID</h3>
+
+<p>Session IDs are generated randomly and checked for uniqueness. The session ID
+also form the filename when stored. The ID is sent as a session cookie
+("SPINNA_SESSION") to the user's browser, and is read from the cookie sent with
+requests.</p>
+
+<h3>Expiry</h3>
+
+<p>Spinna session utilise a soft expiry. Once the timeout has passed, the session
+is marked as expired but it is not deleted. This was done by request to allow
+sessions to be reactivated.</p>
+
+<p class='footer'>
+Copyright 2015 Jaypha
+</p>
+</div>
+</body>
+</html>

@@ -14,6 +14,12 @@
 </head>
 <body>
 <div class='body'>
+<div class='header'>
+ <img style='float:right' src='../jaypha-94x24.gif'/>
+ <a href='../_docs.html'><img style='float:left' src='../spinna-70x24.png'/></a>
+ <a href='_index.html'>Back</a>
+ <div style='clear:both' ></div>
+</div>
 <h1>How To Create a Basic FCGI Website</h1>
 
 <p>It is assumed that you already know how to:</p>
@@ -25,11 +31,11 @@
 <ul>
   <li>Install Spinna and fcgi-loop</li>
   <li>Create a project.</li>
-  <li>Copy config/general.d into your project.</li>
-  <li>Create a module source file.</li>
+  <li>Copy <span class='code'>config/general.d</span> into your project. Edit it if desired.</li>
+  <li>Create an app source file.</li>
   <li>Import <span class='code'>jaypha.spinna.main.fcgi</span></li>
   <li>Create functions for error handling, pre processing and post processing (if desired)</li>
-  <li>Inside a shared static this(), assign function handlers to fcgiRequestProcessor.</li>
+  <li>Inside a <span class='code'>shared static this()</span>, assign function handlers to <span class='code'>fcgiRequestProcessor</code>.</li>
   <li>Create modules and functions to process the requests.</li>
   <li>You will need to create a YAML router definition file. (see Router Definition and Usage)</li>
   <li>Compile the project.</li>

@@ -55,8 +55,9 @@ struct Hash(T)
 
   //--------------------------------------------------------------------------
 
-  Hash!(T) rehash() { a.rehash; return this; } // TODO does rehash modify the original array? If not then use the one below.
-  //Hash!(T) rehash() { auto p = Hash!(T)(); p.a = a.rehash; return p; }
+  // TODO does rehash modify the original array? If not then use the other one.
+  Hash!(T) rehash() { a.rehash; return this; }
+  //Hash!(T) rehash() { Hash p; p.a = a.rehash; return p; }
 
   //--------------------------------------------------------------------------
   // Deep copy constructor.

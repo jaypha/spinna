@@ -16,11 +16,10 @@
   validateString
   validateRequiredInteger
   validateOptionalInteger
-  validateRequiredDecimal
-  validateOptionalDecimal
   validateBoolean
   validateSingleEnumerated
   validateMultipleEnumerated
+  validateFileUpload
   validateOptionalDate
   validateRequiredDate
   validateDate
@@ -32,7 +31,6 @@ module jaypha.spinna.validate;
 
 import jaypha.types;
 public import jaypha.container.hash;
-import jaypha.decimal;
 
 import std.conv;
 import std.regex;
@@ -282,128 +280,6 @@ unittest
 //----------------------------------------------------------------------------
 // Returns - whether the validation succeded.
 
-bool validateRequiredDecimal(uint scale)
-(
-  out decimal!scale value,
-  StrHash source,
-  string name,
-  decimal!scale min = decimal!scale.min,
-  decimal!scale max = decimal!scale.max
-)
-{
-  Nullable!(decimal!scale) v;
-  if (!validateOptionalDecimal!scale(v,source, name, min, max))
-    return false;
-
-  if (v.isNull)
-    return false;
-  value = v.get();
-  return true;
-}
-
-//----------------------------------------------------------------------------
-// Returns - whether the validation succeded.
-
-bool validateOptionalDecimal(uint scale)
-(
-  out Nullable!(decimal!scale) value,
-  StrHash source,
-  string name,
-  decimal!scale min = decimal!scale.min,
-  decimal!scale max = decimal!scale.max
-)
-{
-  if (name !in source || source[name].length == 0)
-  {
-    value.nullify();
-    return true;
-  }
-  else
-  {
-    decimal!scale x;
-    auto r = regex(r"^[+-]?\d+(.\d{1,"~to!string(scale)~"})?$");
-    auto m = match(source[name],r);
-    if (!m)
-      return false;
-    x = source[name];
-    value = x;
-    return (value.get() >= min && value.get() <= max);
-  }
-}
-
-//----------------------------------------------------------------------------
-
-unittest
-{
-  StrHash source;
-
-  source["wip"] = "";
-  source["zip"] = "64";
-  source["dip"] = "2.3";
-  source["rip"] = "3.06";
-  source["yip"] = "-1533.99";
-  source["bip"] = "0";
-
-  source["trip"] = "87.341";
-  source["quip"] = "honk";
-  source["towick"] = "46gzigmontiqu";
-  source["thick"] = "gzigm7.8ontiqu";
-
-  source["sip"] = [ "-34", "zank" ];
-  source["strat"] = [ "tonk", "15" ];
-
-
-  Nullable!dec2 nv;
-  dec2 v;
-
-  assert(!validateRequiredDecimal!2(v, source, "yak"));
-  assert(validateOptionalDecimal!2(nv, source, "yak"));
-  assert(nv.isNull);
-
-  assert(!validateRequiredDecimal!2(v, source, "wip"));
-  assert(validateOptionalDecimal!2(nv, source, "wip"));
-  assert(nv.isNull);
-
-  assert(validateRequiredDecimal!2(v, source, "zip"));
-  assert(v == 64);
-
-  assert(validateOptionalDecimal!2(nv, source, "zip"));
-  assert(nv.get() == 64);
-
-  assert(validateOptionalDecimal!2(nv, source, "dip"));
-  assert(nv.get() == 2.3);
-
-  assert(validateOptionalDecimal!2(nv, source, "rip"));
-  assert(nv.get() == 3.06);
-
-  assert(validateOptionalDecimal!2(nv, source, "yip"));
-  assert(nv.get() == -1533.99);
-
-  assert(validateOptionalDecimal!2(nv, source, "bip"));
-  assert(nv.get() == 0);
-
-  assert(!validateOptionalDecimal!2(nv, source, "trip"));
-  assert(!validateOptionalDecimal!2(nv, source, "quip"));
-  assert(!validateOptionalDecimal!2(nv, source, "towick"));
-  assert(!validateOptionalDecimal!2(nv, source, "thick"));
-
-  assert(validateOptionalDecimal!2(nv, source, "sip"));
-  assert(nv.get() == -34);
-
-  assert(!validateOptionalDecimal!2(nv, source, "strat"));
-
-  dec2 min, max;
-  min = 2.5;
-  max = 4.1;
-
-  assert(!validateOptionalDecimal!2(nv, source, "dip", min, max));
-  assert(!validateOptionalDecimal!2(nv, source, "zip", min, max));
-  assert(validateOptionalDecimal!2(nv, source, "rip", min, max)); 
-}
-
-//----------------------------------------------------------------------------
-// Returns - whether the validation succeded.
-
 /*
  * For booleans, 'required' means that the value must be true, as opposed to
  * other widget types, where 'required' means 'not empty'.
@@ -584,6 +460,30 @@ unittest
   assert(vv == source("strat"));
   assert(!validateMultipleEnumerated(vv, source, "strat", options, 3));
   assert(!validateMultipleEnumerated(vv, source, "strat", options, 0,1));
+}
+
+//----------------------------------------------------------------------------
+// Returns - whether the validation succeded.
+
+import jaypha.spinna.request;
+
+bool validateFileUpload
+(
+  out HttpFileUpload value,
+  HttpRequest request,
+  string name,
+  bool required,
+)
+{
+  if (name in request.files)
+  {
+    if (request.files[name].fileName)
+    {
+      value = request.files[name];
+      return true;
+    }
+  }
+  return !required;
 }
 
 //----------------------------------------------------------------------------

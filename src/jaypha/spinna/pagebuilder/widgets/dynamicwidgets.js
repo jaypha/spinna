@@ -38,6 +38,10 @@ function makeWidgetFromMeta(idPrefix, metadata)
     case "enum":
       jq = makeDropdownListWidget(idPrefix+metadata.name, metadata.name, metadata, metadata.options, metadata.default);
       break;
+    //-----------
+    case "integer":
+      jq = makeIntegerWidget(idPrefix+metadata.name, metadata.name, metadata, metadata.options, metadata.default);
+      break;
   }
 
   return jq;

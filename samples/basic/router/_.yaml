@@ -28,4 +28,4 @@ routes:
   readback:
     pattern: /readback
     module: "jaypha.spinna.readback"
-    get: getReadback
+    service: getReadback

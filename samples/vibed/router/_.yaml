@@ -9,6 +9,9 @@ routes:
     pattern: /
     get: getHome
 
+  files:
+    serveFiles: .*
+
   html:
     pattern: /html
     get: getHtml

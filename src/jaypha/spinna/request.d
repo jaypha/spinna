@@ -19,6 +19,7 @@ module jaypha.spinna.request;
 
 import jaypha.types;
 import jaypha.string;
+import jaypha.range;
 import jaypha.container.hash;
 import jaypha.io.lines;
 
@@ -26,8 +27,8 @@ public import jaypha.inet.http.exception;
 import jaypha.inet.http.cookie;
 
 import jaypha.inet.mime.reading;
-import jaypha.inet.mime.content_type;
-import jaypha.inet.mime.content_disposition;
+import jaypha.inet.mime.contenttype;
+import jaypha.inet.mime.contentdisposition;
 
 import std.uri;
 import std.array;
@@ -44,10 +45,15 @@ class HttpFileUpload
 {
   ulong size;
   File file;
-  string file_name;
-  string client_name;
+  string fileName;
   MimeContentType type;
+  deprecated @property string clientName() { return fileName; }
+
+  this() { file = File.tmpfile(); }
+  ~this() { file.close(); }
 }
+
+alias Hash!HttpFileUpload FileHash;
 
 //-----------------------------------------------------------------------------
 struct HttpRequest
@@ -60,7 +66,7 @@ struct HttpRequest
   @property StrHash request() { if (isPost()) return posts; else return gets; }
 
   HttpCookie[string] cookies;
-  HttpFileUpload[string] files;
+  FileHash files;
 
   ByteArray rawInput;
 
@@ -95,7 +101,7 @@ struct HttpRequest
     gets.clear();
     posts.clear();
     cookies = cookies.init;
-    files = files.init;
+    files.clear();
     rawInput = rawInput.init;
     environment = environment.init;
   }
@@ -129,7 +135,7 @@ void prepare(IRange)(ref HttpRequest request, strstr env, IRange input)
       // artificially end it.
       auto t = take(input, to!(size_t)(env["CONTENT_LENGTH"]));
 
-      if (contentType.type == "multipart/form-data")
+      if (contentType.mimeType == "multipart/form-data")
       {
         if (!("boundary" in contentType.parameters))
           throw new HttpException("malformed Content-Type");
@@ -140,7 +146,7 @@ void prepare(IRange)(ref HttpRequest request, strstr env, IRange input)
         auto a = appender!(immutable(ubyte)[])();
         t.copy(a);
         
-        if (contentType.type == "application/x-www-form-urlencoded")
+        if (contentType.mimeType == "application/x-www-form-urlencoded")
         {
           request.posts = extractPosts(cast(string)a.data);
         }
@@ -242,13 +248,18 @@ void parseForm(IRange)(ref HttpRequest request, IRange input, string boundary)
 
     if ("filename" in disp.parameters)
     {
-      request.files[name] = new HttpFileUpload();
-      request.files[name].client_name = disp.parameters["filename"];
-      request.files[name].file = File.tmpfile();
-      partReader.content.copy(request.files[name].file.lockingTextWriter);
-      request.files[name].file.flush();
-      request.files[name].size = request.files[name].file.size;
-      request.files[name].type = ct;
+      auto upload = new HttpFileUpload();
+      
+      upload.fileName = disp.parameters["filename"];
+      //upload.file.rawWrite(array(partReader.content));
+      foreach (chunk; partReader.content.byChunk(4096))
+        upload.file.rawWrite(array(chunk));
+      //partReader.content.copy(upload.file.lockingTextWriter);
+      upload.file.flush();
+      upload.file.rewind();
+      upload.size = upload.file.size;
+      upload.type = ct;
+      request.files.add(name, upload);
     }
     else
     {

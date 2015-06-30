@@ -61,7 +61,7 @@ abstract class Widget : HtmlElement
   JSONValue toJson() { return JSONValue(null); }
 }
 
-class WidgetComponent(alias tpl = "jaypha/spinna/pagebuilder/widgets/default_widgets.tpl") : Component
+class WidgetComponent(alias tpl) : Component
 {
   string id;
   Widget[] widgets;

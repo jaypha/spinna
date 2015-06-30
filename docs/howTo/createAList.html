@@ -12,17 +12,25 @@
 </head>
 <body>
 <div class='body'>
+<div class='header'>
+ <img style='float:right' src='../jaypha-94x24.gif'/>
+ <a href='../_docs.html'><img style='float:left' src='../spinna-70x24.png'/></a>
+ <a href='_index.html'>Back</a>
+ <div style='clear:both' ></div>
+</div>
 <h1>How To Create A List in Pagebuilder</h1>
 
 
-<h4>Imported Modules</h4>
+<h4>Relevant Modules</h4>
 
 <p>
- jaypha.spinna.pagebuilder.lists.table_list<br/>
- jaypha.spinna.pagebuilder.lists.paged_list (if using pagination)
+ <span class='code'>jaypha.datasource</code><br/>
+ <span class='code'>jaypha.spinna.pagebuilder.lists.itemlist</code><br/>
+ <span class='code'>jaypha.spinna.pagebuilder.lists.tablelist</code><br/>
+ <span class='code'>jaypha.spinna.pagebuilder.lists.pagedlist</code> (if using pagination)
 </p>
 
-<h4>Do the following</h4>
+<h3>Do the following</h3>
 
 <ol>
 <li><p>Define a data source.</p>
@@ -45,13 +53,13 @@
 </ol>
 <h3>Example</h3>
 
-<pre class='code'>
+<pre class='code p'>
 string[string][] sourceData = getDataFromSomewhere();
 
 string[] mapper(string[string] sourceRow)
 {
   // The order of the returning array is the order it will be displayed in the
-  // list table.
+  // list table's row.
 
   return
   [

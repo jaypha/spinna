@@ -20,7 +20,6 @@ JSWFILES = src/jaypha/spinna/pagebuilder/widgets/string.js \
            src/jaypha/spinna/pagebuilder/widgets/timepicker.js \
            src/jaypha/spinna/pagebuilder/widgets/dropdownlist.js \
            src/jaypha/spinna/pagebuilder/widgets/autofill.js \
-           src/jaypha/spinna/pagebuilder/widgets/decimal.js \
            src/jaypha/spinna/pagebuilder/widgets/calendar.js \
            src/jaypha/spinna/pagebuilder/widgets/dialogbox.js \
            src/jaypha/spinna/pagebuilder/widgets/selector.js \

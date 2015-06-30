@@ -24,18 +24,22 @@ import std.conv;
 
 //----------------------------------------------------------------------------
 
-void streamFile(string fileName)
+void streamFile(string fileName, string mimeType = null)
 {
   try
   {
     auto f = File(fileName,"r");
     response.stream = new FileStreamer(fileName, 4096);
-    response.contentType(fileMimeType(fileName));
+    if (mimeType !is null)
+      response.contentType(mimeType);
+    else
+      response.contentType(fileMimeType(fileName));
     response.header("Content-Length", to!string(getSize(fileName)));
   }
   catch (Exception e)
   {
-    throw new HttpException("File not found",404);
+    throw new HttpException(e.msg,404);
+    //throw new HttpException("File not found",404);
   }
 }
 

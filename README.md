@@ -12,7 +12,7 @@ Features
 - Sessions
 - Pagebuilder classes to construct HTML.
 - Widget library with client side validation etc.
-- Templates - Embed D code inside text.
+- Templates. Embed D code inside text.
 
 * Spinna's main processor function is designed to be independant of any particular server.
 Adapters are available for FCGI, console and Vibe-d.
